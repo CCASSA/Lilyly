@@ -19,5 +19,8 @@ Existing `lilyly_secure` encrypted preferences, key alias, application ID and al
 ## Build controls
 `cycle-milestone.yml` builds `android/`, runs unit tests and uploads APK plus test reports. It runs manually or when `.github/build-request.txt` is deliberately changed on main. Ordinary commits do not trigger builds. The two legacy workflows remain manual and still reconstruct the untouched bundles, so they build the old prototype, not this milestone.
 
+## Safe preview installation
+The `preview` build type uses the same source with application ID `com.lilyly.app.preview` and label **Lilyly Garden Preview**. It installs beside the original Lilyly and starts with its own empty records. It cannot read or modify the original app's data. This is a test variant, not a replacement project. Use it when the original signing key is unavailable. The normal debug APK retains the original ID but is not guaranteed to install over the earlier build.
+
 ## Device acceptance checklist
 Install as an update only if Android accepts the signature. Check existing journal/cycle/therapy/medication records; month navigation and historical edit; bleeding vs spotting; saved selections and notes after relaunch; close-with-unsaved-changes dialog; settings persistence; pregnancy pause and hormonal fertility suppression; no-history/overdue/irregular states; graph missing days; keyboard/rotation/large text; light and dark themes. Compilation is not visual/device acceptance.

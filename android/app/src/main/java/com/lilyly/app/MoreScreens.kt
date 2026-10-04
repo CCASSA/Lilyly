@@ -249,12 +249,10 @@ fun SettingsScreen(store: AppStore, onBack: () -> Unit) {
                     }
                 }
             }
-            item { SettingToggle("Biometric lock", "UI planned; enforcement comes next", false) {} }
-            item { DisabledSetting("Encrypted backup", "Optional backup/restore — coming next") }
-            item { DisabledSetting("Export my data", "Full archive + print-perfect PDFs — coming next") }
-            item { DisabledSetting("Pinterest", "Connect boards and import inspiration — requires Pinterest developer access") }
-            item { DisabledSetting("Spotify", "Attach tracks/playlists to pages — authorization required") }
-            item { DisabledSetting("Health Connect", "Optional cycle, sleep and wellness links — permission based") }
+            item {
+                Text("Device protection", fontWeight = FontWeight.SemiBold)
+                Text("Lilyly does not yet require a separate app lock. Use your phone's screen lock. Keep this installation: export and restore are not available in this build.", style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }

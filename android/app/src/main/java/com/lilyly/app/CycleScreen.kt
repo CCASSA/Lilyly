@@ -213,7 +213,7 @@ private fun CycleWheel(today: LocalDate, pattern: CyclePattern, prefs: CyclePref
             Text("✧", color = ink, fontSize = 24.sp)
             Text(subtitle, style = MaterialTheme.typography.labelSmall, letterSpacing = 1.sp, textAlign = TextAlign.Center)
             Text(title, fontFamily = FontFamily.Serif, fontSize = 30.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 6.dp))
-            Text(if (state.day != null) "Cycle day ${state.day}" else "A space to listen", style = MaterialTheme.typography.bodySmall)
+            Text(if (state.day != null) "Day ${state.day} · ${state.phase.removeSuffix(" phase")}" else "A space to listen", style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
             Spacer(Modifier.height(10.dp))
             FilledTonalButton(onClick = onLog) { Text("Log today") }
             if (until != null && until in 1..prefs.pmsDays && prefs.mode != "Pregnancy") Text("Possible premenstrual days", style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center)

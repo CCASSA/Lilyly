@@ -10,13 +10,22 @@ android {
 
     defaultConfig {
         applicationId = "com.lilyly.app"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         minSdk = 26
         targetSdk = 36
         versionCode = 2
         versionName = "0.2.0-cycle-garden"
+        manifestPlaceholders["appLabel"] = "Lilyly"
     }
 
     buildTypes {
+        create("preview") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".preview"
+            versionNameSuffix = "-preview"
+            manifestPlaceholders["appLabel"] = "Lilyly Garden Preview"
+            matchingFallbacks += listOf("debug")
+        }
         release {
             isMinifyEnabled = false
         }
@@ -50,6 +59,9 @@ dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2025.08.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.activity:activity-compose:1.10.1")

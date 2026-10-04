@@ -217,20 +217,6 @@ fun JournalEditorScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            item {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Spotify soundtrack", style = MaterialTheme.typography.bodyMedium)
-                    Text("Coming next", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium)
-                }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Pinterest scrapbook drawer", style = MaterialTheme.typography.bodyMedium)
-                    Text("Coming next", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium)
-                }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Print-perfect A5 export", style = MaterialTheme.typography.bodyMedium)
-                    Text("Coming next", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium)
-                }
-            }
             if (confirmDelete) {
                 item {
                     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
