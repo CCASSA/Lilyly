@@ -29,10 +29,8 @@ jobs:
           from pathlib import Path
           p = Path("build-src/Lilyly/app/build.gradle.kts")
           s = p.read_text()
-          if "import org.jetbrains.kotlin.gradle.dsl.JvmTarget" not in s:
-              s = s.replace("import java.util.Properties\n", "import java.util.Properties\nimport org.jetbrains.kotlin.gradle.dsl.JvmTarget\n")
           s = s.replace('    kotlinOptions {\n        jvmTarget = "17"\n    }\n', '')
-          block = '''\nkotlin {\n    compilerOptions {\n        jvmTarget.set(JvmTarget.JVM_17)\n    }\n}\n'''
+          block = '''\nkotlin {\n    compilerOptions {\n        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)\n    }\n}\n'''
           if "compilerOptions" not in s:
               s = s.replace("\ndependencies {\n", block + "\ndependencies {\n")
           p.write_text(s)
