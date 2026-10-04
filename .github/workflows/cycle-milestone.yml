@@ -1,0 +1,44 @@
+name: Lilyly Milestone APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/build-request.txt']
+concurrency:
+  group: lilyly-milestone
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Prepare the known-working Android SDK
+        run: |
+          SDKMANAGER=/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Preserve debug signing across milestone builds
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: lilyly-debug-signing-v1
+      - name: Test and assemble the milestone
+        run: gradle -p android :app:testDebugUnitTest :app:assembleDebug --stacktrace
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Lilyly-test-results
+          path: android/app/build/reports/tests/testDebugUnitTest
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lilyly-0.2.0-cycle-garden-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
