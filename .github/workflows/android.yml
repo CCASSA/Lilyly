@@ -1,10 +1,6 @@
 name: Build Lilyly Android APK
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - ".github/workflows/android.yml"
   workflow_dispatch:
 
 jobs:
