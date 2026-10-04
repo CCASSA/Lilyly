@@ -39,6 +39,23 @@ jobs:
           s = s.replace('androidx.lifecycle:lifecycle-runtime-ktx:2.11.0', 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.2')
           s = s.replace('io.coil-kt.coil3:coil-compose:3.6.3', 'io.coil-kt.coil3:coil-compose:3.2.0')
           p.write_text(s)
+
+          base = Path("build-src/Lilyly/app/src/main/java/com/lilyly/app")
+          for name in ["HomeScreens.kt", "MoreScreens.kt", "SanctuaryScreen.kt"]:
+              f = base / name
+              t = f.read_text().replace("import androidx.compose.foundation.layout.weight\n", "")
+              f.write_text(t)
+
+          f = base / "MoreScreens.kt"
+          t = f.read_text()
+          t = t.replace('''                    items(listOf("Cottage", "Gothic", "Celestial", "Botanical")) { mood ->\n                        item { FilterChip(selected = style == mood, onClick = { style = mood }, label = { Text(mood) }) }\n                    }''', '''                    items(listOf("Cottage", "Gothic", "Celestial", "Botanical")) { mood ->\n                        FilterChip(selected = style == mood, onClick = { style = mood }, label = { Text(mood) })\n                    }''')
+          f.write_text(t)
+
+          f = base / "SanctuaryScreen.kt"
+          t = f.read_text()
+          t = t.replace('''            items(listOf("Check-in", "Profile", "Medication", "Therapy", "Safety")) { item ->\n                item {\n                    FilterChip(selected = tab == item, onClick = { tab = item }, label = { Text(item) })\n                }\n            }''', '''            items(listOf("Check-in", "Profile", "Medication", "Therapy", "Safety")) { item ->\n                FilterChip(selected = tab == item, onClick = { tab = item }, label = { Text(item) })\n            }''')
+          t = t.replace('''                        items(listOf("Taken", "Late", "Skipped", "PRN")) { status ->\n                            item {\n                                TextButton(onClick = { store.addMedicationLog(MedicationLog(medicationId = med.id, status = status)) }) { Text(status) }\n                            }\n                        }''', '''                        items(listOf("Taken", "Late", "Skipped", "PRN")) { status ->\n                            TextButton(onClick = { store.addMedicationLog(MedicationLog(medicationId = med.id, status = status)) }) { Text(status) }\n                        }''')
+          f.write_text(t)
           PY
 
       - name: Set up JDK 17
