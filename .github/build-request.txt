@@ -1,0 +1,3 @@
+Cycle Garden 0.2 — deliberate build 1
+Source milestone e63462226a3b6815e441305fbb97ab4f32518c25
+Run unit tests and assemble debug APK.
