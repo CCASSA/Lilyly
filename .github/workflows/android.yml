@@ -33,6 +33,11 @@ jobs:
           block = '''\nkotlin {\n    compilerOptions {\n        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)\n    }\n}\n'''
           if "compilerOptions" not in s:
               s = s.replace("\ndependencies {\n", block + "\ndependencies {\n")
+          s = s.replace('androidx.compose:compose-bom:2026.09.00', 'androidx.compose:compose-bom:2025.08.00')
+          s = s.replace('androidx.core:core-ktx:1.17.0', 'androidx.core:core-ktx:1.16.0')
+          s = s.replace('androidx.activity:activity-compose:1.13.0', 'androidx.activity:activity-compose:1.10.1')
+          s = s.replace('androidx.lifecycle:lifecycle-runtime-ktx:2.11.0', 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.2')
+          s = s.replace('io.coil-kt.coil3:coil-compose:3.6.3', 'io.coil-kt.coil3:coil-compose:3.2.0')
           p.write_text(s)
           PY
 
