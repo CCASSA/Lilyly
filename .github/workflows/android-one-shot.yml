@@ -1,10 +1,6 @@
 name: Lilyly One-Shot Debug Build
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - ".github/workflows/android-one-shot.yml"
   workflow_dispatch:
 
 jobs:
