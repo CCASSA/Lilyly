@@ -1,0 +1,87 @@
+name: Lilyly One-Shot Debug Build
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - ".github/workflows/android-one-shot.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Rebuild Lilyly source bundle
+        run: |
+          cat source_bundle/part-*.b64 > Lilyly-source-build.zip
+          unzip -t Lilyly-source-build.zip
+          rm -rf build-src
+          mkdir build-src
+          unzip -q Lilyly-source-build.zip -d build-src
+          sed -i 's/compileSdk = 37/compileSdk = 36/' build-src/Lilyly/app/build.gradle.kts
+          sed -i 's/targetSdk = 37/targetSdk = 36/' build-src/Lilyly/app/build.gradle.kts
+          sed -i 's/version "9.3.0"/version "8.13.2"/' build-src/Lilyly/build.gradle.kts
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("build-src/Lilyly/app/build.gradle.kts")
+          s = p.read_text()
+          s = s.replace('    kotlinOptions {\n        jvmTarget = "17"\n    }\n', '')
+          block = '''\nkotlin {\n    compilerOptions {\n        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)\n    }\n}\n'''
+          if "compilerOptions" not in s:
+              s = s.replace("\ndependencies {\n", block + "\ndependencies {\n")
+          s = s.replace('androidx.compose:compose-bom:2026.09.00', 'androidx.compose:compose-bom:2025.08.00')
+          s = s.replace('androidx.core:core-ktx:1.17.0', 'androidx.core:core-ktx:1.16.0')
+          s = s.replace('androidx.activity:activity-compose:1.13.0', 'androidx.activity:activity-compose:1.10.1')
+          s = s.replace('androidx.lifecycle:lifecycle-runtime-ktx:2.11.0', 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.2')
+          s = s.replace('io.coil-kt.coil3:coil-compose:3.6.3', 'io.coil-kt.coil3:coil-compose:3.2.0')
+          p.write_text(s)
+
+          base = Path("build-src/Lilyly/app/src/main/java/com/lilyly/app")
+          for f in base.glob("*.kt"):
+              t = f.read_text()
+              t = t.replace("import androidx.compose.foundation.layout.weight\n", "")
+              t = t.replace("setHemisphere(", "updateHemisphere(")
+              t = t.replace("setSafetyPlan(", "updateSafetyPlan(")
+              t = t.replace("setMentalProfile(", "updateMentalProfile(")
+              f.write_text(t)
+
+          f = base / "MoreScreens.kt"
+          t = f.read_text()
+          t = t.replace('''                    items(listOf("Cottage", "Gothic", "Celestial", "Botanical")) { mood ->\n                        item { FilterChip(selected = style == mood, onClick = { style = mood }, label = { Text(mood) }) }\n                    }''', '''                    items(listOf("Cottage", "Gothic", "Celestial", "Botanical")) { mood ->\n                        FilterChip(selected = style == mood, onClick = { style = mood }, label = { Text(mood) })\n                    }''')
+          f.write_text(t)
+
+          f = base / "SanctuaryScreen.kt"
+          t = f.read_text()
+          t = t.replace('''            items(listOf("Check-in", "Profile", "Medication", "Therapy", "Safety")) { item ->\n                item {\n                    FilterChip(selected = tab == item, onClick = { tab = item }, label = { Text(item) })\n                }\n            }''', '''            items(listOf("Check-in", "Profile", "Medication", "Therapy", "Safety")) { item ->\n                FilterChip(selected = tab == item, onClick = { tab = item }, label = { Text(item) })\n            }''')
+          t = t.replace('''                        items(listOf("Taken", "Late", "Skipped", "PRN")) { status ->\n                            item {\n                                TextButton(onClick = { store.addMedicationLog(MedicationLog(medicationId = med.id, status = status)) }) { Text(status) }\n                            }\n                        }''', '''                        items(listOf("Taken", "Late", "Skipped", "PRN")) { status ->\n                            TextButton(onClick = { store.addMedicationLog(MedicationLog(medicationId = med.id, status = status)) }) { Text(status) }\n                        }''')
+          f.write_text(t)
+          PY
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepare Android SDK
+        run: |
+          SDKMANAGER=/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Build debug APK
+        run: gradle -p build-src/Lilyly :app:assembleDebug --stacktrace
+
+      - name: Upload Lilyly APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lilyly-debug-apk
+          path: build-src/Lilyly/app/build/outputs/apk/debug/app-debug.apk
