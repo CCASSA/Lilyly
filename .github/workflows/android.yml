@@ -1,11 +1,6 @@
 name: Build Lilyly Android APK
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - ".github/workflows/android.yml"
-      - "source_bundle/**"
   workflow_dispatch:
 
 jobs:
@@ -41,9 +36,12 @@ jobs:
           p.write_text(s)
 
           base = Path("build-src/Lilyly/app/src/main/java/com/lilyly/app")
-          for name in ["HomeScreens.kt", "MoreScreens.kt", "SanctuaryScreen.kt"]:
-              f = base / name
-              t = f.read_text().replace("import androidx.compose.foundation.layout.weight\n", "")
+          for f in base.glob("*.kt"):
+              t = f.read_text()
+              t = t.replace("import androidx.compose.foundation.layout.weight\n", "")
+              t = t.replace("setHemisphere(", "updateHemisphere(")
+              t = t.replace("setSafetyPlan(", "updateSafetyPlan(")
+              t = t.replace("setMentalProfile(", "updateMentalProfile(")
               f.write_text(t)
 
           f = base / "MoreScreens.kt"
