@@ -1,2 +1,2 @@
-Sanctuary & Pages 0.3 — deliberate build 3
-Run migration tests and both emulator journeys; capture validated PNG screenshots.
+Sanctuary & Pages 0.3 — deliberate build 4
+Verify pinned Save and corrected scroll navigation after inspecting build 3 test failure.
