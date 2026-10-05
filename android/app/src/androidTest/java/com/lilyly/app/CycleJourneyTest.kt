@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -31,6 +32,7 @@ class CycleJourneyTest {
         rule.onNodeWithText("Your own rhythm").assertIsDisplayed()
         screenshot("cycle-wheel.png")
         rule.onNodeWithText("Return to today").performScrollTo()
+        rule.onRoot().performTouchInput { swipeUp() }
         screenshot("cycle-calendar.png")
         rule.onNodeWithText("Log today").performScrollTo().performClick()
         rule.onNodeWithText("Choose whatever fits").assertIsDisplayed()
@@ -49,7 +51,7 @@ class CycleJourneyTest {
         screenshot("sanctuary.png")
         rule.onNodeWithText("Save check-in").assertIsDisplayed().performClick()
         rule.onNodeWithText("Journal", useUnmergedTree = true).performClick()
-        rule.onNodeWithText("New page").performClick()
+        rule.onNodeWithText("New page", useUnmergedTree = true).performClick()
         rule.onNodeWithText("Page title").performTextInput("Emulator scrapbook")
         rule.onNodeWithText("+ Words").performClick()
         rule.onNodeWithTag("journal-editor").performScrollToNode(hasText("Selected text"))
@@ -67,7 +69,7 @@ class CycleJourneyTest {
 
     private fun screenshot(name: String) {
         rule.waitForIdle()
-        val image = rule.onAllNodes(isRoot()).onLast().captureToImage().asAndroidBitmap()
+        val image = checkNotNull(InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot())
         File(rule.activity.filesDir, name).outputStream().use { image.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 }
