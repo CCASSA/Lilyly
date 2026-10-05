@@ -1,2 +1,2 @@
-Cycle Garden 0.2 — deliberate build 2
-Include safe side-by-side preview and emulator persistence journey.
+Sanctuary & Pages 0.3 — deliberate build 3
+Run migration tests and both emulator journeys; capture validated PNG screenshots.
