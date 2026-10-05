@@ -1,2 +1,2 @@
-Sanctuary & Pages 0.3 — deliberate build 4
-Verify pinned Save and corrected scroll navigation after inspecting build 3 test failure.
+Sanctuary & Pages 0.3 — deliberate build 5
+Retry after exact FAB accessibility selector failure; use full Android window screenshots.
