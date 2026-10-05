@@ -1,2 +1,1 @@
-Sanctuary & Pages 0.3 — deliberate build 6
-Verify display fixes identified in real emulator screenshots, and persisted canvas after reopening.
+Deliberate build 0.4 attempt 1: tarot, EPUB/PDF reader, regression and new connected journeys.
