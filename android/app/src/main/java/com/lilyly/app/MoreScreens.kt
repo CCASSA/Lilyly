@@ -58,7 +58,7 @@ fun MoreHubScreen(
         items(listOf("Grimoire", "Poems", "Spells", "Dreams", "Ideas")) { section ->
             Card(Modifier.fillMaxWidth().clickable { onOpenSection(section) }, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), shape = RoundedCornerShape(18.dp)) {
                 Column(Modifier.padding(16.dp)) {
-                    Text(section, fontWeight = FontWeight.Bold)
+                    Text(if(section == "Dreams") "Night garden · sleep & dreams" else section, fontWeight = FontWeight.Bold)
                     Text("Open your $section book", style = MaterialTheme.typography.bodySmall)
                 }
             }

@@ -280,6 +280,22 @@ class AppStore(context: Context) {
     val medicationLogs = mutableStateListOf<MedicationLog>()
     val therapyNotes = mutableStateListOf<TherapyNote>()
     val incidents = mutableStateListOf<IncidentLog>()
+    val sleepRecords = mutableStateListOf<SleepRecord>()
+    var includeMindInSleepPatterns by mutableStateOf(false)
+        private set
+    fun setSleepMindPatterns(value: Boolean) { includeMindInSleepPatterns=value;secure.put("sleepMindPatterns",value.toString()) }
+    fun saveSleep(record: SleepRecord) {
+        require(sleepMinutes(record.bedtime,record.wakeTime) != null)
+        val i=sleepRecords.indexOfFirst { it.id==record.id }
+        if(i<0) sleepRecords.add(0,record) else sleepRecords[i]=record
+        saveArray("sleep",sleepRecords.map { it.toJson() })
+    }
+    fun deleteSleep(id: String) { sleepRecords.removeAll { it.id==id };saveArray("sleep",sleepRecords.map { it.toJson() }) }
+    fun journalDream(record: SleepRecord): JournalEntry {
+        journalEntries.firstOrNull { it.id==record.journalId }?.let { return it }
+        val page=JournalEntry(section="Dreams",title="Dream · ${record.date}",body="${record.dream}\n\n${record.dreamMood} · ${record.symbols.joinToString(" · ")}\nPeople: ${record.people}\nPlaces: ${record.places}\n\n${sleepDurationLabel(record.durationMinutes)} rest · ${record.quality}\n${record.notes}",tags=record.symbols.joinToString(", "),paper="Midnight")
+        upsertJournal(page);saveSleep(record.copy(journalId=page.id));return page
+    }
     val books = mutableStateListOf<LibraryBook>()
     val bookNotes = mutableStateListOf<BookNote>()
     var nookTheme by mutableStateOf("Cottage")
@@ -409,6 +425,8 @@ class AppStore(context: Context) {
             tarotNotes = notes.keys().asSequence().associateWith { notes.getString(it) }
             cards.optJSONArray("favorites")?.let { a -> (0 until a.length()).forEach { tarotFavorites.add(a.getString(it)) } }
         }
+        loadArray("sleep") { sleepRecords.add(SleepRecord.fromJson(it)) }
+        includeMindInSleepPatterns = secure.get("sleepMindPatterns", "false").toBoolean()
         loadArray("books") { books.add(LibraryBook.fromJson(it)) }
         loadArray("bookNotes") { bookNotes.add(BookNote.fromJson(it)) }
         nookTheme = secure.get("nookTheme", "Cottage")

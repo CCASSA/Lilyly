@@ -124,7 +124,7 @@ fun TarotScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntry) -
                     } else {
                         item {
                             Text(spread, style = MaterialTheme.typography.titleLarge)
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally).widthIn(max = if(drawn.size == 1) 190.dp else 600.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 drawn.forEachIndexed { index, draw ->
                                     val visible = revealed and (1 shl index) != 0
                                     val alpha by animateFloatAsState(if(visible) 1f else .7f, label = "reveal")

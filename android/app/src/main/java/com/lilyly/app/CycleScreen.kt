@@ -233,6 +233,7 @@ private fun DailyConnections(store: AppStore, date: LocalDate, pattern: CyclePat
     val mind = store.mentalCheckIns.filter { it.dateTime.startsWith(key) }
     val journals = store.journalEntries.count { it.createdAt.startsWith(key) && "sample" !in it.tags }
     val meds = store.medicationLogs.filter { it.dateTime.startsWith(key) }
+    val sleep = store.sleepRecords.filter { it.date == key }
     Column {
         BotanicalDivider()
         Text(date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM")), style = MaterialTheme.typography.titleLarge)
@@ -240,7 +241,7 @@ private fun DailyConnections(store: AppStore, date: LocalDate, pattern: CyclePat
         Text("${state.day?.let { "Cycle day $it · " } ?: ""}${state.phase}", color = MaterialTheme.colorScheme.primary)
         Text("☾ ${moonPhaseName(date.atTime(12, 0))} · approximate", style = MaterialTheme.typography.bodySmall)
         Spacer(Modifier.height(12.dp))
-        if (log == null && mind.isEmpty() && journals == 0 && meds.isEmpty()) Text("An unwritten day. Tap its date to leave a little trace.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (log == null && mind.isEmpty() && journals == 0 && meds.isEmpty() && sleep.isEmpty()) Text("An unwritten day. Tap its date to leave a little trace.", color = MaterialTheme.colorScheme.onSurfaceVariant)
         log?.let {
             if (it.period || it.spotting) Text(if (it.spotting) "Body · spotting" else "Body · ${it.flow.lowercase()} bleeding")
             if (it.selections.isNotEmpty()) Text(it.selections.joinToString(" · "), style = MaterialTheme.typography.bodyMedium)
@@ -248,6 +249,7 @@ private fun DailyConnections(store: AppStore, date: LocalDate, pattern: CyclePat
             if (it.sleepHours > 0 && it.sleepHours.isFinite()) Text("Sleep · ${it.sleepHours} hours")
             if (it.notes.isNotBlank()) Text(it.notes, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
         }
+        if (sleep.isNotEmpty()) Text("Rest · ${sleepDurationLabel(sleep.sumOf { it.durationMinutes })} · ${sleep.count { it.dream.isNotBlank() }} dreams")
         if (mind.isNotEmpty()) {
             val latest = mind.maxBy { it.dateTime }
             Text("Sanctuary · ${mind.size} check-in${if (mind.size == 1) "" else "s"}")

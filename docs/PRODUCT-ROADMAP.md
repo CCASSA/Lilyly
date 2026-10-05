@@ -36,3 +36,5 @@ Work in coherent vertical slices and preserve functioning features. Inspect exac
 
 ## Tarot & Nook 0.4 continuation
 Visual 78-card deck, saved spreads, personal card notes/favorites, recurring appearances and linked grimoire cards; real EPUB/PDF import, themed shelves, reading progress/bookmarks/notes/search and commonplace-page links. See TAROT-NOOK-MILESTONE.md for supported formats, validation and remaining depth. The full product direction above remains intact.
+
+Night Garden adds persistent sleep/dream records, symbol recurrence, minimum-sample rest summaries and opt-in Sanctuary comparisons, with journal and cycle context links. Full statistical insight controls and deeper sleep analysis remain planned.

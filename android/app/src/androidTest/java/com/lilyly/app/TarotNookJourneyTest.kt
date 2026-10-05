@@ -25,10 +25,11 @@ class TarotNookJourneyTest {
         var linked=""
         rule.runOnUiThread {
             store=AppStore(rule.activity)
-            rule.activity.setContent { LilylyTheme { TarotScreen(store,{}, {linked=it.id}) } }
+            rule.activity.setContent { LilylyTheme(true) { TarotScreen(store,{}, {linked=it.id}) } }
         }
         rule.onNodeWithTag("tarot-screen").performScrollToNode(hasText("Shuffle & lay the cards"))
         rule.onNodeWithText("Shuffle & lay the cards").performClick()
+        rule.onNodeWithTag("tarot-screen").performScrollToNode(hasContentDescription("Face-down card. Tap to reveal"))
         rule.onNodeWithContentDescription("Face-down card. Tap to reveal").performClick()
         screenshot("tarot.png")
         rule.onNodeWithTag("tarot-screen").performScrollToNode(hasText("Keep this reading"))
@@ -67,7 +68,7 @@ class TarotNookJourneyTest {
         files.pdf(importedPdf.id,1,300).let { assertTrue(it.width>0);it.recycle() }
         rule.runOnUiThread {
             val store=AppStore(context);store.saveBook(imported);store.saveBook(importedPdf)
-            rule.activity.setContent { LilylyTheme { BookshelfScreen(store,{}, {}) } }
+            rule.activity.setContent { LilylyTheme(true) { BookshelfScreen(store,{}, {}) } }
         }
         rule.onNodeWithText("Celestial").performClick()
         screenshot("bookshelf.png")
@@ -92,6 +93,31 @@ class TarotNookJourneyTest {
             assertTrue(AppStore(context).journalEntries.any { it.id==page.id && it.body.contains("silver leaves") })
         }
     }
+    @Test fun sleepDreamAndJournalShareAPersistentRecord() {
+        lateinit var store: AppStore
+        rule.runOnUiThread {
+            store=AppStore(rule.activity)
+            rule.activity.setContent { LilylyTheme(true) { SleepScreen(store,{}, {}, {}) } }
+        }
+        rule.onNodeWithText("Remember a night").performClick()
+        rule.onNodeWithTag("sleep-editor").performScrollToNode(hasText("A dream, a fragment, a feeling…"))
+        rule.onNodeWithText("A dream, a fragment, a feeling…").performTextInput("The moon shone through the garden")
+        rule.onNodeWithTag("sleep-editor").performScrollToNode(hasText("Symbols & themes, separated by commas"))
+        rule.onNodeWithText("Symbols & themes, separated by commas").performTextInput("moon, garden")
+        rule.onNodeWithText("Keep this night").performClick()
+        rule.onNodeWithTag("night-garden").performScrollToNode(hasText("Make a dream page"))
+        rule.onNodeWithText("Make a dream page").performClick()
+        screenshot("sleep.png")
+        rule.runOnUiThread {
+            val reloaded=AppStore(rule.activity)
+            val night=reloaded.sleepRecords.first { it.dream.contains("moon shone") }
+            assertTrue(night.symbols.contains("garden"))
+            assertEquals(480L,night.durationMinutes)
+            assertTrue(reloaded.journalEntries.any { it.id==night.journalId && it.section=="Dreams" })
+            assertFalse(reloaded.includeMindInSleepPatterns)
+        }
+    }
+
     private fun screenshot(name:String) {
         rule.waitForIdle();InstrumentationRegistry.getInstrumentation().waitForIdleSync();Thread.sleep(350)
         val bitmap=checkNotNull(InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot())

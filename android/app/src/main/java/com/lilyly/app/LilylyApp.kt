@@ -84,7 +84,7 @@ fun LilylyApp(store: AppStore) {
                 when (route) {
                     "home" -> LibraryHomeScreen(
                         store = store,
-                        onOpenSection = { s -> section = s; route = "section" },
+                        onOpenSection = { s -> section = s; route = if(s == "Dreams") "sleep" else "section" },
                         onOpenCycle = { route = "cycle" },
                         onOpenSanctuary = { route = "sanctuary" },
                         onOpenTarot = { route = "tarot" },
@@ -98,7 +98,7 @@ fun LilylyApp(store: AppStore) {
                     "sanctuary" -> SanctuaryScreen(store)
                     "more" -> MoreHubScreen(
                         store = store,
-                        onOpenSection = { s -> section = s; route = "section" },
+                        onOpenSection = { s -> section = s; route = if(s == "Dreams") "sleep" else "section" },
                         onOpenTarot = { route = "tarot" },
                         onOpenBookshelf = { route = "bookshelf" },
                         onOpenCalendar = { route = "calendar" },
@@ -106,6 +106,7 @@ fun LilylyApp(store: AppStore) {
                     )
                     "tarot" -> TarotScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                     "bookshelf" -> BookshelfScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
+                    "sleep" -> SleepScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" }, onDreamPages = { section = "Dreams"; route = "section" })
                     "calendar" -> MagicalCalendarScreen(store, onBack = { route = "more" })
                     "settings" -> SettingsScreen(store, onBack = { route = "more" })
                     "search" -> SearchScreen(store, onBack = { route = "home" }, onOpenJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
