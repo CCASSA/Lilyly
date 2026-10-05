@@ -1,2 +1,2 @@
-Sanctuary & Pages 0.3 — deliberate build 5
-Retry after exact FAB accessibility selector failure; use full Android window screenshots.
+Sanctuary & Pages 0.3 — deliberate build 6
+Verify display fixes identified in real emulator screenshots, and persisted canvas after reopening.
