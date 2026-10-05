@@ -248,7 +248,12 @@ private fun DailyConnections(store: AppStore, date: LocalDate, pattern: CyclePat
             if (it.sleepHours > 0 && it.sleepHours.isFinite()) Text("Sleep · ${it.sleepHours} hours")
             if (it.notes.isNotBlank()) Text(it.notes, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
         }
-        if (mind.isNotEmpty()) Text("Sanctuary · ${mind.size} check-in${if (mind.size == 1) "" else "s"} · latest mood ${mind.maxBy { it.dateTime }.mood}/10")
+        if (mind.isNotEmpty()) {
+            val latest = mind.maxBy { it.dateTime }
+            Text("Sanctuary · ${mind.size} check-in${if (mind.size == 1) "" else "s"}")
+            if (latest.feelings.isNotEmpty()) Text(latest.feelings.joinToString(" · "))
+            if (latest.detailedRatings) Text("Latest mood ${latest.mood}/10", style = MaterialTheme.typography.bodySmall)
+        }
         if (journals > 0) Text("Journal · $journals ${if (journals == 1) "page" else "pages"}")
         if (meds.isNotEmpty()) Text("Medication · " + meds.groupingBy { it.status }.eachCount().entries.joinToString(" · ") { "${it.value} ${it.key.lowercase()}" })
     }

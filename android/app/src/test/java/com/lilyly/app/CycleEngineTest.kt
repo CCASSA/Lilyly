@@ -49,4 +49,22 @@ class CycleEngineTest {
         val restored = CycleLog.fromJson(updated.toJson())
         assertEquals(updated, restored)
     }
+    @Test fun journalMigrationKeepsLegacyWritingAndNewCanvas() {
+        val old = JournalEntry.fromJson(JSONObject("""{"id":"page","body":"old writing","imageUri":"content://owned/photo","inkJson":"[]"}"""))
+        assertEquals("old writing", old.body)
+        assertEquals("[]", old.canvasJson)
+        val piece = PagePiece(content = "A pressed thought", x = .2f, rotation = 12f)
+        val updated = old.copy(canvasJson = piecesJson(listOf(piece)), favorite = true, notebook = "My grimoire")
+        val restored = JournalEntry.fromJson(updated.toJson())
+        assertEquals(updated, restored)
+        assertEquals(piece, pagePieces(restored.canvasJson).single())
+    }
+    @Test fun quickCheckInDoesNotInventNumericObservations() {
+        val quick = MentalCheckIn(feelings = setOf("Calm", "Tired"), detailedRatings = false)
+        val restored = MentalCheckIn.fromJson(quick.toJson())
+        assertFalse(restored.detailedRatings)
+        assertEquals(quick.feelings, restored.feelings)
+        assertTrue(MentalCheckIn.fromJson(JSONObject("""{"mood":7}""")).detailedRatings)
+    }
+
 }

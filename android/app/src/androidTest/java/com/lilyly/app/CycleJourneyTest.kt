@@ -43,6 +43,27 @@ class CycleJourneyTest {
         }
     }
 
+    @Test fun sanctuaryAndScrapbookPersistTogether() {
+        rule.onNodeWithText("Sanctuary", useUnmergedTree = true).performClick()
+        rule.onNodeWithText("Calm").performClick()
+        screenshot("sanctuary.png")
+        rule.onNodeWithText("Save check-in").performScrollTo().performClick()
+        rule.onNodeWithText("Journal", useUnmergedTree = true).performClick()
+        rule.onNodeWithText("New page").performClick()
+        rule.onNodeWithText("Page title").performTextInput("Emulator scrapbook")
+        rule.onNodeWithText("+ Words").performClick()
+        rule.onNodeWithText("Selected text").performScrollTo().performTextReplacement("A little piece of today")
+        rule.onNodeWithText("Drag an element to move it. Select it to edit, resize or turn it.").performScrollTo()
+        screenshot("scrapbook.png")
+        rule.onNodeWithContentDescription("Save").performClick()
+        rule.runOnUiThread {
+            val reloaded = AppStore(rule.activity)
+            assertTrue(reloaded.mentalCheckIns.any { "Calm" in it.feelings && !it.detailedRatings })
+            val page = reloaded.journalEntries.first { it.title == "Emulator scrapbook" }
+            assertTrue(pagePieces(page.canvasJson).any { it.content == "A little piece of today" })
+        }
+    }
+
     private fun screenshot(name: String) {
         rule.waitForIdle()
         val image = rule.onAllNodes(isRoot()).onLast().captureToImage().asAndroidBitmap()

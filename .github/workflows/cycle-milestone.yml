@@ -40,7 +40,7 @@ jobs:
           path: android/app/build/reports/tests/testDebugUnitTest
       - uses: actions/upload-artifact@v4
         with:
-          name: Lilyly-0.2.0-cycle-garden-debug
+          name: Lilyly-0.3.0-sanctuary-pages-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
@@ -59,15 +59,24 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            gradle -p android :app:connectedDebugAndroidTest --stacktrace
+            gradle -p android :app:assembleDebugAndroidTest --stacktrace
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb install -r android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            adb shell am instrument -w com.lilyly.app.test/androidx.test.runner.AndroidJUnitRunner > instrument-results.txt
+            cat instrument-results.txt
+            grep -q 'OK (' instrument-results.txt
             mkdir -p ui-screenshots
             adb exec-out run-as com.lilyly.app cat files/cycle-wheel.png > ui-screenshots/cycle-wheel.png
             adb exec-out run-as com.lilyly.app cat files/cycle-calendar.png > ui-screenshots/cycle-calendar.png
             adb exec-out run-as com.lilyly.app cat files/cycle-log.png > ui-screenshots/cycle-log.png
+            adb exec-out run-as com.lilyly.app cat files/sanctuary.png > ui-screenshots/sanctuary.png
+            adb exec-out run-as com.lilyly.app cat files/scrapbook.png > ui-screenshots/scrapbook.png
+            python3 -c "from pathlib import Path; assert all(p.read_bytes().startswith(bytes([137,80,78,71])) for p in Path('ui-screenshots').glob('*.png'))"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Lilyly-device-check
           path: |
+            instrument-results.txt
             ui-screenshots/
             android/app/build/reports/androidTests/connected/

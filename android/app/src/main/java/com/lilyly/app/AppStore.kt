@@ -28,12 +28,17 @@ data class JournalEntry(
     var imageUri: String = "",
     var inkJson: String = "[]",
     var createdAt: String = LocalDateTime.now().toString(),
-    var updatedAt: String = LocalDateTime.now().toString()
+    var updatedAt: String = LocalDateTime.now().toString(),
+    val canvasJson: String = "[]",
+    val paper: String = "Parchment",
+    val favorite: Boolean = false,
+    val notebook: String = ""
 ) {
     fun toJson() = JSONObject()
         .put("id", id).put("section", section).put("title", title).put("body", body)
         .put("tags", tags).put("imageUri", imageUri).put("inkJson", inkJson)
         .put("createdAt", createdAt).put("updatedAt", updatedAt)
+        .put("canvasJson", canvasJson).put("paper", paper).put("favorite", favorite).put("notebook", notebook)
 
     companion object {
         fun fromJson(o: JSONObject) = JournalEntry(
@@ -45,7 +50,9 @@ data class JournalEntry(
             imageUri = o.optString("imageUri"),
             inkJson = o.optString("inkJson", "[]"),
             createdAt = o.optString("createdAt", LocalDateTime.now().toString()),
-            updatedAt = o.optString("updatedAt", LocalDateTime.now().toString())
+            updatedAt = o.optString("updatedAt", LocalDateTime.now().toString()),
+            canvasJson = o.optString("canvasJson", "[]"), paper = o.optString("paper", "Parchment"),
+            favorite = o.optBoolean("favorite", false), notebook = o.optString("notebook")
         )
     }
 }
@@ -107,13 +114,16 @@ data class MentalCheckIn(
     var appetite: Int = 5,
     var connection: Int = 5,
     var sensoryOverload: Int = 0,
-    var notes: String = ""
+    var notes: String = "",
+    val feelings: Set<String> = emptySet(),
+    val detailedRatings: Boolean = true
 ) {
     fun toJson() = JSONObject().put("id", id).put("dateTime", dateTime).put("mood", mood)
         .put("anxiety", anxiety).put("energy", energy).put("irritability", irritability).put("emptiness", emptiness)
         .put("dissociation", dissociation).put("intrusiveThoughts", intrusiveThoughts).put("selfHarmUrge", selfHarmUrge)
         .put("suicidalThoughts", suicidalThoughts).put("sleepHours", sleepHours).put("appetite", appetite)
         .put("connection", connection).put("sensoryOverload", sensoryOverload).put("notes", notes)
+        .put("feelings", JSONArray(feelings.toList())).put("detailedRatings", detailedRatings)
 
     companion object {
         fun fromJson(o: JSONObject) = MentalCheckIn(
@@ -124,7 +134,9 @@ data class MentalCheckIn(
             intrusiveThoughts = o.optInt("intrusiveThoughts"), selfHarmUrge = o.optInt("selfHarmUrge"),
             suicidalThoughts = o.optInt("suicidalThoughts"), sleepHours = o.optDouble("sleepHours", 0.0),
             appetite = o.optInt("appetite", 5), connection = o.optInt("connection", 5),
-            sensoryOverload = o.optInt("sensoryOverload"), notes = o.optString("notes")
+            sensoryOverload = o.optInt("sensoryOverload"), notes = o.optString("notes"),
+            feelings = o.optJSONArray("feelings")?.let { a -> (0 until a.length()).map { a.getString(it) }.toSet() } ?: emptySet(),
+            detailedRatings = o.optBoolean("detailedRatings", true)
         )
     }
 }

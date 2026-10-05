@@ -1,6 +1,13 @@
 package com.lilyly.app
 
 import android.content.Intent
+import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.lazy.LazyRow
+import org.json.JSONObject
+import java.time.LocalDate
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -61,7 +68,11 @@ fun JournalListScreen(
     onEdit: (String) -> Unit,
     onNew: () -> Unit
 ) {
-    val entries = store.journalEntries.filter { it.section == section }.sortedByDescending { it.updatedAt }
+    var search by rememberSaveable(section) { mutableStateOf("") }
+    var favoritesOnly by rememberSaveable(section) { mutableStateOf(false) }
+    var notebook by rememberSaveable(section) { mutableStateOf("") }
+    val notebooks = store.journalEntries.filter { it.section == section }.map { it.notebook }.filter { it.isNotBlank() }.distinct()
+    val entries = store.journalEntries.filter { it.section == section && (!favoritesOnly || it.favorite) && (notebook.isBlank() || it.notebook == notebook) && (search.isBlank() || "${it.title} ${it.body} ${it.tags} ${it.canvasJson}".contains(search, true)) }.sortedByDescending { it.updatedAt }
     Scaffold(
         topBar = {
             if (onBack != null) {
@@ -75,16 +86,21 @@ fun JournalListScreen(
             ExtendedFloatingActionButton(onClick = onNew, icon = { Icon(Icons.Default.Add, null) }, text = { Text("New page") })
         }
     ) { padding ->
-        if (entries.isEmpty()) {
-            Box(Modifier.fillMaxSize().padding(padding).padding(24.dp)) {
-                Text("No pages yet. Open a fresh page and make this book yours.", color = MaterialTheme.colorScheme.onSurface.copy(alpha = .7f))
-            }
-        } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                item { Spacer(Modifier.height(4.dp)) }
+                item {
+                    Text("Pages to return to", style = MaterialTheme.typography.headlineMedium)
+                    OutlinedTextField(search, { search = it }, label = { Text("Search pages & tags") }, modifier = Modifier.fillMaxWidth())
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        item { FilterChip(favoritesOnly, { favoritesOnly = !favoritesOnly }, label = { Text("Favorites") }) }
+                        item { FilterChip(notebook.isBlank(), { notebook = "" }, label = { Text("All notebooks") }) }
+                        items(notebooks) { name -> FilterChip(notebook == name, { notebook = name }, label = { Text(name) }) }
+                    }
+                    if (entries.isEmpty()) Text("No matching pages. Open a fresh page and make this book yours.")
+                    BotanicalDivider()
+                }
                 items(entries, key = { it.id }) { entry ->
                     Card(
                         modifier = Modifier.fillMaxWidth().clickable { onEdit(entry.id) },
@@ -92,7 +108,9 @@ fun JournalListScreen(
                         shape = RoundedCornerShape(18.dp)
                     ) {
                         Column(Modifier.padding(16.dp)) {
-                            Text(entry.title.ifBlank { "Untitled" }, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
+                            Text("${if (entry.favorite) "✦ " else "❦ "}${entry.title.ifBlank { "Untitled" }}", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
+                            if (entry.notebook.isNotBlank()) Text(entry.notebook, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                            if (entry.canvasJson != "[]") Text("Scrapbook · ${pagePieces(entry.canvasJson).size} elements", style = MaterialTheme.typography.labelSmall)
                             if (entry.body.isNotBlank()) {
                                 Text(entry.body.replace("\n", " ").take(130), maxLines = 3, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = .72f))
                             }
@@ -102,7 +120,6 @@ fun JournalListScreen(
                 }
                 item { Spacer(Modifier.height(90.dp)) }
             }
-        }
     }
 }
 
@@ -117,14 +134,20 @@ fun JournalEditorScreen(
 ) {
     val context = LocalContext.current
     val original = remember(editingId) { store.journalEntries.firstOrNull { it.id == editingId } }
-    var entry by remember(editingId, section) { mutableStateOf(original?.copy() ?: JournalEntry(section = section, title = "")) }
-    var mode by remember { mutableStateOf("Text") }
+    var draft by rememberSaveable(editingId, section) { mutableStateOf((original?.copy() ?: JournalEntry(section = section, title = "")).toJson().toString()) }
+    var entry by remember(editingId, section) { mutableStateOf(JournalEntry.fromJson(JSONObject(draft))) }
+    LaunchedEffect(entry) { draft = entry.toJson().toString() }
+    val initial = remember(editingId, section) { entry.toJson().toString() }
+    var confirmLeave by remember { mutableStateOf(false) }
+    fun leave() { if (entry.toJson().toString() != initial) confirmLeave = true else onBack() }
+    BackHandler { leave() }
+    var mode by rememberSaveable { mutableStateOf("Canvas") }
     var confirmDelete by remember { mutableStateOf(false) }
 
     val imageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             runCatching { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-            entry = entry.copy(imageUri = uri.toString())
+            entry = if (mode == "Canvas") entry.copy(canvasJson = piecesJson(pagePieces(entry.canvasJson) + PagePiece(kind = "photo", content = uri.toString()))) else entry.copy(imageUri = uri.toString())
         }
     }
 
@@ -132,7 +155,7 @@ fun JournalEditorScreen(
         topBar = {
             TopAppBar(
                 title = { Text(entry.title.ifBlank { "New ${entry.section} page" }) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back") } },
+                navigationIcon = { IconButton(onClick = { leave() }) { Icon(Icons.Default.ArrowBack, "Back") } },
                 actions = {
                     if (editingId != null) {
                         IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Default.Delete, "Delete") }
@@ -148,6 +171,7 @@ fun JournalEditorScreen(
         ) {
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(selected = mode == "Canvas", onClick = { mode = "Canvas" }, label = { Text("Scrapbook") })
                     FilterChip(selected = mode == "Text", onClick = { mode = "Text" }, label = { Text("Type") })
                     FilterChip(selected = mode == "Ink", onClick = { mode = "Ink" }, label = { Text("Write / draw") })
                 }
@@ -161,7 +185,16 @@ fun JournalEditorScreen(
                     singleLine = true
                 )
             }
-            if (mode == "Text") {
+            if (mode == "Canvas") {
+                item {
+                    val date = LocalDate.now()
+                    val pattern = cyclePattern(store.cycleLogs.filter { it.period }.mapNotNull { runCatching { LocalDate.parse(it.date) }.getOrNull() }, store.cyclePreferences)
+                    val state = cycleDayState(date, pattern, store.cyclePreferences)
+                    val mind = store.mentalCheckIns.filter { it.dateTime.startsWith(date.toString()) }.maxByOrNull { it.dateTime }
+                    val stamp = "$date\n${moonPhaseName(date.atTime(12, 0))}\n${state.day?.let { "Cycle day $it · " } ?: ""}${state.phase}" + (mind?.feelings?.takeIf { it.isNotEmpty() }?.joinToString(" · ")?.let { "\n$it" } ?: "")
+                    ScrapbookCanvas(entry, { entry = it }, { imageLauncher.launch(arrayOf("image/*")) }, stamp)
+                }
+            } else if (mode == "Text") {
                 item {
                     OutlinedTextField(
                         value = entry.body,
@@ -174,7 +207,7 @@ fun JournalEditorScreen(
             } else {
                 item {
                     Text("Stylus / handwriting layer", fontWeight = FontWeight.SemiBold)
-                    Text("Your ink is saved with the page. Handwriting-to-neat-font conversion is one of the next integrations.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = .66f))
+                    Text("Let your handwriting be part of the page. Your strokes are saved locally.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = .66f))
                 }
                 item {
                     Card(
@@ -193,13 +226,13 @@ fun JournalEditorScreen(
                     TextButton(onClick = { entry = entry.copy(inkJson = clearInk()) }) { Text("Clear handwriting") }
                 }
             }
-            item {
+            if (mode != "Canvas") item {
                 Button(onClick = { imageLauncher.launch(arrayOf("image/*")) }) {
                     Icon(Icons.Default.Image, null)
                     Text(if (entry.imageUri.isBlank()) "  Add image" else "  Change image")
                 }
             }
-            if (entry.imageUri.isNotBlank()) {
+            if (entry.imageUri.isNotBlank() && mode != "Canvas") {
                 item {
                     AsyncImage(
                         model = entry.imageUri,
@@ -210,6 +243,8 @@ fun JournalEditorScreen(
                 }
             }
             item {
+                FilterChip(entry.favorite, { entry = entry.copy(favorite = !entry.favorite) }, label = { Text("Favorite page") })
+                OutlinedTextField(entry.notebook, { entry = entry.copy(notebook = it) }, label = { Text("Notebook or collection") }, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(
                     value = entry.tags,
                     onValueChange = { entry = entry.copy(tags = it) },
@@ -233,4 +268,5 @@ fun JournalEditorScreen(
             item { Spacer(Modifier.height(40.dp)) }
         }
     }
+    if (confirmLeave) AlertDialog(onDismissRequest = { confirmLeave = false }, title = { Text("Keep your page?") }, text = { Text("Save your changes before leaving?") }, confirmButton = { TextButton(onClick = { store.upsertJournal(entry); onDone() }) { Text("Save & close") } }, dismissButton = { TextButton(onClick = onBack) { Text("Discard changes") } })
 }

@@ -1,5 +1,10 @@
 package com.lilyly.app
 
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.Switch
+import org.json.JSONObject
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,10 +41,10 @@ import kotlin.math.roundToInt
 
 @Composable
 fun SanctuaryScreen(store: AppStore) {
-    var tab by remember { mutableStateOf("Check-in") }
+    var tab by rememberSaveable { mutableStateOf("Check-in") }
     Column(Modifier.padding(horizontal = 16.dp)) {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(listOf("Check-in", "Profile", "Medication", "Therapy", "Safety")) { item ->
+            items(listOf("Check-in", "My Mind", "Medication", "Therapy", "Support")) { item ->
                 FilterChip(selected = tab == item, onClick = { tab = item }, label = { Text(item) })
             }
         }
@@ -47,18 +52,22 @@ fun SanctuaryScreen(store: AppStore) {
         Box(Modifier.weight(1f)) {
             when (tab) {
                 "Check-in" -> MentalCheckInTab(store)
-                "Profile" -> MentalProfileTab(store)
+                "My Mind" -> MentalProfileTab(store)
                 "Medication" -> MedicationTab(store)
                 "Therapy" -> TherapyTab(store)
-                "Safety" -> SafetyTab(store)
+                "Support" -> SafetyTab(store)
             }
         }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun MentalCheckInTab(store: AppStore) {
-    var check by remember { mutableStateOf(MentalCheckIn()) }
+    var draft by rememberSaveable { mutableStateOf(MentalCheckIn(detailedRatings = false).toJson().toString()) }
+    var check by remember { mutableStateOf(MentalCheckIn.fromJson(JSONObject(draft))) }
+    androidx.compose.runtime.LaunchedEffect(check) { draft = check.toJson().toString() }
+    var detail by rememberSaveable { mutableStateOf(false) }
     var saved by remember { mutableStateOf(false) }
 
     LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -70,6 +79,25 @@ private fun MentalCheckInTab(store: AppStore) {
                 }
             }
         }
+        item {
+            Text("Choose whatever fits", style = MaterialTheme.typography.titleLarge)
+            Text("There is room for more than one feeling.", style = MaterialTheme.typography.bodySmall)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("Calm", "Happy", "Connected", "Hopeful", "Anxious", "Sad", "Overwhelmed", "Irritable", "Numb", "Empty", "Sensory overload", "Disconnected", "Tired", "Restless", "Focused", "Need space").forEach { feeling ->
+                    FilterChip(feeling in check.feelings, {
+                        saved = false
+                        check = check.copy(feelings = if (feeling in check.feelings) check.feelings - feeling else check.feelings + feeling)
+                    }, label = { Text(feeling) })
+                }
+            }
+            BotanicalDivider()
+            TextButton(onClick = { detail = !detail }) { Text(if (detail) "Close deeper check-in" else "A deeper check-in · optional") }
+        }
+        if (detail) {
+            item {
+                Row { Switch(check.detailedRatings, { check = check.copy(detailedRatings = it) }); Text("Record these ratings", modifier = Modifier.padding(12.dp)) }
+                Text("Turn on when the values reflect how you feel. They are not inferred from the words you chose.", style = MaterialTheme.typography.bodySmall)
+            }
         item { MentalSlider("Mood", check.mood) { check = check.copy(mood = it) } }
         item { MentalSlider("Anxiety", check.anxiety) { check = check.copy(anxiety = it) } }
         item { MentalSlider("Energy", check.energy) { check = check.copy(energy = it) } }
@@ -90,6 +118,7 @@ private fun MentalCheckInTab(store: AppStore) {
                 modifier = Modifier.fillMaxWidth()
             )
         }
+        }
         item {
             OutlinedTextField(check.notes, { check = check.copy(notes = it) }, label = { Text("What happened / what do you need to remember?") }, modifier = Modifier.fillMaxWidth(), minLines = 3)
         }
@@ -108,7 +137,7 @@ private fun MentalCheckInTab(store: AppStore) {
                 onClick = {
                     store.addMentalCheckIn(check.copy(dateTime = LocalDateTime.now().toString()))
                     saved = true
-                    check = MentalCheckIn()
+                    check = MentalCheckIn(detailedRatings = false)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) { Text(if (saved) "Saved ✓" else "Save check-in") }
@@ -120,7 +149,9 @@ private fun MentalCheckInTab(store: AppStore) {
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), shape = RoundedCornerShape(15.dp)) {
                 Column(Modifier.padding(12.dp)) {
                     Text(item.dateTime.take(16).replace("T", "  "), fontWeight = FontWeight.SemiBold)
-                    Text("Mood ${item.mood}/10 • Anxiety ${item.anxiety}/10 • Energy ${item.energy}/10", style = MaterialTheme.typography.bodySmall)
+                    if (item.feelings.isNotEmpty()) Text(item.feelings.joinToString(" · "), style = MaterialTheme.typography.bodyMedium)
+                    if (item.detailedRatings) Text("Mood ${item.mood}/10 • Anxiety ${item.anxiety}/10 • Energy ${item.energy}/10", style = MaterialTheme.typography.bodySmall)
+                    if (item.notes.isNotBlank()) Text(item.notes, style = MaterialTheme.typography.bodySmall)
                     if (item.selfHarmUrge > 0 || item.suicidalThoughts > 0) Text("Urges ${item.selfHarmUrge}/10 • Suicidal thoughts ${item.suicidalThoughts}/10", style = MaterialTheme.typography.bodySmall)
                 }
             }
@@ -131,37 +162,22 @@ private fun MentalCheckInTab(store: AppStore) {
 
 @Composable
 private fun MentalProfileTab(store: AppStore) {
-    var profile by remember(store.mentalProfile) { mutableStateOf(store.mentalProfile) }
-    val conditionIdeas = listOf("ADHD", "Autism spectrum", "Anxiety disorders", "Depressive disorders", "OCD", "PTSD / CPTSD", "Borderline personality disorder", "Bipolar disorders", "Eating disorders", "PMDD", "Other")
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    val stored = remember(store.mentalProfile) { runCatching { JSONObject(store.mentalProfile) }.getOrNull() }
+    var diagnosed by rememberSaveable { mutableStateOf(stored?.optString("diagnosed") ?: "") }
+    var exploring by rememberSaveable { mutableStateOf(stored?.optString("exploring") ?: "") }
+    var notes by rememberSaveable { mutableStateOf(stored?.optString("notes") ?: store.mentalProfile) }
+    var saved by remember { mutableStateOf(false) }
+    LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item {
-            Text("My mental-health profile", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-            Text("Keep professionally diagnosed conditions separate from things you are exploring. Lilyly will organize information, not diagnose you.", style = MaterialTheme.typography.bodySmall)
+            Text("My mind, in my words", style = MaterialTheme.typography.headlineSmall)
+            Text("You are more than a list of labels. Keep the context that helps you understand yourself.")
+            BotanicalDivider()
         }
-        item {
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-                Column(Modifier.padding(14.dp)) {
-                    Text("Common categories you may want to record", fontWeight = FontWeight.SemiBold)
-                    Text(conditionIdeas.joinToString(" • "), style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        }
-        item {
-            OutlinedTextField(
-                profile,
-                { profile = it },
-                label = { Text("Diagnosed / being assessed / suspected / past") },
-                placeholder = { Text("Example:\nProfessionally diagnosed — …\nExploring — …\nPast/remission — …") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 8
-            )
-        }
-        item {
-            Button(onClick = { store.updateMentalProfile(profile) }, modifier = Modifier.fillMaxWidth()) { Text("Save profile") }
-        }
-        item {
-            Text("Evidence-based condition explainers and a selectable diagnosis library are planned for the next build.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = .65f))
-        }
+        item { OutlinedTextField(diagnosed, { diagnosed = it; saved = false }, label = { Text("Professionally diagnosed") }, supportingText = { Text("Conditions a qualified professional has diagnosed.") }, minLines = 2, modifier = Modifier.fillMaxWidth()) }
+        item { OutlinedTextField(exploring, { exploring = it; saved = false }, label = { Text("Exploring or wondering about") }, supportingText = { Text("Questions to explore, kept separate from diagnoses.") }, minLines = 2, modifier = Modifier.fillMaxWidth()) }
+        item { OutlinedTextField(notes, { notes = it; saved = false }, label = { Text("My context & previous notes") }, minLines = 3, modifier = Modifier.fillMaxWidth()) }
+        item { Button(onClick = { store.updateMentalProfile(JSONObject().put("diagnosed", diagnosed).put("exploring", exploring).put("notes", notes).toString()); saved = true }) { Text(if (saved) "Saved" else "Keep my profile") } }
+        item { Text("Lilyly does not infer a diagnosis from your entries.", style = MaterialTheme.typography.bodySmall) }
     }
 }
 
@@ -260,23 +276,31 @@ private fun TherapyTab(store: AppStore) {
 private fun SafetyTab(store: AppStore) {
     var plan by remember(store.safetyPlan) { mutableStateOf(store.safetyPlan) }
     var incident by remember { mutableStateOf(IncidentLog()) }
+    var reflect by rememberSaveable { mutableStateOf(false) }
+    var history by rememberSaveable { mutableStateOf(false) }
 
     LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item {
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = .12f)), shape = RoundedCornerShape(18.dp)) {
                 Column(Modifier.padding(16.dp)) {
-                    Text("My safety plan", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                    Text("What helps me feel safe", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
                     Text("Write this while things are relatively calm: warning signs, grounding steps, safe places, people to contact, clinician details, reasons to get through tonight, and what to put distance between you and when you are unsafe.", style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
         item {
-            OutlinedTextField(plan, { plan = it }, label = { Text("Safety plan") }, modifier = Modifier.fillMaxWidth(), minLines = 9)
+            OutlinedTextField(plan, { plan = it }, label = { Text("My people, places & grounding steps") }, modifier = Modifier.fillMaxWidth(), minLines = 9)
             Spacer(Modifier.height(8.dp))
-            Button(onClick = { store.updateSafetyPlan(plan) }, modifier = Modifier.fillMaxWidth()) { Text("Save safety plan") }
+            Button(onClick = { store.updateSafetyPlan(plan) }, modifier = Modifier.fillMaxWidth()) { Text("Keep my support plan") }
         }
         item {
-            Text("Incident record", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            BotanicalDivider()
+            TextButton(onClick = { reflect = !reflect }) { Text(if (reflect) "Close reflection" else "Reflect on a difficult moment") }
+            Text("Only when you want to. Your support plan is here either way.", style = MaterialTheme.typography.bodySmall)
+        }
+        if (reflect) {
+        item {
+            Text("A difficult moment", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
             Text("For pattern recognition and care — never streaks, badges or injury rankings.", style = MaterialTheme.typography.bodySmall)
         }
         item {
@@ -299,16 +323,11 @@ private fun SafetyTab(store: AppStore) {
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(incident.nextTime, { incident = incident.copy(nextTime = it) }, label = { Text("What might help next time?") }, modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(8.dp))
-            Button(onClick = { store.addIncident(incident.copy(dateTime = LocalDateTime.now().toString())); incident = IncidentLog() }, modifier = Modifier.fillMaxWidth()) { Text("Save incident record") }
+            Button(onClick = { store.addIncident(incident.copy(dateTime = LocalDateTime.now().toString())); incident = IncidentLog() }, modifier = Modifier.fillMaxWidth()) { Text("Keep this reflection") }
         }
-        item {
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-                Column(Modifier.padding(14.dp)) {
-                    Text("Clinical wound photo attachments", fontWeight = FontWeight.SemiBold)
-                    Text("Planned as hidden/private attachments for medical documentation only — never a visible injury gallery or automatic memory resurfacing.", style = MaterialTheme.typography.bodySmall)
-                }
-            }
         }
+        item { TextButton(onClick = { history = !history }) { Text(if (history) "Close past reflections" else "Open past reflections") } }
+        if (history) {
         items(store.incidents.take(8)) { item ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), shape = RoundedCornerShape(15.dp)) {
                 Column(Modifier.padding(12.dp)) {
@@ -317,6 +336,7 @@ private fun SafetyTab(store: AppStore) {
                     if (item.trigger.isNotBlank()) Text("Before: ${item.trigger}", style = MaterialTheme.typography.bodySmall)
                 }
             }
+        }
         }
         item { Spacer(Modifier.height(35.dp)) }
     }
