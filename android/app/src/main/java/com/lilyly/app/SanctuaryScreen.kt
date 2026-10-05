@@ -2,6 +2,7 @@ package com.lilyly.app
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material3.Switch
 import org.json.JSONObject
@@ -70,7 +71,8 @@ private fun MentalCheckInTab(store: AppStore) {
     var detail by rememberSaveable { mutableStateOf(false) }
     var saved by remember { mutableStateOf(false) }
 
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(Modifier.fillMaxSize()) {
+    LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item {
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = .12f)), shape = RoundedCornerShape(20.dp)) {
                 Column(Modifier.padding(16.dp)) {
@@ -133,16 +135,6 @@ private fun MentalCheckInTab(store: AppStore) {
             }
         }
         item {
-            Button(
-                onClick = {
-                    store.addMentalCheckIn(check.copy(dateTime = LocalDateTime.now().toString()))
-                    saved = true
-                    check = MentalCheckIn(detailedRatings = false)
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) { Text(if (saved) "Saved ✓" else "Save check-in") }
-        }
-        item {
             Text("Recent check-ins", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         }
         items(store.mentalCheckIns.take(12)) { item ->
@@ -158,6 +150,13 @@ private fun MentalCheckInTab(store: AppStore) {
         }
         item { Spacer(Modifier.height(40.dp)) }
     }
+        Button(onClick = {
+            store.addMentalCheckIn(check.copy(dateTime = LocalDateTime.now().toString()))
+            saved = true
+            check = MentalCheckIn(detailedRatings = false)
+        }, modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)) { Text(if (saved) "Saved ✓" else "Save check-in") }
+    }
+
 }
 
 @Composable

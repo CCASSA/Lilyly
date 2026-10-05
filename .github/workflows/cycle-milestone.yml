@@ -64,13 +64,13 @@ jobs:
             adb install -r android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             adb shell am instrument -w com.lilyly.app.test/androidx.test.runner.AndroidJUnitRunner > instrument-results.txt
             cat instrument-results.txt
-            grep -q 'OK (' instrument-results.txt
             mkdir -p ui-screenshots
             adb exec-out run-as com.lilyly.app cat files/cycle-wheel.png > ui-screenshots/cycle-wheel.png
             adb exec-out run-as com.lilyly.app cat files/cycle-calendar.png > ui-screenshots/cycle-calendar.png
             adb exec-out run-as com.lilyly.app cat files/cycle-log.png > ui-screenshots/cycle-log.png
             adb exec-out run-as com.lilyly.app cat files/sanctuary.png > ui-screenshots/sanctuary.png
             adb exec-out run-as com.lilyly.app cat files/scrapbook.png > ui-screenshots/scrapbook.png
+            grep -q 'OK (' instrument-results.txt
             python3 -c "from pathlib import Path; assert all(p.read_bytes().startswith(bytes([137,80,78,71])) for p in Path('ui-screenshots').glob('*.png'))"
       - uses: actions/upload-artifact@v4
         if: always()

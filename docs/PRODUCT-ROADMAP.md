@@ -12,6 +12,9 @@ Dark botanical, celestial, feminine, tactile, intimate, sophisticated. Ink, plum
 - Pregnancy mode pauses predictions; TTC mode uses estimated fertility; hormonal/irregular context suppresses fertility markers. These are foundations, not complete pregnancy or fertility products.
 - Same application ID, encrypted preferences and existing JSON fields. Additive fields have safe defaults. No deletion or destructive migration.
 
+## Sanctuary & Pages 0.3 continuation
+Sanctuary now has quick feeling selections, optional detailed ratings, separate diagnosed/exploring fields and opt-in support reflections. Journal pages now have persistent movable text/photo/decorative elements, sizing/rotation, paper styles, context stamps, favorites and notebook-name filtering. This is a foundation for the full canvas, not completion of the journal roadmap. See SANCTUARY-PAGES-MILESTONE.md for concrete limits and validation.
+
 ## Full intended roadmap — none of these are discarded
 1. **Foundation and Home:** cohesive reusable design system, original art/textures, atmospheric customizable daily home, greeting/date/moon/cycle/check-in/prompt/medication/continue-reading/insights/season/ritual/favorites, navigation, transitions, accessibility and performance.
 2. **Cycle:** comprehensive bleeding/body/mood/energy/focus/cravings/mucus/gut/sex/activity/disruptor/contraception/test/medication/supplement/endometriosis/custom/notes tracking; cycle history, confirmed starts and ends, irregular cycles and uncertain estimates, PMS, fertility/ovulation awareness, pregnancy and TTC experiences, temperature, calendar and lunar overlays, configurable assumptions and cross-system graphs. No medical certainty or contraception claims.
