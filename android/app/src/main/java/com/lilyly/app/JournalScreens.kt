@@ -50,6 +50,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -167,7 +168,7 @@ fun JournalEditorScreen(
         }
     ) { padding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp).testTag("journal-editor"),
+            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp).clipToBounds().testTag("journal-editor"),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item {

@@ -31,10 +31,10 @@ class CycleJourneyTest {
         rule.onNodeWithText("Cycle", useUnmergedTree = true).performClick()
         rule.onNodeWithText("Your own rhythm").assertIsDisplayed()
         screenshot("cycle-wheel.png")
-        rule.onNodeWithText("Return to today").performScrollTo()
-        rule.onRoot().performTouchInput { swipeUp() }
+        rule.onNode(hasScrollToIndexAction()).performScrollToIndex(1)
         screenshot("cycle-calendar.png")
-        rule.onNodeWithText("Log today").performScrollTo().performClick()
+        rule.onNode(hasScrollToIndexAction()).performScrollToIndex(0)
+        rule.onNodeWithText("Log today").performClick()
         rule.onNodeWithText("Choose whatever fits").assertIsDisplayed()
         rule.onNodeWithContentDescription("Calm").performClick()
         screenshot("cycle-log.png")
@@ -56,9 +56,13 @@ class CycleJourneyTest {
         rule.onNodeWithText("+ Words").performClick()
         rule.onNodeWithTag("journal-editor").performScrollToNode(hasText("Selected text"))
         rule.onNodeWithText("Selected text").performTextReplacement("A little piece of today")
-        rule.onNodeWithText("Drag an element to move it. Select it to edit, resize or turn it.").performScrollTo()
-        screenshot("scrapbook.png")
         rule.onNodeWithContentDescription("Save").performClick()
+        rule.runOnUiThread {
+            (rule.activity.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager).hideSoftInputFromWindow(rule.activity.window.decorView.windowToken, 0)
+        }
+        rule.onNodeWithText("❦ Emulator scrapbook").performClick()
+        rule.onNodeWithText("A little piece of today").assertIsDisplayed()
+        screenshot("scrapbook.png")
         rule.runOnUiThread {
             val reloaded = AppStore(rule.activity)
             assertTrue(reloaded.mentalCheckIns.any { "Calm" in it.feelings && !it.detailedRatings })
@@ -69,6 +73,8 @@ class CycleJourneyTest {
 
     private fun screenshot(name: String) {
         rule.waitForIdle()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        Thread.sleep(350) // Allow the Android compositor to present the settled window.
         val image = checkNotNull(InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot())
         File(rule.activity.filesDir, name).outputStream().use { image.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }

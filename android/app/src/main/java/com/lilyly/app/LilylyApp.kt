@@ -1,5 +1,6 @@
 package com.lilyly.app
 
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -49,6 +50,7 @@ fun LilylyApp(store: AppStore) {
         )
 
         Scaffold(
+            modifier = Modifier.imePadding(),
             topBar = {
                 if (topLevel) {
                     TopAppBar(

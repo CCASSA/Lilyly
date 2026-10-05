@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -67,7 +68,7 @@ internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Un
         val night = entry.paper == "Midnight"
         val paperColor = if (night) Color(0xFF222032) else if (entry.paper == "Botanical") Color(0xFFE3E5D5) else Color(0xFFF0E5D1)
         val ink = if (night) Color(0xFFE8DABF) else Color(0xFF3C3035)
-        BoxWithConstraints(Modifier.fillMaxWidth().height(500.dp).background(paperColor, RoundedCornerShape(6.dp)).border(1.dp, Gold.copy(alpha = .6f), RoundedCornerShape(6.dp))) {
+        BoxWithConstraints(Modifier.fillMaxWidth().height(500.dp).clipToBounds().background(paperColor, RoundedCornerShape(6.dp)).border(1.dp, Gold.copy(alpha = .6f), RoundedCornerShape(6.dp))) {
             val density = LocalDensity.current
             val widthPx = with(density) { maxWidth.toPx() }
             val heightPx = with(density) { maxHeight.toPx() }
