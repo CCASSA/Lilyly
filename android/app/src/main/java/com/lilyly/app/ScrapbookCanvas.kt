@@ -86,7 +86,7 @@ internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Un
             Column(Modifier.padding(30.dp)) {
                 Text("❦", color = ink.copy(alpha = .65f), fontSize = 26.sp)
                 Text(entry.title.ifBlank { "An unwritten page" }, color = ink, fontFamily = FontFamily.Serif, fontSize = 24.sp)
-                if (entry.body.isNotBlank()) Text(entry.body, color = ink, fontFamily = FontFamily.Serif, fontSize = 16.sp, maxLines = 10, modifier = Modifier.padding(top = 12.dp))
+                if (entry.body.isNotBlank() && pieces.none { it.kind == "tarot" }) Text(entry.body, color = ink, fontFamily = FontFamily.Serif, fontSize = 16.sp, maxLines = 10, modifier = Modifier.padding(top = 12.dp))
                 if (entry.imageUri.isNotBlank()) AsyncImage(entry.imageUri, "Existing journal photograph", Modifier.fillMaxWidth().height(160.dp).padding(top = 12.dp), contentScale = ContentScale.Fit)
             }
             pieces.forEach { piece -> key(piece.id) {
@@ -104,6 +104,11 @@ internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Un
                     androidx.compose.foundation.text.selection.DisableSelection {
                         TextButton(onClick = { selectedId = piece.id }, contentPadding = PaddingValues(6.dp)) {
                             when (piece.kind) {
+                                "tarot" -> {
+                                    val draw = runCatching { JSONObject(piece.content) }.getOrNull()
+                                    val card = tarotDeck.firstOrNull { it.name == draw?.optString("name") }
+                                    Column { Text(draw?.optString("position").orEmpty(),color=ink,style=MaterialTheme.typography.labelSmall); TarotFace(card,Modifier.fillMaxWidth(),draw?.optBoolean("reversed") ?: false) }
+                                }
                                 "photo" -> AsyncImage(piece.content, "Scrapbook photograph", Modifier.fillMaxWidth().height(150.dp).background(Color(0xFFF8F0E3)).padding(7.dp), contentScale = ContentScale.Fit)
                                 "sticker" -> Text(piece.content, color = ink, fontFamily = FontFamily.Serif, fontSize = (piece.width * 85).sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                                 else -> Text(piece.content, color = ink, fontFamily = FontFamily.Serif, fontSize = 17.sp, modifier = Modifier.fillMaxWidth())
@@ -114,7 +119,7 @@ internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Un
             } }
         }
         selected?.let { piece ->
-            if (piece.kind != "photo") OutlinedTextField(piece.content, { update(piece.copy(content = it)) }, label = { Text("Selected ${piece.kind}") }, modifier = Modifier.fillMaxWidth())
+            if (piece.kind !in listOf("photo", "tarot")) OutlinedTextField(piece.content, { update(piece.copy(content = it)) }, label = { Text("Selected ${piece.kind}") }, modifier = Modifier.fillMaxWidth())
             Text("Size")
             Slider(piece.width, { update(piece.copy(width = it)) }, valueRange = .15f.. .95f)
             Text("Rotation · ${piece.rotation.roundToInt()}°")

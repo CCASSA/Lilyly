@@ -216,11 +216,16 @@ data class TarotReading(
     var title: String = "Tarot reading",
     var cards: String = "",
     var notes: String = "",
-    var imageUri: String = ""
+    var imageUri: String = "",
+    val drawsJson: String = "[]",
+    val spread: String = "Free reading",
+    val context: String = "",
+    val journalId: String = ""
 ) {
     fun toJson() = JSONObject().put("id", id).put("date", date).put("title", title).put("cards", cards).put("notes", notes).put("imageUri", imageUri)
+        .put("drawsJson", drawsJson).put("spread", spread).put("context", context).put("journalId", journalId)
     companion object {
-        fun fromJson(o: JSONObject) = TarotReading(o.optString("id", UUID.randomUUID().toString()), o.optString("date", LocalDate.now().toString()), o.optString("title", "Tarot reading"), o.optString("cards"), o.optString("notes"), o.optString("imageUri"))
+        fun fromJson(o: JSONObject) = TarotReading(o.optString("id", UUID.randomUUID().toString()), o.optString("date", LocalDate.now().toString()), o.optString("title", "Tarot reading"), o.optString("cards"), o.optString("notes"), o.optString("imageUri"), o.optString("drawsJson", "[]"), o.optString("spread", "Free reading"), o.optString("context"), o.optString("journalId"))
     }
 }
 
@@ -275,7 +280,60 @@ class AppStore(context: Context) {
     val medicationLogs = mutableStateListOf<MedicationLog>()
     val therapyNotes = mutableStateListOf<TherapyNote>()
     val incidents = mutableStateListOf<IncidentLog>()
+    val books = mutableStateListOf<LibraryBook>()
+    val bookNotes = mutableStateListOf<BookNote>()
+    var nookTheme by mutableStateOf("Cottage")
+        private set
+    fun updateNookTheme(value: String) { nookTheme = value; secure.put("nookTheme", value) }
+    fun saveBook(book: LibraryBook) {
+        val i = books.indexOfFirst { it.id == book.id }
+        if(i < 0) books.add(0,book) else books[i] = book
+        saveArray("books", books.map { it.toJson() })
+    }
+    fun removeBook(id: String) {
+        books.removeAll { it.id == id }; bookNotes.removeAll { it.bookId == id }
+        saveArray("books", books.map { it.toJson() }); saveArray("bookNotes", bookNotes.map { it.toJson() })
+    }
+    fun saveBookNote(note: BookNote) {
+        val i = bookNotes.indexOfFirst { it.id == note.id }
+        if(i < 0) bookNotes.add(0,note) else bookNotes[i] = note
+        saveArray("bookNotes",bookNotes.map { it.toJson() })
+    }
+    fun journalBookNote(note: BookNote): JournalEntry {
+        journalEntries.firstOrNull { it.id == note.journalId }?.let { return it }
+        val book = books.first { it.id == note.bookId }
+        val page = JournalEntry(title = "From ${book.title}", body = "${note.quote}\n\n${note.note}\n\n— ${book.title}, ${book.author} · ${if(book.format == "PDF") "page" else "section"} ${note.position+1}", tags = "reading, quote", notebook = "Commonplace book", paper = "Parchment")
+        upsertJournal(page); saveBookNote(note.copy(journalId = page.id)); return page
+    }
     val tarotReadings = mutableStateListOf<TarotReading>()
+    val tarotFavorites = mutableStateListOf<String>()
+    var tarotNotes by mutableStateOf<Map<String, String>>(emptyMap())
+        private set
+    fun updateTarotCard(name: String, note: String, favorite: Boolean) {
+        tarotNotes = tarotNotes + (name to note)
+        tarotFavorites.remove(name)
+        if (favorite) tarotFavorites.add(name)
+        secure.put("tarotCards", JSONObject().put("notes", JSONObject(tarotNotes)).put("favorites", JSONArray(tarotFavorites)).toString())
+    }
+    fun saveTarotReading(item: TarotReading) {
+        val index = tarotReadings.indexOfFirst { it.id == item.id }
+        if (index < 0) tarotReadings.add(0, item) else tarotReadings[index] = item
+        saveTarot()
+    }
+    fun journalReading(reading: TarotReading): JournalEntry {
+        val existing = journalEntries.firstOrNull { it.id == reading.journalId }
+        if (existing != null) return existing
+        val page = JournalEntry(section = "Grimoire", title = reading.title,
+            body = "${reading.date} · ${reading.spread}\n${reading.context}\n\n${reading.cards}\n\n${reading.notes}", tags = "tarot", paper = "Midnight",
+            canvasJson = JSONArray(drawnCards(reading.drawsJson).mapIndexed { i, card ->
+                JSONObject().put("id", java.util.UUID.randomUUID().toString()).put("kind", "tarot")
+                    .put("content", card.toJson().toString())
+                    .put("x", .04 + i * .31).put("y", .30).put("width", .28).put("rotation", 0)
+            }).toString())
+        upsertJournal(page)
+        saveTarotReading(reading.copy(journalId = page.id))
+        return page
+    }
 
     var darkTheme by mutableStateOf(true)
         private set
@@ -345,6 +403,15 @@ class AppStore(context: Context) {
         loadArray("therapy") { therapyNotes.add(TherapyNote.fromJson(it)) }
         loadArray("incidents") { incidents.add(IncidentLog.fromJson(it)) }
         loadArray("tarot") { tarotReadings.add(TarotReading.fromJson(it)) }
+        runCatching {
+            val cards = JSONObject(secure.get("tarotCards", "{}"))
+            val notes = cards.optJSONObject("notes") ?: JSONObject()
+            tarotNotes = notes.keys().asSequence().associateWith { notes.getString(it) }
+            cards.optJSONArray("favorites")?.let { a -> (0 until a.length()).forEach { tarotFavorites.add(a.getString(it)) } }
+        }
+        loadArray("books") { books.add(LibraryBook.fromJson(it)) }
+        loadArray("bookNotes") { bookNotes.add(BookNote.fromJson(it)) }
+        nookTheme = secure.get("nookTheme", "Cottage")
         if (journalEntries.isEmpty()) seedSamples()
     }
 

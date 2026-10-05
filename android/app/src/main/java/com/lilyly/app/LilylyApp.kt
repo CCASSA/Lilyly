@@ -104,8 +104,8 @@ fun LilylyApp(store: AppStore) {
                         onOpenCalendar = { route = "calendar" },
                         onOpenSettings = { route = "settings" }
                     )
-                    "tarot" -> TarotScreen(store, onBack = { route = "more" })
-                    "bookshelf" -> BookshelfScreen(onBack = { route = "more" })
+                    "tarot" -> TarotScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
+                    "bookshelf" -> BookshelfScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                     "calendar" -> MagicalCalendarScreen(store, onBack = { route = "more" })
                     "settings" -> SettingsScreen(store, onBack = { route = "more" })
                     "search" -> SearchScreen(store, onBack = { route = "home" }, onOpenJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })

@@ -16,3 +16,5 @@ gradle -p android :app:testDebugUnitTest :app:assembleDebug
 ```
 
 CI is manual or explicitly requested via `.github/build-request.txt`. Ordinary source commits do not build. APK milestones are tests of progress, not claims that the complete product is finished.
+
+Tarot and Reading Nook continuation: [implemented behavior and limits](docs/TAROT-NOOK-MILESTONE.md).

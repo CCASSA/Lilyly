@@ -33,3 +33,6 @@ Sanctuary now has quick feeling selections, optional detailed ratings, separate 
 
 ## Engineering rules
 Work in coherent vertical slices and preserve functioning features. Inspect exact failed build logs, repair actual errors, deliberately retry. Ordinary source commits must not build automatically. Build through workflow_dispatch or an explicit build-request file commit. Do not expose inert controls as working features. Report implemented, verified, unverified and remaining work separately. Never describe background progress unless work is actually executing.
+
+## Tarot & Nook 0.4 continuation
+Visual 78-card deck, saved spreads, personal card notes/favorites, recurring appearances and linked grimoire cards; real EPUB/PDF import, themed shelves, reading progress/bookmarks/notes/search and commonplace-page links. See TAROT-NOOK-MILESTONE.md for supported formats, validation and remaining depth. The full product direction above remains intact.

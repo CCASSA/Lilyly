@@ -40,7 +40,7 @@ jobs:
           path: android/app/build/reports/tests/testDebugUnitTest
       - uses: actions/upload-artifact@v4
         with:
-          name: Lilyly-0.3.0-sanctuary-pages-debug
+          name: Lilyly-0.4.0-tarot-nook-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
@@ -51,7 +51,7 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Check the Cycle journey on Android
+      - name: Check connected journeys on Android
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -70,6 +70,9 @@ jobs:
             adb exec-out run-as com.lilyly.app cat files/cycle-log.png > ui-screenshots/cycle-log.png
             adb exec-out run-as com.lilyly.app cat files/sanctuary.png > ui-screenshots/sanctuary.png
             adb exec-out run-as com.lilyly.app cat files/scrapbook.png > ui-screenshots/scrapbook.png
+            adb exec-out run-as com.lilyly.app cat files/tarot.png > ui-screenshots/tarot.png
+            adb exec-out run-as com.lilyly.app cat files/bookshelf.png > ui-screenshots/bookshelf.png
+            adb exec-out run-as com.lilyly.app cat files/reader.png > ui-screenshots/reader.png
             grep -q 'OK (' instrument-results.txt
             python3 -c "from pathlib import Path; assert all(p.read_bytes().startswith(bytes([137,80,78,71])) for p in Path('ui-screenshots').glob('*.png'))"
       - uses: actions/upload-artifact@v4
