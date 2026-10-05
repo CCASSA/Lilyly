@@ -1,1 +1,1 @@
-Deliberate build 0.4 attempt 1: tarot, EPUB/PDF reader, regression and new connected journeys.
+Deliberate build 0.4 attempt 2: includes connected Night Garden and corrected device-test theme setup. Validate 18 unit tests and five device journeys.
