@@ -1,1 +1,1 @@
-Deliberate build 0.4 attempt 2: includes connected Night Garden and corrected device-test theme setup. Validate 18 unit tests and five device journeys.
+Deliberate build 0.4 attempt 3: importer identifier fix, complete connected rooms, supersede obsolete queued builds during GitHub Actions incident.

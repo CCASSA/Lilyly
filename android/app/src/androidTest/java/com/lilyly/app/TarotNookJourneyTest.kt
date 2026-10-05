@@ -56,14 +56,14 @@ class TarotNookJourneyTest {
             entry("two.xhtml","<html><head><title>The path</title></head><body><p>She followed the silver leaves home.</p></body></html>")
         }
         val files=BookFiles(context)
-        val imported=files.import(Uri.fromFile(epub))
+        val imported=files.importBook(Uri.fromFile(epub))
         assertEquals(2,imported.units)
         val pdf=File(context.cacheDir,"fixture.pdf")
         PdfDocument().use { doc ->
             repeat(2) { i -> val page=doc.startPage(PdfDocument.PageInfo.Builder(400,600,i+1).create());page.canvas.drawText("A quiet page ${i+1}",30f,80f,android.graphics.Paint().apply {textSize=20f});doc.finishPage(page) }
             pdf.outputStream().use { doc.writeTo(it) }
         }
-        val importedPdf=files.import(Uri.fromFile(pdf))
+        val importedPdf=files.importBook(Uri.fromFile(pdf))
         assertEquals(2,importedPdf.units)
         files.pdf(importedPdf.id,1,300).let { assertTrue(it.width>0);it.recycle() }
         rule.runOnUiThread {

@@ -89,7 +89,7 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if(uri != null) scope.launch {
             busy = true
-            try { val book = withContext(Dispatchers.IO) { files.import(uri) }; store.saveBook(book) }
+            try { val book = withContext(Dispatchers.IO) { files.importBook(uri) }; store.saveBook(book) }
             catch(e: Exception) { error = e.message ?: "This book could not be imported" }
             finally { busy = false }
         }
@@ -99,7 +99,7 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
         BookReaderScreen(store,book,files,onBack={selected=null},onJournal=onJournal)
         return
     }
-    BackHandler(enabled = !busy, onBack = onBack)
+    BackHandler { if(!busy) onBack() }
     val palette = nookPalette(store.nookTheme)
     Scaffold(topBar = { TopAppBar(title = { Text("Reading nook") }, navigationIcon = { IconButton(onClick = onBack, enabled = !busy) { Icon(Icons.Default.ArrowBack,"Back") } }) }, bottomBar = {
         Surface { Button(onClick = { importer.launch(arrayOf("application/pdf","application/epub+zip")) }, enabled = !busy, modifier = Modifier.fillMaxWidth().padding(14.dp)) { Text(if(busy) "Bringing your book inside…" else "Import EPUB or PDF") } }

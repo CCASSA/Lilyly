@@ -26,3 +26,5 @@ API references: https://developer.android.com/reference/android/graphics/pdf/Pdf
 Persistent editable sleep/dream records, local bedtime/wake time, recorded time in bed, rest quality, waking energy, interruptions, dream mood/people/places/symbols, lucidity/nightmare flags, historical search and linked dream journal pages. Existing freeform dream pages remain accessible. Cycle daily summaries include rest records, and night history shows same-date Sanctuary feelings/cycle context.
 
 Patterns require minimum sample sizes, keep missing numerical ratings out, and require opt-in before combining Sanctuary anxiety with sleep. Recurring symbols are literal user-tag frequencies, not dream interpretation or diagnosis. Manual local times do not infer actual time asleep, timezone changes or DST. The remainder of the full insight roadmap remains open.
+
+During validation on 2026-10-05, GitHub reported an Actions runner-assignment incident. Deliberate newer milestone builds now cancel obsolete queued/running milestone builds in the same concurrency group; ordinary source commits still never trigger builds.

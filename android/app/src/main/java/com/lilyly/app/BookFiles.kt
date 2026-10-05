@@ -20,7 +20,7 @@ class BookFiles(private val context: Context) {
         return File(context.filesDir,"books/$id")
     }
     fun cover(id: String) = File(directory(id),"cover.png")
-    fun import(uri: Uri): LibraryBook {
+    fun importBook(uri: Uri): LibraryBook {
         val resolver = context.contentResolver
         val filename = resolver.query(uri,arrayOf(OpenableColumns.DISPLAY_NAME),null,null,null)?.use { c -> if(c.moveToFirst()) c.getString(0) else null } ?: "Untitled book"
         val id = UUID.randomUUID().toString()

@@ -6,7 +6,7 @@ on:
     paths: ['.github/build-request.txt']
 concurrency:
   group: lilyly-milestone
-  cancel-in-progress: false
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
