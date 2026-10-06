@@ -40,7 +40,7 @@ jobs:
           path: android/app/build/reports/tests/testDebugUnitTest
       - uses: actions/upload-artifact@v4
         with:
-          name: Lilyly-0.5.0-private-world-debug
+          name: Lilyly-0.6.0-daily-world-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
@@ -74,6 +74,7 @@ jobs:
             adb exec-out run-as com.lilyly.app cat files/bookshelf.png > ui-screenshots/bookshelf.png
             adb exec-out run-as com.lilyly.app cat files/reader.png > ui-screenshots/reader.png
             adb exec-out run-as com.lilyly.app cat files/sleep.png > ui-screenshots/sleep.png
+            adb exec-out run-as com.lilyly.app cat files/home.png > ui-screenshots/home.png
             grep -q 'OK (' instrument-results.txt
             python3 -c "from pathlib import Path; assert all(p.read_bytes().startswith(bytes([137,80,78,71])) for p in Path('ui-screenshots').glob('*.png'))"
       - uses: actions/upload-artifact@v4

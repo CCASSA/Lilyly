@@ -79,11 +79,11 @@ private fun NookAtmosphere(theme: String, modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntry) -> Unit) {
+fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntry) -> Unit, initialBookId: String? = null) {
     val context = LocalContext.current
     val files = remember { BookFiles(context.applicationContext) }
     val scope = rememberCoroutineScope()
-    var selected by rememberSaveable { mutableStateOf<String?>(null) }
+    var selected by rememberSaveable(initialBookId) { mutableStateOf(initialBookId) }
     var query by rememberSaveable { mutableStateOf("") }
     var onlyFavorites by rememberSaveable { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }

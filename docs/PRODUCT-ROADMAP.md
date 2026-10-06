@@ -41,3 +41,6 @@ Night Garden adds persistent sleep/dream records, symbol recurrence, minimum-sam
 
 ## Private World 0.5 continuation
 Optional native biometric/device-lock access, screenshot protection, authenticated password-encrypted backup of records/books/photos and a merge restore flow. Details and limits: PRIVACY-MILESTONE.md. This does not complete the remaining product roadmap.
+
+## Daily World 0.6 continuation
+Atmospheric connected Home, direct saved-book/page links, daily record summaries and persistent Home personalization. See DAILY-WORLD-MILESTONE.md. All remaining roadmap items above remain intended work.

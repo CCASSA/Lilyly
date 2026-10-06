@@ -41,8 +41,8 @@ import java.time.LocalDateTime
 import kotlin.math.roundToInt
 
 @Composable
-fun SanctuaryScreen(store: AppStore) {
-    var tab by rememberSaveable { mutableStateOf("Check-in") }
+fun SanctuaryScreen(store: AppStore, initialTab: String = "Check-in") {
+    var tab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
     Column(Modifier.padding(horizontal = 16.dp)) {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(listOf("Check-in", "My Mind", "Medication", "Therapy", "Support")) { item ->

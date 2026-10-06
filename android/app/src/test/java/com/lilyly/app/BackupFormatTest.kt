@@ -39,4 +39,9 @@ class BackupFormatTest {
         val result=mergeSnapshots(mapOf("cycle" to JSONArray(listOf(old.toJson())).toString()),mapOf("cycle" to JSONArray(listOf(incoming.toJson())).toString()))
         assertEquals(1,JSONArray(result.getValue("cycle")).length())
     }
+    @Test fun homeVisibilityKeepsCurrentChoiceDuringRestore() {
+        val result=mergeSnapshots(mapOf("settings" to "{\"homeSections\":[\"Pages\"]}"),mapOf("settings" to "{\"homeSections\":[\"Rhythm\",\"Pages\"]}"))
+        assertEquals("[\"Pages\"]",JSONObject(result.getValue("settings")).getJSONArray("homeSections").toString())
+    }
+
 }

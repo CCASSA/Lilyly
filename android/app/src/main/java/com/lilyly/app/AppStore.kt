@@ -163,6 +163,12 @@ class AppStore(context: Context) {
         return page
     }
 
+    var homeSections by mutableStateOf(homeSectionNames.toSet())
+        private set
+    var greetingName by mutableStateOf("")
+        private set
+    fun personalizeHome(name: String, sections: Set<String>) { greetingName=name.take(40);homeSections=sections.intersect(homeSectionNames.toSet());saveSettings() }
+
     var darkTheme by mutableStateOf(true)
         private set
     var hemisphere by mutableStateOf("Southern")
@@ -222,6 +228,8 @@ class AppStore(context: Context) {
                 mode = c.optString("mode", "Cycle"), contraception = c.optString("contraception", "None"),
                 useHistory = c.optBoolean("useHistory", true)
             )
+            greetingName = settings.optString("greetingName", "")
+            homeSections = settings.optJSONArray("homeSections")?.let { a -> (0 until a.length()).map { a.getString(it) }.toSet().intersect(homeSectionNames.toSet()) } ?: homeSectionNames.toSet()
             darkTheme = settings.optBoolean("darkTheme", true)
             hemisphere = settings.optString("hemisphere", "Southern")
             safetyPlan = settings.optString("safetyPlan", "")
@@ -255,7 +263,7 @@ class AppStore(context: Context) {
         saveJournal()
     }
 
-    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile)
+    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList()))
         .put("cyclePreferences", JSONObject().put("length", cyclePreferences.length).put("periodLength", cyclePreferences.periodLength)
             .put("lutealLength", cyclePreferences.lutealLength).put("pmsDays", cyclePreferences.pmsDays)
             .put("mode", cyclePreferences.mode).put("contraception", cyclePreferences.contraception).put("useHistory", cyclePreferences.useHistory)).toString())

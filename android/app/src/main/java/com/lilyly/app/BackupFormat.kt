@@ -79,7 +79,7 @@ fun mergeSnapshots(current:Map<String,String>,incoming:Map<String,String>):Map<S
                 old.keys().forEach { field -> val v=old.get(field);val n=out.opt(field)
                     when {
                         v is JSONObject && n is JSONObject -> out.put(field,merge(v,n))
-                        v is JSONArray && n is JSONArray -> {val unique=linkedSetOf<String>();listOf(v,n).forEach { a -> repeat(a.length()) {unique.add(a.getString(it))} };out.put(field,JSONArray(unique.toList()))}
+                        key=="tarotCards" && v is JSONArray && n is JSONArray -> {val unique=linkedSetOf<String>();listOf(v,n).forEach { a -> repeat(a.length()) {unique.add(a.getString(it))} };out.put(field,JSONArray(unique.toList()))}
                         v is String && v.isBlank() && n is String -> Unit
                         else -> out.put(field,v)
                     }

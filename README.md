@@ -20,3 +20,5 @@ CI is manual or explicitly requested via `.github/build-request.txt`. Ordinary s
 Tarot and Reading Nook continuation: [implemented behavior and limits](docs/TAROT-NOOK-MILESTONE.md).
 
 Private World continuation: [app lock, encrypted backup and merge restore](docs/PRIVACY-MILESTONE.md).
+
+Daily World continuation: [connected Home and personalization](docs/DAILY-WORLD-MILESTONE.md).
