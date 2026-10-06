@@ -1,1 +1,1 @@
-Deliberate build 0.4 attempt 3: importer identifier fix, complete connected rooms, supersede obsolete queued builds during GitHub Actions incident.
+Deliberate build 0.4 attempt 4, 2026-10-06: retry runner-assignment infrastructure failure; keep independently tested record models separate from Android storage.
