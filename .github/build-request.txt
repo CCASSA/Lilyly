@@ -1,1 +1,1 @@
-Deliberate build 0.4 attempt 5: production APK and unit tests passed; fix exact PdfDocument test-fixture resource closing error before running five emulator journeys.
+Deliberate build 0.4 attempt 6: Android emulator identified unsupported JAXP security feature flags. Keep DOCTYPE rejection and mandatory denial resolver while tolerating absent flags. Rerun all five journeys.

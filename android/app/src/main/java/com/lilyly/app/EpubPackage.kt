@@ -21,13 +21,17 @@ class EpubPackage(private val zip: ZipFile) {
         return data
     }
     private fun xml(bytes: ByteArray): org.w3c.dom.Document {
-        require(!bytes.toString(Charsets.UTF_8).contains("<!DOCTYPE", ignoreCase = true)) { "External XML declarations are not supported" }
+        require(!bytes.filter { it != 0.toByte() }.toByteArray().toString(Charsets.ISO_8859_1).contains("<!DOCTYPE", ignoreCase = true)) { "External XML declarations are not supported" }
         val factory = DocumentBuilderFactory.newInstance()
         factory.isNamespaceAware = true
         factory.isExpandEntityReferences = false
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false)
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
-        return factory.newDocumentBuilder().parse(ByteArrayInputStream(bytes))
+        // Android's bundled parser does not implement all desktop JAXP feature flags.
+        // DOCTYPE is rejected above; the resolver also denies every external entity.
+        runCatching { factory.setFeature("http://xml.org/sax/features/external-general-entities", false) }
+        runCatching { factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false) }
+        val builder = factory.newDocumentBuilder()
+        builder.setEntityResolver { _, _ -> throw org.xml.sax.SAXException("External XML entities are not supported") }
+        return builder.parse(ByteArrayInputStream(bytes))
     }
     private fun org.w3c.dom.Document.elements(name: String): List<Element> {
         val nodes = getElementsByTagNameNS("*", name)
