@@ -1,1 +1,1 @@
-Deliberate build 0.4 attempt 4, 2026-10-06: retry runner-assignment infrastructure failure; keep independently tested record models separate from Android storage.
+Deliberate build 0.4 attempt 5: production APK and unit tests passed; fix exact PdfDocument test-fixture resource closing error before running five emulator journeys.
