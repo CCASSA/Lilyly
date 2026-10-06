@@ -1,1 +1,1 @@
-Deliberate Daily World 0.6 build: connected Home navigation, saved personalization, existing eight Android journeys. Attempt 1.
+Daily World 0.6 attempt 2: fix personalization callback closing parenthesis from Kotlin compiler log.

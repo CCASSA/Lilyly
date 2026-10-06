@@ -128,7 +128,7 @@ fun LibraryHomeScreen(
             Text("Choose the threads you want to see. Everything remains available in its own room.",modifier=Modifier.padding(vertical=12.dp),style=MaterialTheme.typography.bodySmall)
             homeSectionNames.forEach {name ->
                 Row(Modifier.fillMaxWidth().clickable {store.personalizeHome(store.greetingName,if(name in store.homeSections) store.homeSections-name else store.homeSections+name)},verticalAlignment=Alignment.CenterVertically) {
-                    Checkbox(name in store.homeSections,{selected ->store.personalizeHome(store.greetingName,if(selected)store.homeSections+name else store.homeSections-name})
+                    Checkbox(name in store.homeSections,{selected ->store.personalizeHome(store.greetingName,if(selected)store.homeSections+name else store.homeSections-name)})
                     Text(name)
                 }
             }
