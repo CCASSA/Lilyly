@@ -26,6 +26,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -36,9 +37,9 @@ private data class NavItem(val route: String, val label: String, val icon: @Comp
 @Composable
 fun LilylyApp(store: AppStore) {
     LilylyTheme(store.darkTheme) {
-        var route by remember { mutableStateOf("home") }
-        var section by remember { mutableStateOf("Journal") }
-        var editingId by remember { mutableStateOf<String?>(null) }
+        var route by rememberSaveable { mutableStateOf("home") }
+        var section by rememberSaveable { mutableStateOf("Journal") }
+        var editingId by rememberSaveable { mutableStateOf<String?>(null) }
 
         val topLevel = route in listOf("home", "journal", "cycle", "sanctuary", "more")
         val navItems = listOf(

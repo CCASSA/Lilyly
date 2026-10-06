@@ -38,31 +38,53 @@ private class SecurePreferences(context: Context) {
         return generator.generateKey()
     }
 
-    fun put(name: String, plain: String) {
+    private fun encode(plain: String): String {
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.ENCRYPT_MODE, key())
-        val iv = cipher.iv
-        val encrypted = cipher.doFinal(plain.toByteArray(Charsets.UTF_8))
-        val payload = Base64.encodeToString(iv, Base64.NO_WRAP) + ":" + Base64.encodeToString(encrypted, Base64.NO_WRAP)
-        prefs.edit().putString(name, payload).apply()
+        return Base64.encodeToString(cipher.iv, Base64.NO_WRAP) + ":" + Base64.encodeToString(cipher.doFinal(plain.toByteArray(Charsets.UTF_8)), Base64.NO_WRAP)
     }
-
+    private fun decode(payload: String): String {
+        val parts = payload.split(":", limit = 2)
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, Base64.decode(parts[0], Base64.NO_WRAP)))
+        return String(cipher.doFinal(Base64.decode(parts[1], Base64.NO_WRAP)), Charsets.UTF_8)
+    }
+    fun put(name: String, plain: String) { prefs.edit().putString(name, encode(plain)).apply() }
     fun get(name: String, fallback: String = ""): String {
         val payload = prefs.getString(name, null) ?: return fallback
-        return runCatching {
-            val parts = payload.split(":", limit = 2)
-            val iv = Base64.decode(parts[0], Base64.NO_WRAP)
-            val encrypted = Base64.decode(parts[1], Base64.NO_WRAP)
-            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-            cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, iv))
-            String(cipher.doFinal(encrypted), Charsets.UTF_8)
-        }.getOrElse { fallback }
+        return runCatching { decode(payload) }.getOrElse { fallback }
     }
+    fun snapshot(): Map<String,String> = prefs.all.mapValues { (_, value) -> decode(value as String) }
+    fun writeBatch(values: Map<String,String>) {
+        val encrypted = values.mapValues { encode(it.value) }
+        val edit = prefs.edit()
+        encrypted.forEach { (key,value) -> edit.putString(key,value) }
+        check(edit.commit()) { "The restored records could not be written" }
+    }
+
 }
 
 class AppStore(context: Context) {
     private val secure = SecurePreferences(context.applicationContext)
 
+    var privacyBusy by mutableStateOf(false)
+    var privacyMessage by mutableStateOf("")
+    var appLockEnabled by mutableStateOf(false)
+        private set
+    var hideScreenshots by mutableStateOf(false)
+        private set
+    fun updatePrivacy(lock: Boolean = appLockEnabled, screenshots: Boolean = hideScreenshots) {
+        appLockEnabled = lock; hideScreenshots = screenshots
+        secure.put("privacy", JSONObject().put("lock",lock).put("screenshots",screenshots).toString())
+    }
+    fun backupSnapshot(): Map<String,String> = secure.snapshot()
+    suspend fun restoreSnapshot(incoming: Map<String,String>) {
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { secure.writeBatch(mergeSnapshots(secure.snapshot(),incoming)) }
+        journalEntries.clear(); cycleLogs.clear(); mentalCheckIns.clear(); medications.clear(); medicationLogs.clear()
+        therapyNotes.clear(); incidents.clear(); tarotReadings.clear(); tarotFavorites.clear(); tarotNotes=emptyMap()
+        sleepRecords.clear(); books.clear(); bookNotes.clear()
+        loadAll()
+    }
     val journalEntries = mutableStateListOf<JournalEntry>()
     val cycleLogs = mutableStateListOf<CycleLog>()
     val mentalCheckIns = mutableStateListOf<MentalCheckIn>()
@@ -185,6 +207,10 @@ class AppStore(context: Context) {
     fun addTarotReading(item: TarotReading) { tarotReadings.add(0, item); saveTarot() }
 
     private fun loadAll() {
+        runCatching {
+            val privacy = JSONObject(secure.get("privacy", "{}"))
+            appLockEnabled=privacy.optBoolean("lock");hideScreenshots=privacy.optBoolean("screenshots")
+        }
         runCatching {
             val settings = JSONObject(secure.get("settings", "{}"))
             val c = settings.optJSONObject("cyclePreferences") ?: JSONObject()
