@@ -17,3 +17,5 @@ Lock closes dialogs. Journal/cycle and newer screens retain saveable drafts, but
 Unit tests cover encryption round-trip, unique random envelopes, wrong passwords, tampering/truncation, record collision policy and lock exclusion. Android tests restore a photo into an isolated store after removing its original file, retain current records, and verify protected cold-start UI and secure-window flags. Full CI outcomes are recorded after the deliberate build.
 
 Verified on Android API 35 in [run 37423855382](https://github.com/CCASSA/Lilyly/actions/runs/37423855382): compilation, unit tests and all seven Android journeys passed. Hardware biometric success and Samsung document-picker behavior still require physical-device testing.
+
+Final inset-corrected 0.5 build: [run 37546209166](https://github.com/CCASSA/Lilyly/actions/runs/37546209166), 22 JVM tests and seven Android journeys passed. Reader navigation screenshot verified. Preview SHA-256: `bdbe201500745d500788752a92fb33278a1e1e807d39d5f4ff6a71a29bc62d9c`.
