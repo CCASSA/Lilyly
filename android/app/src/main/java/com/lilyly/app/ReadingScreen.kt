@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -213,7 +215,7 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
                 items(unit.text.split(Regex("\\n\\s*\\n")).filter { it.isNotBlank() }) { paragraph ->
                     Column {
                         SelectionContainer { Text(paragraph,fontSize=font.sp,lineHeight=(font*1.55).sp,fontFamily=FontFamily.Serif) }
-                        TextButton(onClick={noteQuote=paragraph;noteBody="";noteOpen=true}) { Text("Keep this passage",style=MaterialTheme.typography.labelSmall) }
+                        TextButton(onClick={noteQuote=paragraph;noteBody="";noteOpen=true},modifier=Modifier.semantics {contentDescription="Keep passage: ${paragraph.take(80)}"}) { Text("Keep this passage",style=MaterialTheme.typography.labelSmall) }
                     }
                 }
             }

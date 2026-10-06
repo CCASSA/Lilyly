@@ -1,1 +1,1 @@
-Deliberate build 0.4 attempt 6: Android emulator identified unsupported JAXP security feature flags. Keep DOCTYPE rejection and mandatory denial resolver while tolerating absent flags. Rerun all five journeys.
+Deliberate build 0.4 attempt 7: EPUB metadata is no longer rendered as prose; accessible passage controls identify their passage so reader tests select the intended quote.

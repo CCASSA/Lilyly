@@ -42,7 +42,7 @@ class BookFiles(private val context: Context) {
             val epub = ZipFile(source).use { EpubPackage(it).parse() }
             val units = mutableListOf<ReadingUnit>()
             epub.chapters.forEach { chapter ->
-                val cleaned = chapter.html.replace(Regex("<(script|style)\\b[^>]*>.*?</\\1\\s*>", setOf(RegexOption.IGNORE_CASE,RegexOption.DOT_MATCHES_ALL)), "")
+                val cleaned = chapter.html.replace(Regex("<(script|style|head)\\b[^>]*>.*?</\\1\\s*>", setOf(RegexOption.IGNORE_CASE,RegexOption.DOT_MATCHES_ALL)), "")
                 val text = HtmlCompat.fromHtml(cleaned,HtmlCompat.FROM_HTML_MODE_LEGACY).toString().trim()
                 if(text.isNotBlank()) text.chunked(6000).forEachIndexed { i, part -> units.add(ReadingUnit(if(i == 0) chapter.title else "${chapter.title} · continued",part)) }
             }

@@ -78,7 +78,7 @@ class TarotNookJourneyTest {
         rule.onNodeWithText("Next").performClick()
         rule.waitUntil(10000) { rule.onAllNodesWithText("She followed the silver leaves home.",substring=true).fetchSemanticsNodes().isNotEmpty() }
         screenshot("reader.png")
-        rule.onNodeWithText("Keep this passage").performClick()
+        rule.onNodeWithContentDescription("Keep passage: She followed the silver leaves home.").performClick()
         rule.onNodeWithText("Your thoughts").performTextInput("A line to remember")
         rule.onNodeWithText("Keep passage").performClick()
         rule.onNodeWithText("Tools").performClick()
