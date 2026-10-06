@@ -1,1 +1,1 @@
-Deliberate privacy milestone 0.5 verification: Android lock, encrypted export and attachment restore. Attempt 1.
+Privacy milestone 0.5: verify system navigation inset correction after successful 22 unit tests and seven Android journeys. Deliberate final build 2026-10-06.
