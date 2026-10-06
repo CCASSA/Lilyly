@@ -31,7 +31,7 @@ fun SleepScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntry) -
     var editing by rememberSaveable { mutableStateOf<String?>(null) }
     var creating by rememberSaveable { mutableStateOf(false) }
     BackHandler(onBack=onBack)
-    Scaffold(topBar={TopAppBar(title={Text("Night garden")},navigationIcon={IconButton(onClick=onBack) {Icon(Icons.Default.ArrowBack,"Back")}})},bottomBar={Surface {Button(onClick={creating=true;editing=null},modifier=Modifier.fillMaxWidth().padding(16.dp)) {Text("Remember a night")}}}) { padding ->
+    Scaffold(topBar={TopAppBar(title={Text("Night garden")},navigationIcon={IconButton(onClick=onBack) {Icon(Icons.Default.ArrowBack,"Back")}})},bottomBar={Surface(Modifier.navigationBarsPadding()) {Button(onClick={creating=true;editing=null},modifier=Modifier.fillMaxWidth().padding(16.dp)) {Text("Remember a night")}}}) { padding ->
         LazyColumn(Modifier.padding(padding).padding(horizontal=20.dp).testTag("night-garden"),verticalArrangement=Arrangement.spacedBy(16.dp),contentPadding=PaddingValues(bottom=28.dp)) {
             item {
                 Text("What did the night leave with you?",style=MaterialTheme.typography.headlineMedium)

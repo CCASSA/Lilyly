@@ -104,7 +104,7 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
     BackHandler { if(!busy) onBack() }
     val palette = nookPalette(store.nookTheme)
     Scaffold(topBar = { TopAppBar(title = { Text("Reading nook") }, navigationIcon = { IconButton(onClick = onBack, enabled = !busy) { Icon(Icons.Default.ArrowBack,"Back") } }) }, bottomBar = {
-        Surface { Button(onClick = { importer.launch(arrayOf("application/pdf","application/epub+zip")) }, enabled = !busy, modifier = Modifier.fillMaxWidth().padding(14.dp)) { Text(if(busy) "Bringing your book inside…" else "Import EPUB or PDF") } }
+        Surface(Modifier.navigationBarsPadding()) { Button(onClick = { importer.launch(arrayOf("application/pdf","application/epub+zip")) }, enabled = !busy, modifier = Modifier.fillMaxWidth().padding(14.dp)) { Text(if(busy) "Bringing your book inside…" else "Import EPUB or PDF") } }
     }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).background(palette.wall).testTag("bookshelf"), contentPadding=PaddingValues(bottom=24.dp)) {
             item { NookAtmosphere(store.nookTheme); Text("Stay for one more chapter", style=MaterialTheme.typography.headlineMedium,color=palette.ink,modifier=Modifier.padding(18.dp)) }
@@ -191,7 +191,7 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
     }
     BackHandler(onBack=onBack)
     Scaffold(topBar={ TopAppBar(title={Text(book.title,maxLines=1)},navigationIcon={IconButton(onClick=onBack) { Icon(Icons.Default.ArrowBack,"Back to shelves") }},actions={TextButton(onClick={panel="Tools"}) { Text("Tools") }}) },bottomBar={
-        Surface { Row(Modifier.fillMaxWidth().padding(8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween) {
+        Surface(Modifier.navigationBarsPadding()) { Row(Modifier.fillMaxWidth().padding(8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween) {
             TextButton(onClick={savePosition(position-1)},enabled=position>0) { Text("Previous") }
             Text("${position+1} / ${book.units}",style=MaterialTheme.typography.labelLarge)
             TextButton(onClick={if(position<book.units-1) savePosition(position+1) else store.saveBook(book.copy(completed=true))},enabled=!book.completed || position<book.units-1) { Text(if(position==book.units-1) "Finish book" else "Next") }

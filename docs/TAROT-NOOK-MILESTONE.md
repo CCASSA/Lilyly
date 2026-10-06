@@ -15,7 +15,7 @@ The original generated card faces use symbols and botanical geometry, not full s
 
 EPUB is a text-focused reader, not full EPUB conformance: fixed layout, embedded illustrations, original CSS, footnote navigation, audio and DRM are unsupported. A declared encryption.xml is rejected even if only fonts are obfuscated. PDF search/text selection is not implemented; PDF notes can be entered manually. EPUB passages are kept as annotations, not colored inline text highlights. Reader sections are capped at 6,000 characters; progress is a section/page location, not a claimed precise percentage of words read.
 
-Imported books and cached text/cover files are app-private files, not separately encrypted. Sensitive reading notes and library metadata use the existing encrypted store. Neither is sent to an external service. Backups and a separate app lock are still outstanding. Reading sessions currently accumulate foreground time, without a session-by-session history.
+Imported books and cached text/cover files are app-private files, not separately encrypted. Sensitive reading notes and library metadata use the existing encrypted store. Neither is sent to an external service. Backups and a separate app lock are implemented in the following 0.5 milestone. Reading sessions currently accumulate foreground time, without a session-by-session history.
 
 ## Validation
 Unit coverage checks 78 unique cards, no-replacement draws, reversals and JSON migration, book/note persistence, spine order and rejection of encrypted/escaping/remote book resources. Emulator journeys import generated local EPUB/PDF fixtures, render PDF pages, reopen stored progress and annotations, and link both reading and tarot material into the journal. Build/test results are recorded after deliberate Actions execution.
@@ -28,3 +28,5 @@ Persistent editable sleep/dream records, local bedtime/wake time, recorded time 
 Patterns require minimum sample sizes, keep missing numerical ratings out, and require opt-in before combining Sanctuary anxiety with sleep. Recurring symbols are literal user-tag frequencies, not dream interpretation or diagnosis. Manual local times do not infer actual time asleep, timezone changes or DST. The remainder of the full insight roadmap remains open.
 
 During validation on 2026-10-05, GitHub reported an Actions runner-assignment incident. Deliberate newer milestone builds now cancel obsolete queued/running milestone builds in the same concurrency group; ordinary source commits still never trigger builds.
+
+Verified 2026-10-06: run [37423375017](https://github.com/CCASSA/Lilyly/actions/runs/37423375017), commit `1b694b10`, passed assembly, all 18 JVM tests and all 5 Android journeys. Screenshot review found navigation-bar overlap in the reader/shelf/night actions; corrected in 0.5 using system navigation insets.
