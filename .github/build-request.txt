@@ -1,1 +1,1 @@
-Privacy milestone 0.5: verify system navigation inset correction after successful 22 unit tests and seven Android journeys. Deliberate final build 2026-10-06.
+Deliberate Daily World 0.6 build: connected Home navigation, saved personalization, existing eight Android journeys. Attempt 1.
