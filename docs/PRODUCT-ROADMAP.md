@@ -47,3 +47,6 @@ Atmospheric connected Home, direct saved-book/page links, daily record summaries
 
 ## Apothecary 0.7 continuation
 Editable multiple daily medication times, PRN use, corrected scheduled logs, archive/history, manual refill counts and private local Android reminders. Complex schedules, automated inventory and longitudinal medication correlations remain planned. See APOTHECARY-MILESTONE.md.
+
+## Therapy room 0.8 continuation
+Searchable editable sessions with Before/After/Practice sections, questions/goals, practice completion and independent linked journal pages. Cross-session goal management, appointment reminders and deeper pattern review remain planned.

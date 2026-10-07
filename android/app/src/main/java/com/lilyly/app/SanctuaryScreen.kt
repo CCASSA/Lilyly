@@ -41,7 +41,7 @@ import java.time.LocalDateTime
 import kotlin.math.roundToInt
 
 @Composable
-fun SanctuaryScreen(store: AppStore, initialTab: String = "Check-in") {
+fun SanctuaryScreen(store: AppStore, initialTab: String = "Check-in", onJournal: (JournalEntry)->Unit = {}) {
     var tab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
     Column(Modifier.padding(horizontal = 16.dp)) {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -55,7 +55,7 @@ fun SanctuaryScreen(store: AppStore, initialTab: String = "Check-in") {
                 "Check-in" -> MentalCheckInTab(store)
                 "My Mind" -> MentalProfileTab(store)
                 "Medication" -> MedicationTab(store)
-                "Therapy" -> TherapyTab(store)
+                "Therapy" -> TherapyTab(store,onJournal)
                 "Support" -> SafetyTab(store)
             }
         }
@@ -177,37 +177,6 @@ private fun MentalProfileTab(store: AppStore) {
         item { OutlinedTextField(notes, { notes = it; saved = false }, label = { Text("My context & previous notes") }, minLines = 3, modifier = Modifier.fillMaxWidth()) }
         item { Button(onClick = { store.updateMentalProfile(JSONObject().put("diagnosed", diagnosed).put("exploring", exploring).put("notes", notes).toString()); saved = true }) { Text(if (saved) "Saved" else "Keep my profile") } }
         item { Text("Lilyly does not infer a diagnosis from your entries.", style = MaterialTheme.typography.bodySmall) }
-    }
-}
-
-@Composable
-private fun TherapyTab(store: AppStore) {
-    var note by remember { mutableStateOf(TherapyNote()) }
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item {
-            Text("Therapy journal", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-            OutlinedTextField(note.title, { note = note.copy(title = it) }, label = { Text("Session title") }, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(note.before, { note = note.copy(before = it) }, label = { Text("Before session — what do I need to bring up?") }, modifier = Modifier.fillMaxWidth(), minLines = 3)
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(note.after, { note = note.copy(after = it) }, label = { Text("After session — what mattered?") }, modifier = Modifier.fillMaxWidth(), minLines = 4)
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(note.homework, { note = note.copy(homework = it) }, label = { Text("Homework / skill to try") }, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(note.nextAppointment, { note = note.copy(nextAppointment = it) }, label = { Text("Next appointment") }, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(8.dp))
-            Button(onClick = { store.addTherapyNote(note.copy(date = LocalDate.now().toString())); note = TherapyNote() }, modifier = Modifier.fillMaxWidth()) { Text("Save therapy note") }
-        }
-        items(store.therapyNotes.take(15)) { item ->
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), shape = RoundedCornerShape(16.dp)) {
-                Column(Modifier.padding(14.dp)) {
-                    Text("${item.date} • ${item.title}", fontWeight = FontWeight.SemiBold)
-                    if (item.after.isNotBlank()) Text(item.after.take(180), style = MaterialTheme.typography.bodySmall)
-                    if (item.homework.isNotBlank()) Text("Homework: ${item.homework}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
-                }
-            }
-        }
-        item { Spacer(Modifier.height(30.dp)) }
     }
 }
 

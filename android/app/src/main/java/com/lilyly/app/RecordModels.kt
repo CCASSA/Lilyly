@@ -167,11 +167,15 @@ data class TherapyNote(
     var before: String = "",
     var after: String = "",
     var homework: String = "",
-    var nextAppointment: String = ""
+    var nextAppointment: String = "",
+    var goals: String = "",
+    var questions: String = "",
+    var homeworkDone: Boolean = false,
+    var journalId: String = ""
 ) {
-    fun toJson() = JSONObject().put("id", id).put("date", date).put("title", title).put("before", before).put("after", after).put("homework", homework).put("nextAppointment", nextAppointment)
+    fun toJson() = JSONObject().put("id", id).put("date", date).put("title", title).put("before", before).put("after", after).put("homework", homework).put("nextAppointment", nextAppointment).put("goals",goals).put("questions",questions).put("homeworkDone",homeworkDone).put("journalId",journalId)
     companion object {
-        fun fromJson(o: JSONObject) = TherapyNote(o.optString("id", UUID.randomUUID().toString()), o.optString("date", LocalDate.now().toString()), o.optString("title", "Therapy session"), o.optString("before"), o.optString("after"), o.optString("homework"), o.optString("nextAppointment"))
+        fun fromJson(o: JSONObject) = TherapyNote(o.optString("id", UUID.randomUUID().toString()), o.optString("date", LocalDate.now().toString()), o.optString("title", "Therapy session"), o.optString("before"), o.optString("after"), o.optString("homework"), o.optString("nextAppointment"),o.optString("goals"),o.optString("questions"),o.optBoolean("homeworkDone"),o.optString("journalId"))
     }
 }
 

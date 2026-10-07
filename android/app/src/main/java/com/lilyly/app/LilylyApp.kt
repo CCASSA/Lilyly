@@ -104,7 +104,7 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false) {
                     "section" -> JournalListScreen(store, section, onBack = { route = "home" }, onEdit = { editingId = it; route = "editor" }, onNew = { editingId = null; route = "editor" })
                     "editor" -> JournalEditorScreen(store, editingId, section, onDone = { route = if (section == "Journal") "journal" else "section" }, onBack = { route = if (section == "Journal") "journal" else "section" })
                     "cycle" -> CycleScreen(store)
-                    "sanctuary" -> SanctuaryScreen(store, sanctuaryTab)
+                    "sanctuary" -> SanctuaryScreen(store, sanctuaryTab, onJournal={entry -> editingId=entry.id;section=entry.section;route="editor"})
                     "more" -> MoreHubScreen(
                         store = store,
                         onOpenSection = { s -> section = s; route = if(s == "Dreams") "sleep" else "section" },

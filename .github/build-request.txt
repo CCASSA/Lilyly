@@ -1,1 +1,1 @@
-Apothecary 0.7 final refinement: native log date/time selection and full-app medication journey. Attempt 2.
+Deliberate therapy room 0.8 build: edit sessions, practice status, independent journal links and preserved records. Attempt 1.

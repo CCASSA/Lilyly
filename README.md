@@ -24,3 +24,5 @@ Private World continuation: [app lock, encrypted backup and merge restore](docs/
 Daily World continuation: [connected Home and personalization](docs/DAILY-WORLD-MILESTONE.md).
 
 Apothecary continuation: [medication care, manual refills and private local reminders](docs/APOTHECARY-MILESTONE.md).
+
+Therapy continuation: [session preparation, practice and linked journal pages](docs/THERAPY-MILESTONE.md).

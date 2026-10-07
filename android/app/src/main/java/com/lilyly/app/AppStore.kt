@@ -219,7 +219,18 @@ class AppStore(context: Context) {
         saveMedications(); MedicationReminders.schedule(appContext,medications,medicationLogs)
     }
     fun removeMedicationLog(id:String) {medicationLogs.removeAll {it.id==id};saveMedications();MedicationReminders.schedule(appContext,medications,medicationLogs)}
-    fun addTherapyNote(item: TherapyNote) { therapyNotes.add(0, item); saveTherapy() }
+    fun addTherapyNote(item: TherapyNote) {
+        val index=therapyNotes.indexOfFirst {it.id==item.id}
+        if(index<0)therapyNotes.add(0,item) else therapyNotes[index]=item
+        saveTherapy()
+    }
+    fun journalTherapy(item:TherapyNote):JournalEntry {
+        journalEntries.firstOrNull {it.id==item.journalId}?.let {return it}
+        val body=listOf("Session" to item.date,"To bring" to item.before,"Questions" to item.questions,"What mattered" to item.after,"Goals" to item.goals,"Practice" to item.homework)
+            .filter {it.second.isNotBlank()}.joinToString("\n\n") {"${it.first}\n${it.second}"}
+        val page=JournalEntry(section="Journal",title=item.title,body=body,tags="therapy",notebook="Sanctuary")
+        upsertJournal(page);addTherapyNote(item.copy(journalId=page.id));return page
+    }
     fun addIncident(item: IncidentLog) { incidents.add(0, item); saveIncidents() }
     fun addTarotReading(item: TarotReading) { tarotReadings.add(0, item); saveTarot() }
 
