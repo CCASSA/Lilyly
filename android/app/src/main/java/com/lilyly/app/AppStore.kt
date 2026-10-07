@@ -65,7 +65,8 @@ private class SecurePreferences(context: Context) {
 }
 
 class AppStore(context: Context) {
-    private val secure = SecurePreferences(context.applicationContext)
+    private val appContext = context.applicationContext
+    private val secure = SecurePreferences(appContext)
 
     var privacyBusy by mutableStateOf(false)
     var privacyMessage by mutableStateOf("")
@@ -84,6 +85,7 @@ class AppStore(context: Context) {
         therapyNotes.clear(); incidents.clear(); tarotReadings.clear(); tarotFavorites.clear(); tarotNotes=emptyMap()
         sleepRecords.clear(); books.clear(); bookNotes.clear()
         loadAll()
+        MedicationReminders.schedule(appContext,medications,medicationLogs)
     }
     val journalEntries = mutableStateListOf<JournalEntry>()
     val cycleLogs = mutableStateListOf<CycleLog>()
@@ -206,8 +208,17 @@ class AppStore(context: Context) {
     }
 
     fun addMentalCheckIn(item: MentalCheckIn) { mentalCheckIns.add(0, item); saveMental() }
-    fun addMedication(item: Medication) { medications.add(item); saveMedications() }
-    fun addMedicationLog(item: MedicationLog) { medicationLogs.add(0, item); saveMedications() }
+    fun addMedication(item: Medication) {
+        val i=medications.indexOfFirst {it.id==item.id}
+        if(i<0) medications.add(item) else medications[i]=item
+        saveMedications(); MedicationReminders.schedule(appContext,medications,medicationLogs)
+    }
+    fun addMedicationLog(item: MedicationLog) {
+        val i=medicationLogs.indexOfFirst {it.id==item.id || (item.scheduledFor.isNotBlank() && it.medicationId==item.medicationId && it.scheduledFor==item.scheduledFor)}
+        if(i<0) medicationLogs.add(0,item) else medicationLogs[i]=item.copy(id=medicationLogs[i].id)
+        saveMedications(); MedicationReminders.schedule(appContext,medications,medicationLogs)
+    }
+    fun removeMedicationLog(id:String) {medicationLogs.removeAll {it.id==id};saveMedications();MedicationReminders.schedule(appContext,medications,medicationLogs)}
     fun addTherapyNote(item: TherapyNote) { therapyNotes.add(0, item); saveTherapy() }
     fun addIncident(item: IncidentLog) { incidents.add(0, item); saveIncidents() }
     fun addTarotReading(item: TarotReading) { tarotReadings.add(0, item); saveTarot() }

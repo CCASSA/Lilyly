@@ -181,66 +181,6 @@ private fun MentalProfileTab(store: AppStore) {
 }
 
 @Composable
-private fun MedicationTab(store: AppStore) {
-    var name by remember { mutableStateOf("") }
-    var dose by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("08:00") }
-    var reason by remember { mutableStateOf("") }
-
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item {
-            Text("Medication cabinet", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-            Text("Record the schedule you were prescribed. Lilyly does not change doses or tell you how much to take.", style = MaterialTheme.typography.bodySmall)
-        }
-        item {
-            OutlinedTextField(name, { name = it }, label = { Text("Medication") }, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(dose, { dose = it }, label = { Text("Prescribed dose") }, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(time, { time = it }, label = { Text("Reminder time") }, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(reason, { reason = it }, label = { Text("Reason / notes") }, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(8.dp))
-            Button(
-                onClick = {
-                    if (name.isNotBlank()) {
-                        store.addMedication(Medication(name = name.trim(), dose = dose.trim(), time = time.trim(), reason = reason.trim()))
-                        name = ""; dose = ""; reason = ""
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("Add medication") }
-        }
-        item {
-            Text("Device notification alarms are the next step; the schedule and medication log already live here.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
-        }
-        items(store.medications) { med ->
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), shape = RoundedCornerShape(16.dp)) {
-                Column(Modifier.padding(14.dp)) {
-                    Text("${med.name}  ${med.dose}", fontWeight = FontWeight.Bold)
-                    Text("${med.time}${if (med.reason.isNotBlank()) " • ${med.reason}" else ""}", style = MaterialTheme.typography.bodySmall)
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        items(listOf("Taken", "Late", "Skipped", "PRN")) { status ->
-                            TextButton(onClick = { store.addMedicationLog(MedicationLog(medicationId = med.id, status = status)) }) { Text(status) }
-                        }
-                    }
-                }
-            }
-        }
-        item {
-            if (store.medicationLogs.isNotEmpty()) {
-                Text("Recent medication log", fontWeight = FontWeight.SemiBold)
-                store.medicationLogs.take(10).forEach { log ->
-                    val med = store.medications.firstOrNull { it.id == log.medicationId }
-                    Text("${log.dateTime.take(16).replace("T", " ")} • ${med?.name ?: "Medication"} • ${log.status}", style = MaterialTheme.typography.bodySmall)
-                }
-            }
-            Spacer(Modifier.height(35.dp))
-        }
-    }
-}
-
-@Composable
 private fun TherapyTab(store: AppStore) {
     var note by remember { mutableStateOf(TherapyNote()) }
     LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {

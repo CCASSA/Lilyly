@@ -66,6 +66,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         store=AppStore(this)
+        MedicationReminders.schedule(this,store.medications,store.medicationLogs)
         unlocked=!store.appLockEnabled
         setContent {
             DisposableEffect(store.darkTheme,store.appLockEnabled,store.hideScreenshots) {
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
                 onDispose { }
             }
             val pages=rememberSaveableStateHolder()
-            if(!store.appLockEnabled || unlocked) pages.SaveableStateProvider("lilyly") {LilylyApp(store)}
+            if(!store.appLockEnabled || unlocked) pages.SaveableStateProvider("lilyly") {LilylyApp(store, intent.getBooleanExtra("medication",false))}
             else LilylyTheme(store.darkTheme) {
                 Surface(Modifier.fillMaxSize()) {
                     Column(Modifier.fillMaxSize().padding(30.dp),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally) {

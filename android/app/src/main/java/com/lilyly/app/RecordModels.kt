@@ -134,11 +134,15 @@ data class Medication(
     var dose: String = "",
     var time: String = "08:00",
     var reason: String = "",
-    var active: Boolean = true
+    var active: Boolean = true,
+    var asNeeded: Boolean = false,
+    var reminders: Boolean = false,
+    var remaining: Int = -1,
+    var refillAt: Int = 5
 ) {
-    fun toJson() = JSONObject().put("id", id).put("name", name).put("dose", dose).put("time", time).put("reason", reason).put("active", active)
+    fun toJson() = JSONObject().put("id", id).put("name", name).put("dose", dose).put("time", time).put("reason", reason).put("active", active).put("asNeeded",asNeeded).put("reminders",reminders).put("remaining",remaining).put("refillAt",refillAt)
     companion object {
-        fun fromJson(o: JSONObject) = Medication(o.optString("id", UUID.randomUUID().toString()), o.optString("name"), o.optString("dose"), o.optString("time", "08:00"), o.optString("reason"), o.optBoolean("active", true))
+        fun fromJson(o: JSONObject) = Medication(o.optString("id", UUID.randomUUID().toString()), o.optString("name"), o.optString("dose"), o.optString("time", "08:00"), o.optString("reason"), o.optBoolean("active", true),o.optBoolean("asNeeded"),o.optBoolean("reminders"),o.optInt("remaining",-1),o.optInt("refillAt",5))
     }
 }
 
@@ -146,11 +150,13 @@ data class MedicationLog(
     val id: String = UUID.randomUUID().toString(),
     var medicationId: String = "",
     var dateTime: String = LocalDateTime.now().toString(),
-    var status: String = "Taken"
+    var status: String = "Taken",
+    var scheduledFor: String = "",
+    var notes: String = ""
 ) {
-    fun toJson() = JSONObject().put("id", id).put("medicationId", medicationId).put("dateTime", dateTime).put("status", status)
+    fun toJson() = JSONObject().put("id", id).put("medicationId", medicationId).put("dateTime", dateTime).put("status", status).put("scheduledFor",scheduledFor).put("notes",notes)
     companion object {
-        fun fromJson(o: JSONObject) = MedicationLog(o.optString("id", UUID.randomUUID().toString()), o.optString("medicationId"), o.optString("dateTime", LocalDateTime.now().toString()), o.optString("status", "Taken"))
+        fun fromJson(o: JSONObject) = MedicationLog(o.optString("id", UUID.randomUUID().toString()), o.optString("medicationId"), o.optString("dateTime", LocalDateTime.now().toString()), o.optString("status", "Taken"),o.optString("scheduledFor"),o.optString("notes"))
     }
 }
 
