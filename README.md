@@ -26,3 +26,5 @@ Daily World continuation: [connected Home and personalization](docs/DAILY-WORLD-
 Apothecary continuation: [medication care, manual refills and private local reminders](docs/APOTHECARY-MILESTONE.md).
 
 Therapy continuation: [session preparation, practice and linked journal pages](docs/THERAPY-MILESTONE.md).
+
+Bound Pages continuation: [notebook covers, reusable templates and scrapbook controls](docs/BOUND-PAGES-MILESTONE.md).

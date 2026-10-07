@@ -165,6 +165,17 @@ class AppStore(context: Context) {
         return page
     }
 
+    var notebookCovers by mutableStateOf<Map<String,String>>(emptyMap())
+        private set
+    fun saveNotebook(section:String,name:String,cover:String) {
+        require(name.isNotBlank() && cover in notebookCoverNames)
+        notebookCovers=notebookCovers + (notebookKey(section,name.trim()) to cover);saveSettings()
+    }
+    fun notebookNames(section:String):List<String> = (notebookCovers.keys.filter {it.startsWith("$section::")}.map {it.removePrefix("$section::")} + journalEntries.filter {it.section==section}.map {it.notebook}.filter {it.isNotBlank()}).distinct().sorted()
+    fun keepPageTemplate(entry:JournalEntry):JournalEntry {
+        val template=freshPage(entry,"Templates","");upsertJournal(template);return template
+    }
+
     var homeSections by mutableStateOf(homeSectionNames.toSet())
         private set
     var greetingName by mutableStateOf("")
@@ -250,6 +261,8 @@ class AppStore(context: Context) {
                 mode = c.optString("mode", "Cycle"), contraception = c.optString("contraception", "None"),
                 useHistory = c.optBoolean("useHistory", true)
             )
+            val covers=settings.optJSONObject("notebookCovers") ?: JSONObject()
+            notebookCovers=covers.keys().asSequence().associateWith {covers.getString(it)}
             greetingName = settings.optString("greetingName", "")
             homeSections = settings.optJSONArray("homeSections")?.let { a -> (0 until a.length()).map { a.getString(it) }.toSet().intersect(homeSectionNames.toSet()) } ?: homeSectionNames.toSet()
             darkTheme = settings.optBoolean("darkTheme", true)
@@ -285,7 +298,7 @@ class AppStore(context: Context) {
         saveJournal()
     }
 
-    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList()))
+    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("notebookCovers",JSONObject(notebookCovers)).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList()))
         .put("cyclePreferences", JSONObject().put("length", cyclePreferences.length).put("periodLength", cyclePreferences.periodLength)
             .put("lutealLength", cyclePreferences.lutealLength).put("pmsDays", cyclePreferences.pmsDays)
             .put("mode", cyclePreferences.mode).put("contraception", cyclePreferences.contraception).put("useHistory", cyclePreferences.useHistory)).toString())

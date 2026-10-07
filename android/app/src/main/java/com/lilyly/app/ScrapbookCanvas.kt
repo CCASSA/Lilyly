@@ -48,10 +48,17 @@ internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Un
     var selectedId by rememberSaveable(entry.id) { mutableStateOf<String?>(null) }
     val selected = pieces.firstOrNull { it.id == selectedId }
     val latestEntry by rememberUpdatedState(entry)
-    fun update(piece: PagePiece) { onChange(latestEntry.copy(canvasJson = piecesJson(pagePieces(latestEntry.canvasJson).map { if (it.id == piece.id) piece else it }))) }
+    var undo by remember(entry.id) { mutableStateOf<List<String>>(emptyList()) }
+    var redo by remember(entry.id) { mutableStateOf<List<String>>(emptyList()) }
+    fun changeCanvas(json:String) {
+        if(json==latestEntry.canvasJson)return
+        undo=(undo+latestEntry.canvasJson).takeLast(60);redo=emptyList()
+        onChange(latestEntry.copy(canvasJson=json))
+    }
+    fun update(piece: PagePiece) { changeCanvas(piecesJson(pagePieces(latestEntry.canvasJson).map { if (it.id == piece.id) piece else it })) }
     fun add(kind: String, content: String) {
         val piece = PagePiece(kind = kind, content = content, y = (.22f + pieces.size * .06f).coerceAtMost(.7f))
-        onChange(entry.copy(canvasJson = piecesJson(pieces + piece))); selectedId = piece.id
+        changeCanvas(piecesJson(pieces + piece)); selectedId = piece.id
     }
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -63,6 +70,10 @@ internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Un
             item { FilledTonalButton(onClick = { add("sticker", "❦") }) { Text("+ Botanical") } }
             item { FilledTonalButton(onClick = { add("sticker", "☾ ✧") }) { Text("+ Celestial") } }
             item { FilledTonalButton(onClick = { add("text", contextStamp) }) { Text("+ Today's context") } }
+        }
+        Row {
+            TextButton(enabled=undo.isNotEmpty(),onClick={redo=redo+entry.canvasJson;onChange(entry.copy(canvasJson=undo.last()));undo=undo.dropLast(1);selectedId=null}) {Text("Undo")}
+            TextButton(enabled=redo.isNotEmpty(),onClick={undo=undo+entry.canvasJson;onChange(entry.copy(canvasJson=redo.last()));redo=redo.dropLast(1);selectedId=null}) {Text("Redo")}
         }
         Text("Drag an element to move it. Select it to edit, resize or turn it.", style = MaterialTheme.typography.bodySmall)
         val night = entry.paper == "Midnight"
@@ -119,12 +130,17 @@ internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Un
             } }
         }
         selected?.let { piece ->
+            LazyRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                item {TextButton(onClick={val copy=piece.copy(id=UUID.randomUUID().toString(),y=(piece.y+.04f).coerceAtMost(.85f));changeCanvas(piecesJson(pieces+copy));selectedId=copy.id}) {Text("Duplicate element")}}
+                item {TextButton(onClick={changeCanvas(piecesJson(pieces.filterNot {it.id==piece.id}+piece))}) {Text("Bring to front")}}
+                item {TextButton(onClick={changeCanvas(piecesJson(listOf(piece)+pieces.filterNot {it.id==piece.id}))}) {Text("Send to back")}}
+            }
             if (piece.kind !in listOf("photo", "tarot")) OutlinedTextField(piece.content, { update(piece.copy(content = it)) }, label = { Text("Selected ${piece.kind}") }, modifier = Modifier.fillMaxWidth())
             Text("Size")
-            Slider(piece.width, { update(piece.copy(width = it)) }, valueRange = .15f.. .95f)
+            Slider(piece.width, { update(piece.copy(width = it,x=piece.x.coerceAtMost(1f-it))) }, valueRange = .15f.. .95f)
             Text("Rotation · ${piece.rotation.roundToInt()}°")
             Slider(piece.rotation, { update(piece.copy(rotation = it)) }, valueRange = -45f..45f)
-            TextButton(onClick = { onChange(entry.copy(canvasJson = piecesJson(pieces.filterNot { it.id == piece.id }))); selectedId = null }) { Text("Remove selected element") }
+            TextButton(onClick = { changeCanvas(piecesJson(pieces.filterNot { it.id == piece.id })); selectedId = null }) { Text("Remove selected element") }
         }
     }
 }

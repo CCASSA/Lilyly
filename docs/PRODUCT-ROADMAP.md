@@ -50,3 +50,6 @@ Editable multiple daily medication times, PRN use, corrected scheduled logs, arc
 
 ## Therapy room 0.8 continuation
 Searchable editable sessions with Before/After/Practice sections, questions/goals, practice completion and independent linked journal pages. Cross-session goal management, appointment reminders and deeper pattern review remain planned.
+
+## Bound Pages 0.9 continuation
+Persistent notebook covers, empty notebooks, starter/personal templates and canvas undo/redo, duplication and layer ordering. Existing notebook names/pages preserved. See BOUND-PAGES-MILESTONE.md for limits; remaining journal features are retained in the full roadmap.

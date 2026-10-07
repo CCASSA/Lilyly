@@ -73,7 +73,8 @@ fun JournalListScreen(
     var search by rememberSaveable(section) { mutableStateOf("") }
     var favoritesOnly by rememberSaveable(section) { mutableStateOf(false) }
     var notebook by rememberSaveable(section) { mutableStateOf("") }
-    val notebooks = store.journalEntries.filter { it.section == section }.map { it.notebook }.filter { it.isNotBlank() }.distinct()
+    val notebooks = store.notebookNames(section)
+    var chooseTemplate by rememberSaveable { mutableStateOf(false) }
     val entries = store.journalEntries.filter { it.section == section && (!favoritesOnly || it.favorite) && (notebook.isBlank() || it.notebook == notebook) && (search.isBlank() || "${it.title} ${it.body} ${it.tags} ${it.canvasJson}".contains(search, true)) }.sortedByDescending { it.updatedAt }
     Scaffold(
         topBar = {
@@ -85,7 +86,7 @@ fun JournalListScreen(
             }
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(onClick = onNew, icon = { Icon(Icons.Default.Add, null) }, text = { Text("New page") })
+            ExtendedFloatingActionButton(onClick = { if(notebook.isBlank()) onNew() else { val page=JournalEntry(section=section,title="",notebook=notebook);store.upsertJournal(page);onEdit(page.id) } }, icon = { Icon(Icons.Default.Add, null) }, text = { Text("New page") })
         }
     ) { padding ->
             LazyColumn(
@@ -93,6 +94,8 @@ fun JournalListScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 item {
+                    NotebookShelf(store,section,notebook,{notebook=it})
+                    TextButton(onClick={chooseTemplate=true}) { Text("Create from a template") }
                     Text("Pages to return to", style = MaterialTheme.typography.headlineMedium)
                     OutlinedTextField(search, { search = it }, label = { Text("Search pages & tags") }, modifier = Modifier.fillMaxWidth())
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -123,6 +126,9 @@ fun JournalListScreen(
                 item { Spacer(Modifier.height(90.dp)) }
             }
     }
+    if(chooseTemplate) PageTemplatePicker(store,onDismiss={chooseTemplate=false},onUse={template ->
+        val page=freshPage(template,section,notebook);store.upsertJournal(page);chooseTemplate=false;onEdit(page.id)
+    },onEdit={id ->chooseTemplate=false;onEdit(id)})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,6 +151,7 @@ fun JournalEditorScreen(
     BackHandler { leave() }
     var mode by rememberSaveable { mutableStateOf("Canvas") }
     var confirmDelete by remember { mutableStateOf(false) }
+    var templateSaved by remember { mutableStateOf(false) }
 
     val imageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -245,6 +252,7 @@ fun JournalEditorScreen(
                 }
             }
             item {
+                TextButton(onClick={store.keepPageTemplate(entry);templateSaved=true},enabled=!templateSaved) { Text(if(templateSaved) "Template kept" else "Save as reusable template") }
                 FilterChip(entry.favorite, { entry = entry.copy(favorite = !entry.favorite) }, label = { Text("Favorite page") })
                 OutlinedTextField(entry.notebook, { entry = entry.copy(notebook = it) }, label = { Text("Notebook or collection") }, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(

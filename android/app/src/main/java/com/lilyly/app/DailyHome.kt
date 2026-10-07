@@ -75,7 +75,7 @@ fun LibraryHomeScreen(
                 Text("A thought for your page",style=MaterialTheme.typography.labelLarge,color=MaterialTheme.colorScheme.primary)
                 Text(prompt,style=MaterialTheme.typography.headlineSmall)
                 TextButton(onClick=onNewPage) {Text("Open a fresh page")}
-                store.journalEntries.filter {"sample" !in it.tags.split(',').map(String::trim)}.maxByOrNull {it.updatedAt}?.let {entry ->
+                store.journalEntries.filter {it.section!="Templates" && "sample" !in it.tags.split(',').map(String::trim)}.maxByOrNull {it.updatedAt}?.let {entry ->
                     HorizontalDivider(color=MaterialTheme.colorScheme.primary.copy(alpha=.25f))
                     TextButton(onClick={onOpenEntry(entry)}) {Text("Return to ${entry.title.ifBlank {"your last page"}}",maxLines=2)}
                 }

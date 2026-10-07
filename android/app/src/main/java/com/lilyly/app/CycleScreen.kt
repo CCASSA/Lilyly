@@ -231,7 +231,7 @@ private fun DailyConnections(store: AppStore, date: LocalDate, pattern: CyclePat
     val key = date.toString()
     val log = store.cycleLogs.firstOrNull { it.date == key }
     val mind = store.mentalCheckIns.filter { it.dateTime.startsWith(key) }
-    val journals = store.journalEntries.count { it.createdAt.startsWith(key) && "sample" !in it.tags }
+    val journals = store.journalEntries.count { it.section!="Templates" && it.createdAt.startsWith(key) && "sample" !in it.tags }
     val meds = store.medicationLogs.filter { it.dateTime.startsWith(key) }
     val sleep = store.sleepRecords.filter { it.date == key }
     Column {
