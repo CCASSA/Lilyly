@@ -44,3 +44,6 @@ Optional native biometric/device-lock access, screenshot protection, authenticat
 
 ## Daily World 0.6 continuation
 Atmospheric connected Home, direct saved-book/page links, daily record summaries and persistent Home personalization. See DAILY-WORLD-MILESTONE.md. All remaining roadmap items above remain intended work.
+
+## Apothecary 0.7 continuation
+Editable multiple daily medication times, PRN use, corrected scheduled logs, archive/history, manual refill counts and private local Android reminders. Complex schedules, automated inventory and longitudinal medication correlations remain planned. See APOTHECARY-MILESTONE.md.

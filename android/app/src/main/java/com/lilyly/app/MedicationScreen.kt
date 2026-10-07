@@ -1,6 +1,7 @@
 package com.lilyly.app
 
 import android.Manifest
+import android.app.TimePickerDialog
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Build
@@ -122,7 +123,12 @@ fun MedicationTab(store:AppStore) {
         AlertDialog(onDismissRequest={entry=null},title={Text("Record your care")},text={Column(Modifier.verticalScroll(rememberScrollState())) {
             Text(store.medications.firstOrNull {it.id==log.medicationId}?.name ?: "Medication")
             FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) {listOf("Taken","Late","Skipped","PRN").forEach {status -> FilterChip(log.status==status,{entry=log.copy(status=status).toJson().toString()},label={Text(status)})}}
-            OutlinedTextField(log.dateTime.take(16),{entry=log.copy(dateTime=it).toJson().toString()},label={Text("Recorded at · YYYY-MM-DDTHH:MM")})
+            val recorded=runCatching {LocalDateTime.parse(log.dateTime)}.getOrDefault(LocalDateTime.now())
+            Text("Recorded at",style=MaterialTheme.typography.labelLarge)
+            Row {
+                TextButton(onClick={DatePickerDialog(context,{_,y,m,d -> entry=log.copy(dateTime=recorded.withYear(y).withMonth(1).withDayOfMonth(1).withMonth(m+1).withDayOfMonth(d).toString()).toJson().toString()},recorded.year,recorded.monthValue-1,recorded.dayOfMonth).apply {datePicker.maxDate=System.currentTimeMillis()}.show()}) {Text(recorded.format(java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy")))}
+                TextButton(onClick={TimePickerDialog(context,{_,h,m -> entry=log.copy(dateTime=recorded.withHour(h).withMinute(m).withSecond(0).withNano(0).toString()).toJson().toString()},recorded.hour,recorded.minute,true).show()}) {Text(recorded.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")))}
+            }
             OutlinedTextField(log.notes,{entry=log.copy(notes=it).toJson().toString()},label={Text("Optional note")})
         }},confirmButton={TextButton(enabled=runCatching {LocalDateTime.parse(log.dateTime)<=LocalDateTime.now()}.getOrDefault(false),onClick={store.addMedicationLog(log);entry=null}) {Text("Save entry")}},dismissButton={TextButton(onClick={entry=null}) {Text("Cancel")}})
     }

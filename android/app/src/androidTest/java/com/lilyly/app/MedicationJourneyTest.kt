@@ -21,7 +21,7 @@ class MedicationJourneyTest {
         rule.runOnUiThread {
             store=AppStore(rule.activity)
             store.addMedication(Medication(id="medication-fixture",name="Test cabinet entry",time="08:00",remaining=4,refillAt=5))
-            rule.activity.setContent {LilylyTheme(true) {MedicationTab(store)}}
+            rule.activity.setContent {LilylyApp(store,openMedication=true)}
         }
         rule.onNodeWithTag("medication-cabinet").performScrollToNode(hasText("08:00 · Not recorded"))
         rule.onNodeWithText("08:00 · Not recorded").performClick()
@@ -36,6 +36,9 @@ class MedicationJourneyTest {
             assertEquals(1,logs.size);assertEquals("Taken",logs.single().status)
             assertEquals(4,loaded.medications.first {it.id=="medication-fixture"}.remaining)
         }
+        rule.onNodeWithText("Record your care").assertDoesNotExist()
+        rule.mainClock.advanceTimeBy(600)
+        rule.waitForIdle()
         val bitmap=InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
         File(rule.activity.filesDir,"medication.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)};bitmap.recycle()
     }

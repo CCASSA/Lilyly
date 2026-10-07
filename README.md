@@ -22,3 +22,5 @@ Tarot and Reading Nook continuation: [implemented behavior and limits](docs/TARO
 Private World continuation: [app lock, encrypted backup and merge restore](docs/PRIVACY-MILESTONE.md).
 
 Daily World continuation: [connected Home and personalization](docs/DAILY-WORLD-MILESTONE.md).
+
+Apothecary continuation: [medication care, manual refills and private local reminders](docs/APOTHECARY-MILESTONE.md).

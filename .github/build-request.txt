@@ -1,1 +1,1 @@
-Deliberate Apothecary 0.7 build: medication schedules, log correction, manual refills and private Android reminders. Attempt 1.
+Apothecary 0.7 final refinement: native log date/time selection and full-app medication journey. Attempt 2.
