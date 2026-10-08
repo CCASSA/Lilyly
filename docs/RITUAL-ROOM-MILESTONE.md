@@ -8,4 +8,8 @@ Repeat practice makes a new ID retaining the plan but clearing dates, reflection
 
 Scope: personal ritual planning and recording, not a sourced herb/crystal reference library or a claim of guaranteed supernatural outcomes. No alarms, step timers, ingredient safety database or reference catalog in this milestone.
 
-Validation pending deliberate CI run.
+## Validation
+
+[Run 37783874901](https://github.com/CCASSA/Lilyly/actions/runs/37783874901) passed for `bfa06e8608a55842bb7135efd42cbfffb2986c54`: 34 JVM tests and 14 Android journeys. The first run's ritual test attempted an offscreen lazy-list save action; exact logs identified the missing node. The test now scrolls to editor/list actions, and the deliberately triggered retry passed. Saved ritual list screenshot visually reviewed. Physical Samsung testing remains with the user.
+
+Preview APK SHA-256: `fb25b9792e1dff37dcf74d7d4576d2235189620e1f55b8507d20a79eb2a8ddbe`. Artifact: `Lilyly-Garden-Preview-safe-side-by-side`.
