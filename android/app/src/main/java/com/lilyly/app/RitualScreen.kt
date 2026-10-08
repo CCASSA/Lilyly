@@ -34,7 +34,7 @@ fun RitualScreen(store:AppStore,onBack:()->Unit,onPages:()->Unit,onJournal:(Jour
     }.sortedByDescending {it.updatedAt}
     BackHandler {if(editing!=null)discard=true else onBack()}
     Scaffold(topBar={TopAppBar(title={Text("The ritual room")},navigationIcon={IconButton(onClick={if(editing!=null)discard=true else onBack()}) {Icon(Icons.Default.ArrowBack,"Back")}})}) {padding ->
-        if(editing==null) LazyColumn(Modifier.fillMaxSize().padding(padding).padding(horizontal=20.dp),contentPadding=PaddingValues(bottom=32.dp),verticalArrangement=Arrangement.spacedBy(18.dp)) {
+        if(editing==null) LazyColumn(Modifier.testTag("ritual-list").fillMaxSize().padding(padding).padding(horizontal=20.dp),contentPadding=PaddingValues(bottom=32.dp),verticalArrangement=Arrangement.spacedBy(18.dp)) {
             item {
                 Text("☾  ❧  ✧",style=MaterialTheme.typography.headlineLarge,color=MaterialTheme.colorScheme.primary)
                 Text("Small acts, held with intention",style=MaterialTheme.typography.headlineLarge)
