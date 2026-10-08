@@ -6,4 +6,8 @@ Selection persists in existing encrypted settings, included in backup. Missing/u
 
 Scope: global colors and typography. Existing specialist canvas art and cycle phase colors remain intentionally independent. This does not yet add custom color editing, texture packs, decorative intensity, downloadable fonts or custom background images.
 
-Validation pending deliberate CI build; Android journey covers theme selection, typography, persistent reload, light mode and unchanged page count.
+## Validation
+
+[Run 37751368009](https://github.com/CCASSA/Lilyly/actions/runs/37751368009) passed for source `95e915be1bb07c192a491611b01b9297fe5f84f9`: 32 JVM tests and 13 Android journeys. New Android journey covers theme selection, typography, persistent reload, light mode and unchanged page count. Captured Celestial/Letters settings screen was visually reviewed. Palette body and primary/secondary/tertiary colors against surface all pass a 4.5:1 computed contrast check; this is not a full accessibility audit.
+
+Preview APK SHA-256: `14d9a72ac9c91778f2c822c40d584c019a565da1ef3ac6480feace122cff1875`. Artifact: `Lilyly-Garden-Preview-safe-side-by-side`. Physical Samsung testing remains with the user.
