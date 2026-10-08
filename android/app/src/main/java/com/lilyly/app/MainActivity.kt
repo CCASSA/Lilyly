@@ -69,15 +69,16 @@ class MainActivity : ComponentActivity() {
         MedicationReminders.schedule(this,store.medications,store.medicationLogs)
         unlocked=!store.appLockEnabled
         setContent {
-            DisposableEffect(store.darkTheme,store.appLockEnabled,store.hideScreenshots) {
-                val style=if(store.darkTheme) SystemBarStyle.dark(android.graphics.Color.rgb(16,15,22)) else SystemBarStyle.light(android.graphics.Color.rgb(245,235,221),android.graphics.Color.rgb(16,15,22))
+            DisposableEffect(store.themeName,store.appLockEnabled,store.hideScreenshots) {
+                val barColor=lilylyPalette(store.themeName,store.darkTheme).background.toInt()
+                val style=if(store.darkTheme) SystemBarStyle.dark(barColor) else SystemBarStyle.light(barColor,barColor)
                 enableEdgeToEdge(statusBarStyle=style,navigationBarStyle=style)
                 if(store.appLockEnabled || store.hideScreenshots) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE) else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                 onDispose { }
             }
             val pages=rememberSaveableStateHolder()
             if(!store.appLockEnabled || unlocked) pages.SaveableStateProvider("lilyly") {LilylyApp(store, intent.getBooleanExtra("medication",false))}
-            else LilylyTheme(store.darkTheme) {
+            else LilylyTheme(store.darkTheme, store.themeName, store.typeStyle) {
                 Surface(Modifier.fillMaxSize()) {
                     Column(Modifier.fillMaxSize().padding(30.dp),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally) {
                         Text("☾",style=MaterialTheme.typography.displayLarge)

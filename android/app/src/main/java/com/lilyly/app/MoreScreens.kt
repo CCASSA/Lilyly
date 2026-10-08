@@ -111,7 +111,7 @@ fun SettingsScreen(store: AppStore, onBack: () -> Unit) {
     Scaffold(topBar = { TopAppBar(title = { Text("Settings & privacy") }, navigationIcon = { IconButton(onClick = onBack, enabled = !store.privacyBusy) { Icon(Icons.Default.ArrowBack, "Back") } }) }) { padding ->
         LazyColumn(Modifier.padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
-                SettingToggle("Nightshade theme", "Dark Victorian / candlelit palette", store.darkTheme) { store.setTheme(it) }
+                ThemePicker(store)
             }
             item {
                 Text("Hemisphere", fontWeight = FontWeight.SemiBold)

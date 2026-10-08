@@ -182,6 +182,17 @@ class AppStore(context: Context) {
         private set
     fun personalizeHome(name: String, sections: Set<String>) { greetingName=name.take(40);homeSections=sections.intersect(homeSectionNames.toSet());saveSettings() }
 
+    var themeName by mutableStateOf("Lilyly")
+        private set
+    var typeStyle by mutableStateOf("Storybook")
+        private set
+    fun personalizeTheme(name: String, typography: String = typeStyle) {
+        val palette=lilylyPalette(name,darkTheme)
+        themeName=palette.name; darkTheme=palette.dark
+        typeStyle=typography.takeIf {it in lilylyTypeStyles} ?: "Storybook"
+        saveSettings()
+    }
+
     var darkTheme by mutableStateOf(true)
         private set
     var hemisphere by mutableStateOf("Southern")
@@ -198,7 +209,7 @@ class AppStore(context: Context) {
 
     init { loadAll() }
 
-    fun setTheme(dark: Boolean) { darkTheme = dark; saveSettings() }
+    fun setTheme(dark: Boolean) { personalizeTheme(if(dark) "Lilyly" else "Cottage Witch") }
     fun updateHemisphere(value: String) { hemisphere = value; saveSettings() }
     fun updateSafetyPlan(value: String) { safetyPlan = value; saveSettings() }
     fun updateMentalProfile(value: String) { mentalProfile = value; saveSettings() }
@@ -266,6 +277,9 @@ class AppStore(context: Context) {
             greetingName = settings.optString("greetingName", "")
             homeSections = settings.optJSONArray("homeSections")?.let { a -> (0 until a.length()).map { a.getString(it) }.toSet().intersect(homeSectionNames.toSet()) } ?: homeSectionNames.toSet()
             darkTheme = settings.optBoolean("darkTheme", true)
+            themeName = lilylyPalette(settings.optString("themeName", ""), darkTheme).name
+            darkTheme = lilylyPalette(themeName).dark
+            typeStyle = settings.optString("typeStyle", "Storybook").takeIf {it in lilylyTypeStyles} ?: "Storybook"
             hemisphere = settings.optString("hemisphere", "Southern")
             safetyPlan = settings.optString("safetyPlan", "")
             mentalProfile = settings.optString("mentalProfile", "")
@@ -298,7 +312,7 @@ class AppStore(context: Context) {
         saveJournal()
     }
 
-    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("notebookCovers",JSONObject(notebookCovers)).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList()))
+    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("themeName",themeName).put("typeStyle",typeStyle).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("notebookCovers",JSONObject(notebookCovers)).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList()))
         .put("cyclePreferences", JSONObject().put("length", cyclePreferences.length).put("periodLength", cyclePreferences.periodLength)
             .put("lutealLength", cyclePreferences.lutealLength).put("pmsDays", cyclePreferences.pmsDays)
             .put("mode", cyclePreferences.mode).put("contraception", cyclePreferences.contraception).put("useHistory", cyclePreferences.useHistory)).toString())
