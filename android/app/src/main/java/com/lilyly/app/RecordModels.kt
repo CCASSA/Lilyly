@@ -19,13 +19,14 @@ data class JournalEntry(
     val canvasJson: String = "[]",
     val paper: String = "Parchment",
     val favorite: Boolean = false,
-    val notebook: String = ""
+    val notebook: String = "",
+    val ritualJson: String = ""
 ) {
     fun toJson() = JSONObject()
         .put("id", id).put("section", section).put("title", title).put("body", body)
         .put("tags", tags).put("imageUri", imageUri).put("inkJson", inkJson)
         .put("createdAt", createdAt).put("updatedAt", updatedAt)
-        .put("canvasJson", canvasJson).put("paper", paper).put("favorite", favorite).put("notebook", notebook)
+        .put("canvasJson", canvasJson).put("paper", paper).put("favorite", favorite).put("notebook", notebook).put("ritualJson", ritualJson)
 
     companion object {
         fun fromJson(o: JSONObject) = JournalEntry(
@@ -39,7 +40,7 @@ data class JournalEntry(
             createdAt = o.optString("createdAt", LocalDateTime.now().toString()),
             updatedAt = o.optString("updatedAt", LocalDateTime.now().toString()),
             canvasJson = o.optString("canvasJson", "[]"), paper = o.optString("paper", "Parchment"),
-            favorite = o.optBoolean("favorite", false), notebook = o.optString("notebook")
+            favorite = o.optBoolean("favorite", false), notebook = o.optString("notebook"), ritualJson = o.optString("ritualJson")
         )
     }
 }

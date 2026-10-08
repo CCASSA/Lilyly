@@ -186,6 +186,7 @@ fun JournalEditorScreen(
                 }
             }
             item {
+                if(entry.ritualJson.isNotBlank()) Text(ritualSummary(RitualDetails.fromJson(entry.ritualJson)), style=MaterialTheme.typography.bodyMedium)
                 OutlinedTextField(
                     value = entry.title,
                     onValueChange = { entry = entry.copy(title = it) },
