@@ -18,7 +18,7 @@ fun dayThreads(cycles:List<CycleLog>,mind:List<MentalCheckIn>,sleeps:List<SleepR
         if(r.feelings.isNotEmpty())add(r.feelings.sorted().joinToString(" · "))
         if(r.detailedRatings)add("Mood ${r.mood}/10 · anxiety ${r.anxiety}/10 · energy ${r.energy}/10")
         if(r.notes.isNotBlank())add(r.notes)
-    }.joinToString("\n").ifBlank {"A check-in kept."}))) }
+    }.joinToString("\n").ifBlank {"A check-in kept."})) }
     sleeps.forEach {r -> add(DayThread("sleep:${r.id}",r.date,"Sleep","${sleepDurationLabel(r.durationMinutes)} of recorded rest",buildList {
         add("Wake date · ${r.wakeTime.take(10)}")
         if(r.quality.isNotBlank())add(r.quality)
