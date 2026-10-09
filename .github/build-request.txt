@@ -1,1 +1,1 @@
-Build Day Threads 0.12 — correct check-in summary syntax, 2026-10-09
+Build Day Threads 0.12 — resolve generated setter name clash, 2026-10-09

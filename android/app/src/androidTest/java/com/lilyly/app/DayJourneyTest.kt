@@ -32,10 +32,10 @@ class DayJourneyTest {
         rule.waitForIdle()
         val bitmap=InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
         File(rule.activity.filesDir,"day-threads.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)};bitmap.recycle()
-        rule.runOnUiThread {store.setDaySections(store.daySections-"Sleep");assertFalse("Sleep" in AppStore(rule.activity).daySections)}
+        rule.runOnUiThread {store.updateDaySections(store.daySections-"Sleep");assertFalse("Sleep" in AppStore(rule.activity).daySections)}
         rule.onNodeWithTag("day-threads").performScrollToNode(hasText("Open page · A thread worth keeping"))
         rule.onNodeWithText("Open page · A thread worth keeping").performClick()
         rule.onNodeWithText("Page title").assertExists()
-        rule.runOnUiThread {store.setDaySections(dayThreadCategories.toSet())}
+        rule.runOnUiThread {store.updateDaySections(dayThreadCategories.toSet())}
     }
 }

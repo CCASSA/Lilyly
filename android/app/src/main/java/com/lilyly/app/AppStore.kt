@@ -178,7 +178,7 @@ class AppStore(context: Context) {
 
     var daySections by mutableStateOf(dayThreadCategories.toSet())
         private set
-    fun setDaySections(value:Set<String>) {daySections=value.intersect(dayThreadCategories.toSet());saveSettings()}
+    fun updateDaySections(value:Set<String>) {daySections=value.intersect(dayThreadCategories.toSet());saveSettings()}
     var homeSections by mutableStateOf(homeSectionNames.toSet())
         private set
     var greetingName by mutableStateOf("")

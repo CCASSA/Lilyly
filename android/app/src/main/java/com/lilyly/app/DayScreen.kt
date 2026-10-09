@@ -68,7 +68,7 @@ fun DayScreen(store:AppStore,onBack:()->Unit,onPage:(JournalEntry)->Unit,onSpace
     if(choosing) AlertDialog(onDismissRequest={choosing=false},title={Text("The threads you want to see")},text={Column {
         Text("This only changes this view. Your saved records stay in their own spaces.",style=MaterialTheme.typography.bodySmall)
         dayThreadCategories.forEach {category -> Row {
-            Checkbox(category in store.daySections,{enabled ->store.setDaySections(if(enabled)store.daySections+category else store.daySections-category)})
+            Checkbox(category in store.daySections,{enabled ->store.updateDaySections(if(enabled)store.daySections+category else store.daySections-category)})
             Text(category,Modifier.padding(top=12.dp))
         }}
     }},confirmButton={TextButton(onClick={choosing=false}) {Text("Done")}})
