@@ -8,19 +8,21 @@ import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
+import org.junit.After
 import org.junit.runner.RunWith
 import java.io.File
 import java.time.LocalDate
 @RunWith(AndroidJUnit4::class)
 class DayJourneyTest {
     @get:Rule val rule=createAndroidComposeRule<MainActivity>()
+    @After fun cleanUpSampleNight() { rule.runOnUiThread {AppStore(rule.activity).deleteSleep("day-journey-night")} }
     @Test fun gatherDateHideThreadPersistChoiceAndOpenActualPage() {
         lateinit var store:AppStore
         val today=LocalDate.now()
         rule.runOnUiThread {
             store=AppStore(rule.activity)
             store.addMentalCheckIn(MentalCheckIn(dateTime=today.toString()+"T09:00",feelings=setOf("Quietly hopeful"),detailedRatings=false))
-            store.saveSleep(SleepRecord(bedtime=today.minusDays(1).toString()+"T23:00",wakeTime=today.toString()+"T07:00",quality="Restful"))
+            store.saveSleep(SleepRecord(id="day-journey-night",bedtime=today.minusDays(1).toString()+"T23:00",wakeTime=today.toString()+"T07:00",quality="Restful"))
             store.upsertJournal(JournalEntry(title="A thread worth keeping",body="My connected day",createdAt=today.toString()+"T10:00"))
             rule.activity.setContent {LilylyApp(store)}
         }

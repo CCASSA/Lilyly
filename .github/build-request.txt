@@ -1,1 +1,1 @@
-Build Day Threads 0.12 — resolve generated setter name clash, 2026-10-09
+Build Day Threads 0.12 — isolate test sleep fixture after overlap validation, 2026-10-09
