@@ -8,4 +8,8 @@ Pages open their actual editor IDs. Other links visit the corresponding room; Cy
 
 Limits: grouped daily records, not a chronological timestamp timeline or a correlation engine. Other room links do not yet focus the exact historical record. Filtering is only for this view, not global privacy policy. Computation currently scans local record lists; pagination/indexing remains a scale improvement.
 
-Validation pending deliberate build.
+## Validation
+
+[Run 37938123959](https://github.com/CCASSA/Lilyly/actions/runs/37938123959) passed for `8eb3221b50308b1e73b4c572e8d9fa7a7da28afa`: 36 JVM tests and 15 Android journeys. Initial compiler failures (extra parenthesis and generated setter clash) were fixed from exact logs. Stale-checkout integration was corrected to preserve all Ritual Room routes and tests. The daily test's overnight fixture was cleaned up after it correctly triggered the later sleep journey's overlap validation. Final suite passes with product overlap protection retained. Daily-view screenshot reviewed. Physical Samsung validation remains with the user.
+
+Preview APK SHA-256: `3b4e7cd4510db0b509bd397016126b07676154b96154cc4fbea3a5a17d5609d9`. Artifact: `Lilyly-Garden-Preview-safe-side-by-side`.
