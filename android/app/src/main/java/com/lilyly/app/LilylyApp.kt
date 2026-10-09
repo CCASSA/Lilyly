@@ -41,6 +41,7 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false) {
         var section by rememberSaveable { mutableStateOf("Journal") }
         var editingId by rememberSaveable { mutableStateOf<String?>(null) }
 
+        var initialCycleDate by rememberSaveable {mutableStateOf<String?>(null)}
         var initialBookId by rememberSaveable { mutableStateOf<String?>(null) }
         var sanctuaryTab by rememberSaveable { mutableStateOf(if(openMedication) "Medication" else "Check-in") }
 
@@ -89,8 +90,8 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false) {
                 when (route) {
                     "home" -> LibraryHomeScreen(
                         store = store,
-                        onOpenSection = { s -> section = s; route = if(s == "Dreams") "sleep" else if(s == "Spells") "rituals" else "section" },
-                        onOpenCycle = { route = "cycle" },
+                        onOpenSection = { s -> section = s; route = if(s == "Dreams") "sleep" else "section" },
+                        onOpenCycle = { initialCycleDate=null;route = "cycle" },
                         onOpenSanctuary = { sanctuaryTab="Check-in";route = "sanctuary" },
                         onOpenTarot = { route = "tarot" },
                         onOpenBookshelf = { initialBookId=null;route = "bookshelf" },
@@ -98,16 +99,17 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false) {
                         onReadBook = { id -> initialBookId=id;route="bookshelf" },
                         onNewPage = { editingId=null;section="Journal";route="editor" },
                         onMedication = { sanctuaryTab="Medication";route="sanctuary" },
+                        onOpenDay = {route="day"},
                         onOpenEntry = { entry -> editingId=entry.id;section=entry.section;route="editor" }
                     )
                     "journal" -> JournalListScreen(store, "Journal", onEdit = { editingId = it; section = "Journal"; route = "editor" }, onNew = { editingId = null; section = "Journal"; route = "editor" })
                     "section" -> JournalListScreen(store, section, onBack = { route = "home" }, onEdit = { editingId = it; route = "editor" }, onNew = { editingId = null; route = "editor" })
                     "editor" -> JournalEditorScreen(store, editingId, section, onDone = { route = if (section == "Journal") "journal" else "section" }, onBack = { route = if (section == "Journal") "journal" else "section" })
-                    "cycle" -> CycleScreen(store)
+                    "cycle" -> CycleScreen(store,initialCycleDate)
                     "sanctuary" -> SanctuaryScreen(store, sanctuaryTab, onJournal={entry -> editingId=entry.id;section=entry.section;route="editor"})
                     "more" -> MoreHubScreen(
                         store = store,
-                        onOpenSection = { s -> section = s; route = if(s == "Dreams") "sleep" else if(s == "Spells") "rituals" else "section" },
+                        onOpenSection = { s -> section = s; route = if(s == "Dreams") "sleep" else "section" },
                         onOpenTarot = { route = "tarot" },
                         onOpenBookshelf = { initialBookId=null;route = "bookshelf" },
                         onOpenCalendar = { route = "calendar" },
@@ -116,7 +118,15 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false) {
                     "tarot" -> TarotScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                     "bookshelf" -> BookshelfScreen(store, initialBookId=initialBookId, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                     "sleep" -> SleepScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" }, onDreamPages = { section = "Dreams"; route = "section" })
-                    "rituals" -> RitualScreen(store, onBack={route="more"}, onPages={section="Spells";route="section"}, onJournal={entry -> section=entry.section;editingId=entry.id;route="editor"})
+                    "day" -> DayScreen(store,onBack={route="home"},onPage={entry -> section=entry.section;editingId=entry.id;route="editor"},onSpace={category,date ->
+                        when(category) {
+                            "Cycle" -> {initialCycleDate=date;route="cycle"}
+                            "Sanctuary","Medication","Therapy" -> {sanctuaryTab=if(category=="Sanctuary") "Check-in" else category;route="sanctuary"}
+                            "Sleep" -> route="sleep"
+                            "Tarot" -> route="tarot"
+                            "Rituals" -> route="rituals"
+                        }
+                    })
                     "calendar" -> MagicalCalendarScreen(store, onBack = { route = "more" })
                     "settings" -> SettingsScreen(store, onBack = { route = "more" })
                     "search" -> SearchScreen(store, onBack = { route = "home" }, onOpenJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })

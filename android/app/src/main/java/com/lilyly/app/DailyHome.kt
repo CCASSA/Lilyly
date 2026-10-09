@@ -39,6 +39,7 @@ fun LibraryHomeScreen(
     onOpenSanctuary: ()->Unit, onOpenTarot: ()->Unit, onOpenBookshelf: ()->Unit,
     onOpenCalendar: ()->Unit, onReadBook: (String)->Unit = {onOpenBookshelf()},
     onNewPage: ()->Unit = {onOpenSection("Journal")}, onMedication: ()->Unit = onOpenSanctuary,
+    onOpenDay: ()->Unit = {},
     onOpenEntry: (JournalEntry)->Unit = {onOpenSection(it.section)}
 ) {
     val now by produceState(LocalDateTime.now()) { while(true) {value=LocalDateTime.now();delay(60000)} }
@@ -53,6 +54,7 @@ fun LibraryHomeScreen(
                 Text(today.format(DateTimeFormatter.ofPattern("EEEE · d MMMM")),style=MaterialTheme.typography.labelLarge,color=MaterialTheme.colorScheme.primary)
                 Text(greeting + if(store.greetingName.isNotBlank()) ", ${store.greetingName}" else "", style=MaterialTheme.typography.headlineLarge)
                 Text("Your pages are here. Take the time you need.",color=MaterialTheme.colorScheme.onSurface.copy(alpha=.72f))
+                TextButton(onClick=onOpenDay) {Text("Gather the threads of a day")}
                 TextButton(onClick=onOpenCalendar,contentPadding=PaddingValues(0.dp)) {Text("☾  ${moonPhaseName(now)} · approximate")}
             }
         }

@@ -57,10 +57,11 @@ private fun phaseColor(state: CycleDayState): Color = when {
 }
 
 @Composable
-fun CycleScreen(store: AppStore) {
+fun CycleScreen(store: AppStore, initialDate:String?=null) {
     val today = LocalDate.now()
-    var monthText by rememberSaveable { mutableStateOf(YearMonth.from(today).toString()) }
-    var selectedText by rememberSaveable { mutableStateOf(today.toString()) }
+    val openingDate=initialDate?.let {runCatching {LocalDate.parse(it)}.getOrNull()} ?: today
+    var monthText by rememberSaveable(initialDate) { mutableStateOf(YearMonth.from(openingDate).toString()) }
+    var selectedText by rememberSaveable(initialDate) { mutableStateOf(openingDate.toString()) }
     var editing by rememberSaveable { mutableStateOf(false) }
     var settings by rememberSaveable { mutableStateOf(false) }
     val month = YearMonth.parse(monthText)

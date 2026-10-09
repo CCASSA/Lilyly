@@ -176,6 +176,9 @@ class AppStore(context: Context) {
         val template=freshPage(entry,"Templates","");upsertJournal(template);return template
     }
 
+    var daySections by mutableStateOf(dayThreadCategories.toSet())
+        private set
+    fun setDaySections(value:Set<String>) {daySections=value.intersect(dayThreadCategories.toSet());saveSettings()}
     var homeSections by mutableStateOf(homeSectionNames.toSet())
         private set
     var greetingName by mutableStateOf("")
@@ -275,6 +278,7 @@ class AppStore(context: Context) {
             val covers=settings.optJSONObject("notebookCovers") ?: JSONObject()
             notebookCovers=covers.keys().asSequence().associateWith {covers.getString(it)}
             greetingName = settings.optString("greetingName", "")
+            daySections = settings.optJSONArray("daySections")?.let {a -> (0 until a.length()).map {a.getString(it)}.toSet().intersect(dayThreadCategories.toSet())} ?: dayThreadCategories.toSet()
             homeSections = settings.optJSONArray("homeSections")?.let { a -> (0 until a.length()).map { a.getString(it) }.toSet().intersect(homeSectionNames.toSet()) } ?: homeSectionNames.toSet()
             darkTheme = settings.optBoolean("darkTheme", true)
             themeName = lilylyPalette(settings.optString("themeName", ""), darkTheme).name
@@ -312,7 +316,7 @@ class AppStore(context: Context) {
         saveJournal()
     }
 
-    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("themeName",themeName).put("typeStyle",typeStyle).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("notebookCovers",JSONObject(notebookCovers)).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList()))
+    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("themeName",themeName).put("typeStyle",typeStyle).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("notebookCovers",JSONObject(notebookCovers)).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList())).put("daySections",JSONArray(daySections.toList()))
         .put("cyclePreferences", JSONObject().put("length", cyclePreferences.length).put("periodLength", cyclePreferences.periodLength)
             .put("lutealLength", cyclePreferences.lutealLength).put("pmsDays", cyclePreferences.pmsDays)
             .put("mode", cyclePreferences.mode).put("contraception", cyclePreferences.contraception).put("useHistory", cyclePreferences.useHistory)).toString())
