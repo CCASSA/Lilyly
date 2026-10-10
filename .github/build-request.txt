@@ -1,1 +1,1 @@
-Build Lilyly 0.13 Spotify music pages; run unit and Android journeys.
+Build Lilyly 0.13 Spotify music pages with save/reopen Android journey.
