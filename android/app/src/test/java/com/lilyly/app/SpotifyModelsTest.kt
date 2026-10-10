@@ -9,13 +9,18 @@ class SpotifyModelsTest {
         assertEquals("playlist",spotifyLink("spotify:playlist:$id")?.kind)
         listOf("http://open.spotify.com/track/$id","https://open.spotify.com.evil.test/track/$id","https://evil@open.spotify.com/track/$id","https://open.spotify.com/album/$id","https://open.spotify.com/track/short").forEach {assertNull(spotifyLink(it))}
     }
-    @Test fun callbackRejectsWrongStateHostReplayAndExpiry() {
+    @Test fun callbackRejectsWrongStateHostDuplicatesAndExpiry() {
         val redirect="https://music.example.org/spotify/callback"
         assertTrue(validSpotifyCallback("$redirect?code=a&state=expected",redirect,"expected",1000,2000))
         assertFalse(validSpotifyCallback("$redirect?code=a&state=wrong",redirect,"expected",1000,2000))
         assertFalse(validSpotifyCallback("$redirect?state=expected&state=expected",redirect,"expected",1000,2000))
         assertFalse(validSpotifyCallback("$redirect?state=expected",redirect,"expected",1000,700001))
         assertFalse(validSpotifyCallback("https://evil.test/spotify/callback?state=expected",redirect,"expected",1000,2000))
+    }
+    @Test fun legacyPagesAndMusicRoundTrip() {
+        assertEquals("[]",JournalEntry.fromJson(org.json.JSONObject("{\"title\":\"Old page\"}")).musicJson)
+        val page=JournalEntry(musicJson=musicJson(listOf(MusicAttachment("https://open.spotify.com/track/1234567890123456789012","Memory"))))
+        assertEquals(page.musicJson,JournalEntry.fromJson(page.toJson()).musicJson)
     }
     @Test fun attachmentsPreserveCaptionAndMetadata() {
         val item=MusicAttachment("https://open.spotify.com/track/1234567890123456789012","My memory","Title","Artist")
