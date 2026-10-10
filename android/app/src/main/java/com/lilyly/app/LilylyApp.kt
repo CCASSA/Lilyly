@@ -35,9 +35,9 @@ private data class NavItem(val route: String, val label: String, val icon: @Comp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LilylyApp(store: AppStore, openMedication: Boolean = false) {
+fun LilylyApp(store: AppStore, openMedication: Boolean = false, openSpotify: Boolean = false) {
     LilylyTheme(store.darkTheme, store.themeName, store.typeStyle) {
-        var route by rememberSaveable { mutableStateOf(if(openMedication) "sanctuary" else "home") }
+        var route by rememberSaveable { mutableStateOf(if(openSpotify) "spotify" else if(openMedication) "sanctuary" else "home") }
         var section by rememberSaveable { mutableStateOf("Journal") }
         var editingId by rememberSaveable { mutableStateOf<String?>(null) }
 
@@ -129,7 +129,8 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false) {
                     })
                     "rituals" -> RitualScreen(store, onBack={route="more"}, onPages={section="Spells";route="section"}, onJournal={entry -> section=entry.section;editingId=entry.id;route="editor"})
                     "calendar" -> MagicalCalendarScreen(store, onBack = { route = "more" })
-                    "settings" -> SettingsScreen(store, onBack = { route = "more" })
+                    "spotify" -> SpotifyScreen(onBack={route="settings"})
+                    "settings" -> SettingsScreen(store, onBack = { route = "more" }, onSpotify={route="spotify"})
                     "search" -> SearchScreen(store, onBack = { route = "home" }, onOpenJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                 }
             }

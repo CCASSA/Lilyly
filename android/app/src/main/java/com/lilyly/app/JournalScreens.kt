@@ -253,6 +253,7 @@ fun JournalEditorScreen(
                 }
             }
             item {
+                MusicAttachmentsPanel(entry.musicJson) {entry=entry.copy(musicJson=it)}
                 TextButton(onClick={store.keepPageTemplate(entry);templateSaved=true},enabled=!templateSaved) { Text(if(templateSaved) "Template kept" else "Save as reusable template") }
                 FilterChip(entry.favorite, { entry = entry.copy(favorite = !entry.favorite) }, label = { Text("Favorite page") })
                 OutlinedTextField(entry.notebook, { entry = entry.copy(notebook = it) }, label = { Text("Notebook or collection") }, modifier = Modifier.fillMaxWidth())

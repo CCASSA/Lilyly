@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
                 onDispose { }
             }
             val pages=rememberSaveableStateHolder()
-            if(!store.appLockEnabled || unlocked) pages.SaveableStateProvider("lilyly") {LilylyApp(store, intent.getBooleanExtra("medication",false))}
+            if(!store.appLockEnabled || unlocked) pages.SaveableStateProvider("lilyly") {LilylyApp(store, intent.getBooleanExtra("medication",false), intent.getBooleanExtra("spotify",false))}
             else LilylyTheme(store.darkTheme, store.themeName, store.typeStyle) {
                 Surface(Modifier.fillMaxSize()) {
                     Column(Modifier.fillMaxSize().padding(30.dp),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally) {

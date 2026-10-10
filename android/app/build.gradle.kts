@@ -4,6 +4,11 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val spotifyClient = providers.gradleProperty("spotifyClientId").orElse("").get()
+val spotifyHost = providers.gradleProperty("spotifyRedirectHost").orElse("unconfigured.invalid").get().ifBlank { "unconfigured.invalid" }
+require(spotifyClient.isEmpty() || spotifyClient.matches(Regex("[a-fA-F0-9]{32}")))
+require(spotifyHost.matches(Regex("[a-zA-Z0-9.-]+")))
+
 android {
     namespace = "com.lilyly.app"
     compileSdk = 36
@@ -13,15 +18,22 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         minSdk = 26
         targetSdk = 36
-        versionCode = 12
-        versionName = "0.12.0-day-threads"
+        versionCode = 13
+        versionName = "0.13.0-music-pages"
         manifestPlaceholders["appLabel"] = "Lilyly"
+        manifestPlaceholders["spotifyHost"] = spotifyHost
+        manifestPlaceholders["spotifyPath"] = "/spotify/callback"
+        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"$spotifyClient\"")
+        buildConfigField("String", "SPOTIFY_REDIRECT_HOST", "\"$spotifyHost\"")
+        buildConfigField("String", "SPOTIFY_REDIRECT_PATH", "\"/spotify/callback\"")
     }
 
     buildTypes {
         create("preview") {
             initWith(getByName("debug"))
             applicationIdSuffix = ".preview"
+            manifestPlaceholders["spotifyPath"] = "/spotify/preview/callback"
+            buildConfigField("String", "SPOTIFY_REDIRECT_PATH", "\"/spotify/preview/callback\"")
             versionNameSuffix = "-preview"
             manifestPlaceholders["appLabel"] = "Lilyly Garden Preview"
             matchingFallbacks += listOf("debug")

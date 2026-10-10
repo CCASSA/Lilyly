@@ -19,8 +19,8 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-private class SecurePreferences(context: Context) {
-    private val prefs = context.getSharedPreferences("lilyly_secure", Context.MODE_PRIVATE)
+internal class SecurePreferences(context: Context, namespace: String = "lilyly_secure") {
+    private val prefs = context.getSharedPreferences(namespace, Context.MODE_PRIVATE)
     private val keyAlias = "lilyly_local_data_key"
     private val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
 

@@ -1,1 +1,1 @@
-Build Day Threads 0.12 — isolate test sleep fixture after overlap validation, 2026-10-09
+Build Lilyly 0.13 Spotify music pages; run unit and Android journeys.

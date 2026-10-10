@@ -12,6 +12,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_spotifyClientId: ${{ vars.SPOTIFY_CLIENT_ID }}
+      ORG_GRADLE_PROJECT_spotifyRedirectHost: ${{ vars.SPOTIFY_REDIRECT_HOST }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v5
@@ -40,7 +43,7 @@ jobs:
           path: android/app/build/reports/tests/testDebugUnitTest
       - uses: actions/upload-artifact@v4
         with:
-          name: Lilyly-0.12.0-day-threads-debug
+          name: Lilyly-0.13.0-music-pages-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
