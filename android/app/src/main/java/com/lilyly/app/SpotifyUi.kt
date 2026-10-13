@@ -51,7 +51,7 @@ fun SpotifyScreen(onBack:()->Unit) {
 }
 
 @Composable
-fun MusicAttachmentsPanel(raw:String,onChanged:(String)->Unit) {
+fun MusicAttachmentsPanel(raw:String, title:String="Music for this page", saveHint:String="Save your page to keep the attachment.", addLabel:String="Add to page", savedMusic:List<MusicAttachment> = emptyList(), onChanged:(String)->Unit) {
     val context=LocalContext.current
     val session=remember {SpotifySession(context)}
     val scope=rememberCoroutineScope()
@@ -62,9 +62,12 @@ fun MusicAttachmentsPanel(raw:String,onChanged:(String)->Unit) {
     var caption by rememberSaveable {mutableStateOf("")}
     var message by remember {mutableStateOf("")}
     var busy by remember {mutableStateOf(false)}
+    var picking by rememberSaveable {mutableStateOf(false)}
+    var editingUrl by rememberSaveable {mutableStateOf<String?>(null)}
+    var editedCaption by rememberSaveable {mutableStateOf("")}
     val attachments=musicAttachments(raw)
     Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        Text("Music for this page",style=MaterialTheme.typography.titleLarge)
+        Text(title,style=MaterialTheme.typography.titleLarge)
         attachments.forEach {item ->
             Surface(color=MaterialTheme.colorScheme.secondaryContainer,shape=MaterialTheme.shapes.large) {
                 Column(Modifier.fillMaxWidth().padding(18.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
@@ -76,6 +79,7 @@ fun MusicAttachmentsPanel(raw:String,onChanged:(String)->Unit) {
                         TextButton(onClick={try{context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(item.url)))}catch(e:Exception){message="No app is available to open this link."}}){Text("Open in Spotify")}
                         TextButton(onClick={onChanged(musicJson(attachments.filterNot {it.url==item.url}))},enabled=!busy){Text("Remove")}
                     }
+                    TextButton(onClick={editingUrl=item.url;editedCaption=item.label}) {Text("Edit caption")}
                     if(session.linked) TextButton(enabled=!busy,onClick={
                         busy=true;message=""
                         scope.launch {
@@ -92,18 +96,29 @@ fun MusicAttachmentsPanel(raw:String,onChanged:(String)->Unit) {
         }
         if(attachments.isEmpty()) Text("A song for a memory, a playlist for a ritual. Add a link and a personal caption.")
         OutlinedButton(onClick={adding=true;message=""},enabled=attachments.size<12 && !busy){Text("Attach Spotify music")}
+        if(savedMusic.any {candidate -> attachments.none {it.url==candidate.url}}) TextButton(onClick={picking=true},enabled=attachments.size<12 && !busy) {Text("Choose saved music")}
         if(message.isNotBlank()) Text(message)
         if(busy) LinearProgressIndicator(Modifier.fillMaxWidth())
     }
+    if(picking) SavedMusicPicker(savedMusic.filter {candidate -> attachments.none {it.url==candidate.url}},onChoose={item ->
+        val latest=musicAttachments(currentRaw)
+        if(latest.size<12) change(musicJson(uniqueMusic(latest+item)))
+        picking=false
+    },onClose={picking=false})
+    if(editingUrl!=null) AlertDialog(onDismissRequest={editingUrl=null},title={Text("Your caption")},text={
+        OutlinedTextField(editedCaption,{editedCaption=it},label={Text("Personal caption")})
+    },confirmButton={TextButton(onClick={
+        change(musicJson(musicAttachments(currentRaw).map {if(it.url==editingUrl)it.copy(label=editedCaption.trim()) else it}));editingUrl=null
+    }){Text("Keep caption")}},dismissButton={TextButton(onClick={editingUrl=null}){Text("Cancel")}})
     if(adding) AlertDialog(onDismissRequest={adding=false},title={Text("A little soundtrack")},text={Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
         OutlinedTextField(value=url,onValueChange={url=it},label={Text("Spotify song or playlist link")},singleLine=true)
         OutlinedTextField(value=caption,onValueChange={caption=it},label={Text("Personal caption (optional)")})
-        Text("Use Share → Copy link in Spotify. Save your page to keep the attachment.")
+        Text("Use Share → Copy link in Spotify. $saveHint")
         if(message.isNotBlank()) Text(message)
     }},confirmButton={TextButton(onClick={
         val link=spotifyLink(url)
         if(link==null) message="Paste a full open.spotify.com song or playlist link."
         else if(attachments.any {it.url==link.url}) message="That music is already on this page."
         else {onChanged(musicJson(attachments+MusicAttachment(link.url,label=caption.trim())));url="";caption="";adding=false;message=""}
-    }){Text("Add to page")}},dismissButton={TextButton(onClick={adding=false}){Text("Cancel")}})
+    }){Text(addLabel)}},dismissButton={TextButton(onClick={adding=false}){Text("Cancel")}})
 }

@@ -107,6 +107,7 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
         Surface(Modifier.navigationBarsPadding()) { Button(onClick = { importer.launch(arrayOf("application/pdf","application/epub+zip")) }, enabled = !busy, modifier = Modifier.fillMaxWidth().padding(14.dp)) { Text(if(busy) "Bringing your book inside…" else "Import EPUB or PDF") } }
     }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).background(palette.wall).testTag("bookshelf"), contentPadding=PaddingValues(bottom=24.dp)) {
+            item { SoundtrackButton(store,"reading",Modifier.padding(horizontal=18.dp)) }
             item { NookAtmosphere(store.nookTheme); Text("Stay for one more chapter", style=MaterialTheme.typography.headlineMedium,color=palette.ink,modifier=Modifier.padding(18.dp)) }
             item {
                 LazyRow(contentPadding=PaddingValues(horizontal=18.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) { items(listOf("Cottage","Gothic","Celestial","Botanical")) { theme -> FilterChip(store.nookTheme==theme,{store.updateNookTheme(theme)},label={Text(theme,color=palette.ink)}) } }
@@ -224,6 +225,7 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
     if(panel.isNotEmpty()) ModalBottomSheet(onDismissRequest={panel=""}) {
         LazyColumn(Modifier.padding(horizontal=20.dp),contentPadding=PaddingValues(bottom=28.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             item {
+                SoundtrackButton(store,"reading")
                 Text(book.title,style=MaterialTheme.typography.headlineSmall)
                 Text("${book.author} · ${book.readingSeconds/60} minutes of reading",style=MaterialTheme.typography.bodySmall)
                 Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {

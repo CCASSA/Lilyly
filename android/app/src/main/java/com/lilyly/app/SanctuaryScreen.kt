@@ -49,6 +49,7 @@ fun SanctuaryScreen(store: AppStore, initialTab: String = "Check-in", onJournal:
                 FilterChip(selected = tab == item, onClick = { tab = item }, label = { Text(item) })
             }
         }
+        SoundtrackButton(store,"sanctuary")
         Spacer(Modifier.height(8.dp))
         Box(Modifier.weight(1f)) {
             when (tab) {

@@ -210,6 +210,18 @@ class AppStore(context: Context) {
 
     fun updateCyclePreferences(value: CyclePreferences) { cyclePreferences = value; saveSettings() }
 
+    var soundtracks by mutableStateOf<Map<String,String>>(emptyMap())
+        private set
+    fun updateSoundtrack(space:String, raw:String) {
+        require(space in soundtrackSpaces)
+        soundtracks=soundtracks + (space to musicJson(uniqueMusic(musicAttachments(raw)).take(12)))
+        saveSettings()
+    }
+    fun savedMusic():List<MusicAttachment> = uniqueMusic(
+        journalEntries.filter {it.section!="Templates"}.flatMap {musicAttachments(it.musicJson)} +
+        soundtracks.values.flatMap {musicAttachments(it)}
+    )
+
     init { loadAll() }
 
     fun setTheme(dark: Boolean) { personalizeTheme(if(dark) "Lilyly" else "Cottage Witch") }
@@ -266,6 +278,7 @@ class AppStore(context: Context) {
         }
         runCatching {
             val settings = JSONObject(secure.get("settings", "{}"))
+            soundtracks=readSoundtracks(settings)
             val c = settings.optJSONObject("cyclePreferences") ?: JSONObject()
             cyclePreferences = CyclePreferences(
                 length = c.optInt("length", 28).coerceIn(15, 90),
@@ -316,7 +329,7 @@ class AppStore(context: Context) {
         saveJournal()
     }
 
-    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("themeName",themeName).put("typeStyle",typeStyle).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("notebookCovers",JSONObject(notebookCovers)).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList())).put("daySections",JSONArray(daySections.toList()))
+    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("themeName",themeName).put("typeStyle",typeStyle).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("notebookCovers",JSONObject(notebookCovers)).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList())).put("daySections",JSONArray(daySections.toList())).put("soundtracks",JSONObject(soundtracks))
         .put("cyclePreferences", JSONObject().put("length", cyclePreferences.length).put("periodLength", cyclePreferences.periodLength)
             .put("lutealLength", cyclePreferences.lutealLength).put("pmsDays", cyclePreferences.pmsDays)
             .put("mode", cyclePreferences.mode).put("contraception", cyclePreferences.contraception).put("useHistory", cyclePreferences.useHistory)).toString())

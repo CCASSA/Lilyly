@@ -43,7 +43,7 @@ jobs:
           path: android/app/build/reports/tests/testDebugUnitTest
       - uses: actions/upload-artifact@v4
         with:
-          name: Lilyly-0.13.0-music-pages-debug
+          name: Lilyly-0.14.0-room-soundtracks-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
@@ -85,6 +85,7 @@ jobs:
             adb exec-out run-as com.lilyly.app cat files/day-threads.png > ui-screenshots/day-threads.png
             adb exec-out run-as com.lilyly.app cat files/rituals.png > ui-screenshots/rituals.png
             adb exec-out run-as com.lilyly.app cat files/music.png > ui-screenshots/music.png
+            adb exec-out run-as com.lilyly.app cat files/soundtrack.png > ui-screenshots/soundtrack.png
             grep -q 'OK (' instrument-results.txt
             python3 -c "from pathlib import Path; assert all(p.read_bytes().startswith(bytes([137,80,78,71])) for p in Path('ui-screenshots').glob('*.png'))"
       - uses: actions/upload-artifact@v4
