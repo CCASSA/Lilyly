@@ -37,6 +37,7 @@ private data class NavItem(val route: String, val label: String, val icon: @Comp
 @Composable
 fun LilylyApp(store: AppStore, openMedication: Boolean = false, openSpotify: Boolean = false) {
     LilylyTheme(store.darkTheme, store.themeName, store.typeStyle) {
+        var insightDate by rememberSaveable { mutableStateOf<String?>(null) }
         var route by rememberSaveable { mutableStateOf(if(openSpotify) "spotify" else if(openMedication) "sanctuary" else "home") }
         var section by rememberSaveable { mutableStateOf("Journal") }
         var editingId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -99,26 +100,27 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false, openSpotify: Boo
                         onReadBook = { id -> initialBookId=id;route="bookshelf" },
                         onNewPage = { editingId=null;section="Journal";route="editor" },
                         onMedication = { sanctuaryTab="Medication";route="sanctuary" },
-                        onOpenDay = {route="day"},
+                        onOpenDay = {insightDate=null;route="day"},
                         onOpenEntry = { entry -> editingId=entry.id;section=entry.section;route="editor" }
                     )
                     "journal" -> JournalListScreen(store, "Journal", onEdit = { editingId = it; section = "Journal"; route = "editor" }, onNew = { editingId = null; section = "Journal"; route = "editor" })
                     "section" -> JournalListScreen(store, section, onBack = { route = "home" }, onEdit = { editingId = it; route = "editor" }, onNew = { editingId = null; route = "editor" })
                     "editor" -> JournalEditorScreen(store, editingId, section, onDone = { route = if (section == "Journal") "journal" else "section" }, onBack = { route = if (section == "Journal") "journal" else "section" })
                     "cycle" -> CycleScreen(store,initialCycleDate)
-                    "sanctuary" -> SanctuaryScreen(store, sanctuaryTab, onJournal={entry -> editingId=entry.id;section=entry.section;route="editor"})
+                    "sanctuary" -> SanctuaryScreen(store, sanctuaryTab, onInsights={route="insights"}, onJournal={entry -> editingId=entry.id;section=entry.section;route="editor"})
                     "more" -> MoreHubScreen(
                         store = store,
                         onOpenSection = { s -> section = s; route = if(s == "Dreams") "sleep" else if(s == "Spells") "rituals" else "section" },
                         onOpenTarot = { route = "tarot" },
                         onOpenBookshelf = { initialBookId=null;route = "bookshelf" },
                         onOpenCalendar = { route = "calendar" },
-                        onOpenSettings = { route = "settings" }
+                        onOpenSettings = { route = "settings" }, onInsights={route="insights"}
                     )
                     "tarot" -> TarotScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                     "bookshelf" -> BookshelfScreen(store, initialBookId=initialBookId, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                     "sleep" -> SleepScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" }, onDreamPages = { section = "Dreams"; route = "section" })
-                    "day" -> DayScreen(store,onBack={route="home"},onPage={entry -> section=entry.section;editingId=entry.id;route="editor"},onSpace={category,date ->
+                    "insights" -> InsightsScreen(store,onBack={route="more"},onDay={insightDate=it;route="day"})
+                    "day" -> DayScreen(store,initialDate=insightDate,onBack={route="home"},onPage={entry -> section=entry.section;editingId=entry.id;route="editor"},onSpace={category,date ->
                         when(category) {
                             "Cycle" -> {initialCycleDate=date;route="cycle"}
                             "Sanctuary","Medication","Therapy" -> {sanctuaryTab=if(category=="Sanctuary") "Check-in" else category;route="sanctuary"}

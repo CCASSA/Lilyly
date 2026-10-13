@@ -19,8 +19,8 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DayScreen(store:AppStore,onBack:()->Unit,onPage:(JournalEntry)->Unit,onSpace:(String,String)->Unit) {
-    var dateText by rememberSaveable {mutableStateOf(LocalDate.now().toString())}
+fun DayScreen(store:AppStore,initialDate:String?=null,onBack:()->Unit,onPage:(JournalEntry)->Unit,onSpace:(String,String)->Unit) {
+    var dateText by rememberSaveable(initialDate) {mutableStateOf(initialDate ?: LocalDate.now().toString())}
     var choosing by rememberSaveable {mutableStateOf(false)}
     val date=LocalDate.parse(dateText)
     val context=LocalContext.current

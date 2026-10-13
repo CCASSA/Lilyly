@@ -41,12 +41,12 @@ import java.time.LocalDateTime
 import kotlin.math.roundToInt
 
 @Composable
-fun SanctuaryScreen(store: AppStore, initialTab: String = "Check-in", onJournal: (JournalEntry)->Unit = {}) {
+fun SanctuaryScreen(store: AppStore, initialTab: String = "Check-in", onJournal: (JournalEntry)->Unit = {}, onInsights:()->Unit = {}) {
     var tab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
     Column(Modifier.padding(horizontal = 16.dp)) {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(listOf("Check-in", "My Mind", "Medication", "Therapy", "Support")) { item ->
-                FilterChip(selected = tab == item, onClick = { tab = item }, label = { Text(item) })
+            items(listOf("Check-in", "My Mind", "Medication", "Therapy", "Support", "Patterns")) { item ->
+                FilterChip(selected = tab == item, onClick = { if(item=="Patterns") onInsights() else tab = item }, label = { Text(item) })
             }
         }
         SoundtrackButton(store,"sanctuary")

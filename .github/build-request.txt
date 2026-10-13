@@ -1,1 +1,1 @@
-Build Lilyly 0.14 room soundtracks and cross-space saved music; verify persistence and Android journey.
+Build Lilyly 0.15 personal insights: explicit data controls, matched recorded dates, persistence and Android journeys.
