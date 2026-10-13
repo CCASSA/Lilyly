@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DayScreen(store:AppStore,initialDate:String?=null,onBack:()->Unit,onPage:(JournalEntry)->Unit,onSpace:(String,String)->Unit) {
+    androidx.activity.compose.BackHandler(onBack=onBack)
     var dateText by rememberSaveable(initialDate) {mutableStateOf(initialDate ?: LocalDate.now().toString())}
     var choosing by rememberSaveable {mutableStateOf(false)}
     val date=LocalDate.parse(dateText)

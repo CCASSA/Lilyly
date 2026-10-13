@@ -1,1 +1,1 @@
-Build Lilyly 0.15 personal insights: explicit data controls, matched recorded dates, persistence and Android journeys.
+Build Lilyly 0.15 personal insights including Android back navigation through recorded-day evidence.

@@ -16,6 +16,7 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InsightsScreen(store:AppStore,onBack:()->Unit,onDay:(String)->Unit) {
+    androidx.activity.compose.BackHandler(onBack=onBack)
     var choosing by rememberSaveable {mutableStateOf(false)}
     var expanded by rememberSaveable {mutableStateOf("")}
     val report=personalInsights(store.sleepRecords,store.mentalCheckIns,store.cycleLogs,store.insightData,store.insightDays,LocalDate.now())
