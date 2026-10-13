@@ -53,3 +53,9 @@ Searchable editable sessions with Before/After/Practice sections, questions/goal
 
 ## Bound Pages 0.9 continuation
 Persistent notebook covers, empty notebooks, starter/personal templates and canvas undo/redo, duplication and layer ordering. Existing notebook names/pages preserved. See BOUND-PAGES-MILESTONE.md for limits; remaining journal features are retained in the full roadmap.
+
+## Music 0.13–0.14 continuation
+Persistent Spotify song/playlist cards, encrypted PKCE credential storage and configurable account linking, saved-music reuse and separate Reading Nook/Sanctuary soundtracks are implemented. Live account authentication/metadata verification still needs developer configuration. In-app playback, richer music discovery and inspiration import remain planned. See SPOTIFY-SETUP.md and MUSIC-SPACES.md.
+
+## Personal insights 0.15 continuation
+Threads over time adds opt-in sources, date windows, matched-date descriptive rest/rating comparisons, recurring dream tags and inspectable recorded-day evidence. See PERSONAL-INSIGHTS.md. Remaining phase-based, medication, symptom and broader longitudinal analysis remains intended work. No part of the full product roadmap is removed or considered complete solely because an APK builds.
