@@ -59,3 +59,6 @@ Persistent Spotify song/playlist cards, encrypted PKCE credential storage and co
 
 ## Personal insights 0.15 continuation
 Threads over time adds opt-in sources, date windows, matched-date descriptive rest/rating comparisons, recurring dream tags and inspectable recorded-day evidence. See PERSONAL-INSIGHTS.md. Remaining phase-based, medication, symptom and broader longitudinal analysis remains intended work. No part of the full product roadmap is removed or considered complete solely because an APK builds.
+
+## Gathered Inspiration 0.16 continuation
+Local image imports, source-link/creator-credit cards, collection/favorite/search tools and credited scrapbook insertion are implemented. Existing image backups preserve the new fields. This is a real local inspiration workflow, not Pinterest account integration; share-sheet intake, deeper boards, media management and richer asset collections remain planned. See GATHERED-INSPIRATION.md.
