@@ -1,1 +1,1 @@
-Deliberate 0.17 Ink Studio milestone: compile, 58 unit tests and connected journeys.
+Deliberate 0.17 retry: scroll ink tools into viewport and assert selections before gesture tests.
