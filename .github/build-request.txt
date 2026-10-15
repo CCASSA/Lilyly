@@ -1,1 +1,1 @@
-Build 0.16 Gathered Inspiration; verify local imports, source attribution, scrapbook reuse and backup preservation.
+Build final 0.16 Inspiration milestone with unsaved-editor dismissal protection.

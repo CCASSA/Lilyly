@@ -116,7 +116,13 @@ private fun InspirationEditor(store:AppStore,original:JournalEntry?,onClose:()->
         catch(e:Exception){message=e.message ?: "This image could not be imported."}
         finally {busy=false}
     }}
-    ModalBottomSheet(onDismissRequest=close,sheetState=rememberModalBottomSheetState(skipPartiallyExpanded=true)) {
+    val editorSheet=rememberModalBottomSheetState(skipPartiallyExpanded=true,confirmValueChange={next ->
+        if(next!=SheetValue.Hidden) true
+        else if(busy) false
+        else if(json!=initial){discard=true;false}
+        else true
+    })
+    ModalBottomSheet(onDismissRequest=close,sheetState=editorSheet) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp).testTag("inspiration-editor"),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             Text("A spark to keep",style=MaterialTheme.typography.headlineMedium)
             if(card.imageUri.isNotBlank()) AsyncImage(card.imageUri,"Inspiration preview",Modifier.fillMaxWidth().height(180.dp),contentScale=ContentScale.Fit)
