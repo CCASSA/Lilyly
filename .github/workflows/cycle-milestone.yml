@@ -43,7 +43,7 @@ jobs:
           path: android/app/build/reports/tests/testDebugUnitTest
       - uses: actions/upload-artifact@v4
         with:
-          name: Lilyly-0.16.0-gathered-inspiration-debug
+          name: Lilyly-0.17.0-ink-studio-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
@@ -88,6 +88,7 @@ jobs:
             adb exec-out run-as com.lilyly.app cat files/soundtrack.png > ui-screenshots/soundtrack.png
             adb exec-out run-as com.lilyly.app cat files/insights.png > ui-screenshots/insights.png
             adb exec-out run-as com.lilyly.app cat files/inspiration.png > ui-screenshots/inspiration.png
+            adb exec-out run-as com.lilyly.app cat files/ink-studio.png > ui-screenshots/ink-studio.png
             grep -q 'OK (' instrument-results.txt
             python3 -c "from pathlib import Path; assert all(p.read_bytes().startswith(bytes([137,80,78,71])) for p in Path('ui-screenshots').glob('*.png'))"
       - uses: actions/upload-artifact@v4

@@ -122,6 +122,10 @@ internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Un
                                     val card = tarotDeck.firstOrNull { it.name == draw?.optString("name") }
                                     Column { Text(draw?.optString("position").orEmpty(),color=ink,style=MaterialTheme.typography.labelSmall); TarotFace(card,Modifier.fillMaxWidth(),draw?.optBoolean("reversed") ?: false) }
                                 }
+                                "ink" -> {
+                                    val inkDoc=remember(piece.content){readInk(piece.content)}
+                                    InkArtwork(piece.content,Modifier.fillMaxWidth().aspectRatio(if(inkDoc.width>0 && inkDoc.height>0)inkDoc.width/inkDoc.height else .8f))
+                                }
                                 "photo" -> AsyncImage(piece.content, "Scrapbook photograph", Modifier.fillMaxWidth().height(150.dp).background(Color(0xFFF8F0E3)).padding(7.dp), contentScale = ContentScale.Fit)
                                 "sticker" -> Text(piece.content, color = ink, fontFamily = FontFamily.Serif, fontSize = (piece.width * 85).sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                                 else -> Text(piece.content, color = ink, fontFamily = FontFamily.Serif, fontSize = 17.sp, modifier = Modifier.fillMaxWidth())
@@ -137,7 +141,7 @@ internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Un
                 item {TextButton(onClick={changeCanvas(piecesJson(pieces.filterNot {it.id==piece.id}+piece))}) {Text("Bring to front")}}
                 item {TextButton(onClick={changeCanvas(piecesJson(listOf(piece)+pieces.filterNot {it.id==piece.id}))}) {Text("Send to back")}}
             }
-            if (piece.kind !in listOf("photo", "tarot")) OutlinedTextField(piece.content, { update(piece.copy(content = it)) }, label = { Text("Selected ${piece.kind}") }, modifier = Modifier.fillMaxWidth())
+            if (piece.kind !in listOf("photo", "tarot", "ink")) OutlinedTextField(piece.content, { update(piece.copy(content = it)) }, label = { Text("Selected ${piece.kind}") }, modifier = Modifier.fillMaxWidth())
             if(piece.sourceCredit.isNotBlank()) Text("Source · ${piece.sourceCredit}",style=MaterialTheme.typography.bodySmall)
             inspirationUrl(piece.sourceUrl)?.let {url -> TextButton(onClick={try {context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,android.net.Uri.parse(url)))}catch(e:Exception){sourceError="No app is available to open this source."}}) {Text("Open source")}}
             if(sourceError.isNotBlank()) Text(sourceError)

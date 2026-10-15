@@ -1,1 +1,1 @@
-Build final 0.16 Inspiration milestone with unsaved-editor dismissal protection.
+Deliberate 0.17 Ink Studio milestone: compile, 58 unit tests and connected journeys.

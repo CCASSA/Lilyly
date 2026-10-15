@@ -218,24 +218,10 @@ fun JournalEditorScreen(
                 }
             } else {
                 item {
-                    Text("Stylus / handwriting layer", fontWeight = FontWeight.SemiBold)
-                    Text("Let your handwriting be part of the page. Your strokes are saved locally.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = .66f))
-                }
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth().height(430.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = if (store.darkTheme) Color(0xFFEFE1CB) else Color(0xFFFFFBF2))
-                    ) {
-                        InkCanvas(
-                            initialInkJson = entry.inkJson,
-                            inkColor = Color(0xFF3A2422),
-                            paperColor = if (store.darkTheme) Color(0xFFEFE1CB) else Color(0xFFFFFBF2),
-                            onInkChanged = { entry = entry.copy(inkJson = it) },
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                    TextButton(onClick = { entry = entry.copy(inkJson = clearInk()) }) { Text("Clear handwriting") }
+                    InkStudio(entry.inkJson,{entry=entry.copy(inkJson=it)},onPlace={ink ->
+                        entry=entry.copy(canvasJson=piecesJson(pagePieces(entry.canvasJson)+PagePiece(kind="ink",content=ink,x=.08f,y=.2f,width=.8f)))
+                        mode="Canvas"
+                    })
                 }
             }
             if (mode != "Canvas") item {
