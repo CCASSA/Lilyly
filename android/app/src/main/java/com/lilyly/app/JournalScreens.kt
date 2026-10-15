@@ -152,6 +152,7 @@ fun JournalEditorScreen(
     var mode by rememberSaveable { mutableStateOf("Canvas") }
     var confirmDelete by remember { mutableStateOf(false) }
     var templateSaved by remember { mutableStateOf(false) }
+    var choosingInspiration by rememberSaveable {mutableStateOf(false)}
 
     val imageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -202,6 +203,7 @@ fun JournalEditorScreen(
                     val state = cycleDayState(date, pattern, store.cyclePreferences)
                     val mind = store.mentalCheckIns.filter { it.dateTime.startsWith(date.toString()) }.maxByOrNull { it.dateTime }
                     val stamp = "$date\n${moonPhaseName(date.atTime(12, 0))}\n${state.day?.let { "Cycle day $it · " } ?: ""}${state.phase}" + (mind?.feelings?.takeIf { it.isNotEmpty() }?.joinToString(" · ")?.let { "\n$it" } ?: "")
+                    TextButton(onClick={choosingInspiration=true}) {Text("+ Inspiration")}
                     ScrapbookCanvas(entry, { entry = it }, { imageLauncher.launch(arrayOf("image/*")) }, stamp)
                 }
             } else if (mode == "Text") {
@@ -280,5 +282,8 @@ fun JournalEditorScreen(
             item { Spacer(Modifier.height(40.dp)) }
         }
     }
+    if(choosingInspiration) InspirationPicker(store,onChoose={card ->
+        entry=entry.copy(canvasJson=piecesJson(pagePieces(entry.canvasJson)+inspirationPiece(card)));choosingInspiration=false
+    },onClose={choosingInspiration=false})
     if (confirmLeave) AlertDialog(onDismissRequest = { confirmLeave = false }, title = { Text("Keep your page?") }, text = { Text("Save your changes before leaving?") }, confirmButton = { TextButton(onClick = { store.upsertJournal(entry); onDone() }) { Text("Save & close") } }, dismissButton = { TextButton(onClick = onBack) { Text("Discard changes") } })
 }

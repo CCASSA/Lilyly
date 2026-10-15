@@ -21,13 +21,14 @@ data class JournalEntry(
     val favorite: Boolean = false,
     val notebook: String = "",
     val ritualJson: String = "",
-    val musicJson: String = "[]"
+    val musicJson: String = "[]",
+    val sourceUrl:String="", val sourceCredit:String=""
 ) {
     fun toJson() = JSONObject()
         .put("id", id).put("section", section).put("title", title).put("body", body)
         .put("tags", tags).put("imageUri", imageUri).put("inkJson", inkJson)
         .put("createdAt", createdAt).put("updatedAt", updatedAt)
-        .put("canvasJson", canvasJson).put("paper", paper).put("favorite", favorite).put("notebook", notebook).put("ritualJson", ritualJson).put("musicJson",musicJson)
+        .put("canvasJson", canvasJson).put("paper", paper).put("favorite", favorite).put("notebook", notebook).put("ritualJson", ritualJson).put("musicJson",musicJson).put("sourceUrl",sourceUrl).put("sourceCredit",sourceCredit)
 
     companion object {
         fun fromJson(o: JSONObject) = JournalEntry(
@@ -41,7 +42,7 @@ data class JournalEntry(
             createdAt = o.optString("createdAt", LocalDateTime.now().toString()),
             updatedAt = o.optString("updatedAt", LocalDateTime.now().toString()),
             canvasJson = o.optString("canvasJson", "[]"), paper = o.optString("paper", "Parchment"),
-            favorite = o.optBoolean("favorite", false), notebook = o.optString("notebook"), ritualJson = o.optString("ritualJson"), musicJson=o.optString("musicJson","[]")
+            favorite = o.optBoolean("favorite", false), notebook = o.optString("notebook"), ritualJson = o.optString("ritualJson"), musicJson=o.optString("musicJson","[]"), sourceUrl=o.optString("sourceUrl"), sourceCredit=o.optString("sourceCredit")
         )
     }
 }

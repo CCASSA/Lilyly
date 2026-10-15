@@ -46,10 +46,12 @@ fun MoreHubScreen(
     onOpenBookshelf: () -> Unit,
     onOpenCalendar: () -> Unit,
     onOpenSettings: () -> Unit,
-    onInsights: () -> Unit = {}
+    onInsights: () -> Unit = {},
+    onInspiration: () -> Unit = {}
 ) {
     val rooms = listOf(
         Triple("❧", "Patterns & insights", onInsights),
+        Triple("❦", "Inspiration", onInspiration),
         Triple("🔮", "Tarot", onOpenTarot),
         Triple("📚", "Reading nook", onOpenBookshelf),
         Triple("🌙", "Magical calendar", onOpenCalendar),

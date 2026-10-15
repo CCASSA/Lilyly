@@ -114,7 +114,7 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false, openSpotify: Boo
                         onOpenTarot = { route = "tarot" },
                         onOpenBookshelf = { initialBookId=null;route = "bookshelf" },
                         onOpenCalendar = { route = "calendar" },
-                        onOpenSettings = { route = "settings" }, onInsights={route="insights"}
+                        onOpenSettings = { route = "settings" }, onInsights={route="insights"}, onInspiration={route="inspiration"}
                     )
                     "tarot" -> TarotScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                     "bookshelf" -> BookshelfScreen(store, initialBookId=initialBookId, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
@@ -131,6 +131,7 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false, openSpotify: Boo
                     })
                     "rituals" -> RitualScreen(store, onBack={route="more"}, onPages={section="Spells";route="section"}, onJournal={entry -> section=entry.section;editingId=entry.id;route="editor"})
                     "calendar" -> MagicalCalendarScreen(store, onBack = { route = "more" })
+                    "inspiration" -> InspirationScreen(store,onBack={route="more"})
                     "spotify" -> SpotifyScreen(onBack={route="settings"})
                     "settings" -> SettingsScreen(store, onBack = { route = "more" }, onSpotify={route="spotify"})
                     "search" -> SearchScreen(store, onBack = { route = "home" }, onOpenJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })

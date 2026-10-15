@@ -31,19 +31,21 @@ import java.util.UUID
 import kotlin.math.roundToInt
 
 /** Normalized positions keep a page portable between different phone widths. */
-data class PagePiece(val id: String = UUID.randomUUID().toString(), val kind: String = "text", val content: String = "", val x: Float = .12f, val y: Float = .25f, val width: Float = .55f, val rotation: Float = 0f) {
-    fun json() = JSONObject().put("id", id).put("kind", kind).put("content", content).put("x", x).put("y", y).put("width", width).put("rotation", rotation)
+data class PagePiece(val id: String = UUID.randomUUID().toString(), val kind: String = "text", val content: String = "", val x: Float = .12f, val y: Float = .25f, val width: Float = .55f, val rotation: Float = 0f, val sourceUrl:String="", val sourceCredit:String="") {
+    fun json() = JSONObject().put("id", id).put("kind", kind).put("content", content).put("x", x).put("y", y).put("width", width).put("rotation", rotation).put("sourceUrl",sourceUrl).put("sourceCredit",sourceCredit)
 }
 fun pagePieces(json: String): List<PagePiece> = runCatching {
     val array = JSONArray(json)
     (0 until array.length()).map { i -> array.getJSONObject(i).let { o ->
-        PagePiece(o.getString("id"), o.optString("kind", "text"), o.optString("content"), o.optDouble("x", .12).toFloat().coerceIn(0f, .9f), o.optDouble("y", .25).toFloat().coerceIn(0f, .9f), o.optDouble("width", .55).toFloat().coerceIn(.15f, .95f), o.optDouble("rotation", 0.0).toFloat().coerceIn(-45f, 45f))
+        PagePiece(o.getString("id"), o.optString("kind", "text"), o.optString("content"), o.optDouble("x", .12).toFloat().coerceIn(0f, .9f), o.optDouble("y", .25).toFloat().coerceIn(0f, .9f), o.optDouble("width", .55).toFloat().coerceIn(.15f, .95f), o.optDouble("rotation", 0.0).toFloat().coerceIn(-45f, 45f), o.optString("sourceUrl"), o.optString("sourceCredit"))
     } }
 }.getOrElse { emptyList() }
 fun piecesJson(pieces: List<PagePiece>) = JSONArray().apply { pieces.forEach { put(it.json()) } }.toString()
 
 @Composable
 internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Unit, onPhoto: () -> Unit, contextStamp: String) {
+    val context=androidx.compose.ui.platform.LocalContext.current
+    var sourceError by remember {mutableStateOf("")}
     val pieces = remember(entry.canvasJson) { pagePieces(entry.canvasJson) }
     var selectedId by rememberSaveable(entry.id) { mutableStateOf<String?>(null) }
     val selected = pieces.firstOrNull { it.id == selectedId }
@@ -136,6 +138,9 @@ internal fun ScrapbookCanvas(entry: JournalEntry, onChange: (JournalEntry) -> Un
                 item {TextButton(onClick={changeCanvas(piecesJson(listOf(piece)+pieces.filterNot {it.id==piece.id}))}) {Text("Send to back")}}
             }
             if (piece.kind !in listOf("photo", "tarot")) OutlinedTextField(piece.content, { update(piece.copy(content = it)) }, label = { Text("Selected ${piece.kind}") }, modifier = Modifier.fillMaxWidth())
+            if(piece.sourceCredit.isNotBlank()) Text("Source · ${piece.sourceCredit}",style=MaterialTheme.typography.bodySmall)
+            inspirationUrl(piece.sourceUrl)?.let {url -> TextButton(onClick={try {context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,android.net.Uri.parse(url)))}catch(e:Exception){sourceError="No app is available to open this source."}}) {Text("Open source")}}
+            if(sourceError.isNotBlank()) Text(sourceError)
             Text("Size")
             Slider(piece.width, { update(piece.copy(width = it,x=piece.x.coerceAtMost(1f-it))) }, valueRange = .15f.. .95f)
             Text("Rotation · ${piece.rotation.roundToInt()}°")

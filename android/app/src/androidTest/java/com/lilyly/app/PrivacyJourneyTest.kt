@@ -37,7 +37,7 @@ class PrivacyJourneyTest {
             val store=AppStore(source)
             val photo=File(source.filesDir,"fixture.png")
             Bitmap.createBitmap(20,20,Bitmap.Config.ARGB_8888).let {bitmap ->photo.outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)};bitmap.recycle()}
-            store.upsertJournal(JournalEntry(id="photo-fixture",title="Photo page",imageUri=Uri.fromFile(photo).toString()))
+            store.upsertJournal(JournalEntry(id="photo-fixture",title="Photo page",imageUri=Uri.fromFile(photo).toString(),sourceUrl="https://example.org/source",sourceCredit="Fixture artist",canvasJson=piecesJson(listOf(PagePiece(kind="photo",content=Uri.fromFile(photo).toString(),sourceUrl="https://example.org/source",sourceCredit="Fixture artist")))))
             store.upsertJournal(JournalEntry(id="collision-fixture",body="Older backup text"))
             store.saveSleep(SleepRecord(bedtime="2026-10-01T23:00",wakeTime="2026-10-02T07:00",dream="Synthetic garden",symbols=setOf("garden")))
             val pdf=File(root,"book.pdf")
@@ -64,6 +64,8 @@ class PrivacyJourneyTest {
             photo.delete()
             val restored=AppStore(target)
             assertEquals("Current local text",restored.journalEntries.first {it.id=="collision-fixture"}.body)
+            assertEquals("Fixture artist",pagePieces(restored.journalEntries.first {it.id=="photo-fixture"}.canvasJson).single().sourceCredit)
+            assertEquals("https://example.org/source",restored.journalEntries.first {it.id=="photo-fixture"}.sourceUrl)
             val restoredPhoto=Uri.parse(restored.journalEntries.first {it.id=="photo-fixture"}.imageUri)
             assertTrue(target.contentResolver.openInputStream(restoredPhoto)!!.use {it.readBounded(8)}.contentEquals(byteArrayOf(-119,80,78,71,13,10,26,10)))
             assertTrue(restored.sleepRecords.any {it.dream=="Synthetic garden"})

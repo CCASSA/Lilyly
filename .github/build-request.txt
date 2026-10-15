@@ -1,1 +1,1 @@
-Retry 0.15 device checks after Android SDK system-image download failed with Error on ZipFile unknown archive; app compilation and 49 unit tests passed.
+Build 0.16 Gathered Inspiration; verify local imports, source attribution, scrapbook reuse and backup preservation.
