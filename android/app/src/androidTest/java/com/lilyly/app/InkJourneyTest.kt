@@ -24,8 +24,9 @@ class InkJourneyTest {
         rule.onNodeWithText("Write / draw").performClick()
         fun surface(){rule.onNodeWithTag("journal-editor").performScrollToNode(hasTestTag("ink-surface"))}
         fun tap(label:String){
-            rule.onNodeWithTag("journal-editor").performScrollToNode(hasText(label))
-            rule.onNodeWithText(label).performClick()
+            if(label=="Place ink on scrapbook") rule.onNodeWithTag("journal-editor").performScrollToNode(hasText(label))
+            else rule.onNodeWithTag("journal-editor").performScrollToIndex(2)
+            rule.onNodeWithText(label).assertIsDisplayed().performClick()
         }
         surface()
         rule.onNodeWithTag("ink-surface").performTouchInput {swipe(Offset(width*.2f,height*.25f),Offset(width*.7f,height*.55f),400)}

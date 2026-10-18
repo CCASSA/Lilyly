@@ -1,1 +1,1 @@
-Deliberate 0.17 retry: scroll ink tools into viewport and assert selections before gesture tests.
+Deliberate Ink Studio validation: position oversized studio item before tapping its toolbar.
