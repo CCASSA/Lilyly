@@ -65,3 +65,6 @@ Local image imports, source-link/creator-credit cards, collection/favorite/searc
 
 ## Ink Studio 0.17 continuation
 Pen/highlighter colors and widths, stylus-only input, pressure-aware strokes, whole-stroke erasing, gesture undo/redo, clear confirmation and independent scrapbook ink placement extend the journal. New reference dimensions preserve drawing proportions; legacy handwriting remains readable. See INK-STUDIO.md for remaining depth and hardware limits.
+
+## Reading copies 0.18 continuation
+Selected journal entries and filtered notebook collections can be exported as paginated printable PDFs with text, local images, ink, source credits and music references. Scope and unencrypted-output privacy are explicit. This reading layout is separate from exact scrapbook reproduction; richer book layout, exact canvas publishing and direct printing remain planned. See READING-COPIES.md.
