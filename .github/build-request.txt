@@ -1,1 +1,1 @@
-Deliberate 0.18 reading-copy milestone: compile, unit tests, Android export and regression journeys.
+Deliberate 0.18 validation retry: close keyboard before scrolling ritual save controls.

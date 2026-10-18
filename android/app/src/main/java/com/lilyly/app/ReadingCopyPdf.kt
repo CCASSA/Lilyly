@@ -50,12 +50,12 @@ class ReadingCopyPdf(private val context:Context) {
             if(bitmap==null){missing++;paragraph("[Image unavailable — the original file could not be read.]",10f);return}
             try {val scale=min(contentWidth.toFloat()/bitmap.width,300f/bitmap.height);val w=bitmap.width*scale;val h=bitmap.height*scale;space(h+12);page!!.canvas.drawBitmap(bitmap,null,RectF(left,y,left+w,y+h),Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG));y+=h+12}finally {bitmap.recycle()}
         }
-        fun ink(raw:String) {
+        fun ink(raw:String,heading:String?=null) {
             val d=readInk(raw);if(d.strokes.isEmpty())return
             val w=d.width.takeIf {it>0} ?: (d.strokes.flatMap {it.points}.maxOfOrNull {it.x} ?: 300f).coerceAtLeast(1f)
             val h=d.height.takeIf {it>0} ?: (d.strokes.flatMap {it.points}.maxOfOrNull {it.y} ?: 430f).coerceAtLeast(1f)
             val scale=min(contentWidth/w,420f/h);val height=h*scale
-            space(height+14);val canvas=page!!.canvas;canvas.save();canvas.translate(left,y);canvas.clipRect(0f,0f,contentWidth.toFloat(),height)
+            space(height+if(heading==null)14 else 48);if(heading!=null)paragraph(heading,16f);val canvas=page!!.canvas;canvas.save();canvas.translate(left,y);canvas.clipRect(0f,0f,contentWidth.toFloat(),height)
             canvas.drawColor(Color.rgb(240,229,209));canvas.scale(scale,scale)
             d.strokes.forEach {s->
                 val p=Paint(Paint.ANTI_ALIAS_FLAG).apply {color=s.color.toInt();alpha=if(s.highlighter)71 else 255;strokeWidth=s.width;strokeCap=Paint.Cap.ROUND;strokeJoin=Paint.Join.ROUND}
@@ -72,7 +72,7 @@ class ReadingCopyPdf(private val context:Context) {
                 paragraph(listOf(entry.section,entry.notebook,entry.createdAt.take(10)).filter {it.isNotBlank()}.joinToString(" · "),10f)
                 paragraph(entry.body);image(entry.imageUri)
                 if(entry.ritualJson.isNotBlank())paragraph(ritualSummary(RitualDetails.fromJson(entry.ritualJson)))
-                if(readInk(entry.inkJson).strokes.isNotEmpty()){paragraph("Handwriting",16f);ink(entry.inkJson)}
+                if(readInk(entry.inkJson).strokes.isNotEmpty()){ink(entry.inkJson,"Handwriting")}
                 val pieces=pagePieces(entry.canvasJson)
                 if(pieces.isNotEmpty())paragraph("From the scrapbook",16f)
                 pieces.forEach {p->

@@ -1,5 +1,6 @@
 package com.lilyly.app
 import android.graphics.Bitmap
+import androidx.test.espresso.Espresso
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -20,15 +21,17 @@ class RitualJourneyTest {
         rule.onNodeWithText("Ritual room · spells & intentions").performClick()
         rule.onNodeWithText("A quiet beginning").performClick()
         rule.onNodeWithText("Ritual title").performTextReplacement("My threshold ritual")
+        Espresso.closeSoftKeyboard()
         rule.onNodeWithTag("ritual-editor").performScrollToNode(hasText("Keep ritual"))
-        rule.onNodeWithText("Keep ritual").performClick()
+        rule.onNodeWithText("Keep ritual").assertIsDisplayed().performClick()
         rule.runOnUiThread {val page=AppStore(rule.activity).journalEntries.single {it.title=="My threshold ritual"};assertTrue(RitualDetails.fromJson(page.ritualJson).intention.contains("beginning"))}
         rule.onNodeWithTag("ritual-list").performScrollToNode(hasText("My threshold ritual"))
         rule.onNodeWithText("My threshold ritual").performClick()
         rule.onNodeWithText("Reflection").performClick()
         rule.onNodeWithText("What I noticed afterward").performTextInput("A moment of quiet")
+        Espresso.closeSoftKeyboard()
         rule.onNodeWithTag("ritual-editor").performScrollToNode(hasText("Keep ritual"))
-        rule.onNodeWithText("Keep ritual").performClick()
+        rule.onNodeWithText("Keep ritual").assertIsDisplayed().performClick()
         rule.onNodeWithTag("ritual-list").performScrollToNode(hasText("My threshold ritual"))
         rule.waitForIdle()
         val bitmap=InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()

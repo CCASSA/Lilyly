@@ -3,6 +3,8 @@ package com.lilyly.app
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,7 +32,7 @@ fun ReadingCopyButton(entries:List<JournalEntry>,defaultTitle:String) {
             try {
                 val result=withContext(Dispatchers.IO) {
                     require(snapshot?.exists()==true){"The export selection expired. Please choose Export reading copy again."}
-                    val data=org.json.JSONObject(snapshot!!.readText())
+                    val data=org.json.JSONObject(snapshot.readText())
                     val temp=File.createTempFile("reading-copy-",".pdf",context.cacheDir)
                     try {
                         val result=ReadingCopyPdf(context).write(readingCopyEntries(data.getString("entries")),data.getString("title"),temp)
@@ -48,7 +50,7 @@ fun ReadingCopyButton(entries:List<JournalEntry>,defaultTitle:String) {
         if(busy)Text("Preparing your reading copy…",style=MaterialTheme.typography.bodySmall)
         if(message.isNotBlank())Text(message,style=MaterialTheme.typography.bodySmall)
     }
-    if(show)AlertDialog(onDismissRequest={show=false},title={Text("Keep a printable copy")},text={Column {
+    if(show)AlertDialog(onDismissRequest={show=false},title={Text("Keep a printable copy")},text={Column(Modifier.verticalScroll(rememberScrollState())) {
         Text("Export ${entries.size} ${if(entries.size==1)"entry" else "entries"} from the current selection, in the order shown. ${entries.take(3).joinToString(" · "){it.title.ifBlank {"Untitled"}}}${if(entries.size>3)" …" else ""}")
         OutlinedTextField(title,{title=it},label={Text("Book title")},modifier=Modifier.fillMaxWidth())
         Text("Includes text, images, handwriting, credits and music references. This is a reading layout; scrapbook positions and rotations are not reproduced.",style=MaterialTheme.typography.bodySmall)
