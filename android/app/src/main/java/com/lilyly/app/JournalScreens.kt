@@ -96,6 +96,7 @@ fun JournalListScreen(
                 item {
                     NotebookShelf(store,section,notebook,{notebook=it})
                     TextButton(onClick={chooseTemplate=true}) { Text("Create from a template") }
+                    ReadingCopyButton(entries,notebook.ifBlank {section})
                     Text("Pages to return to", style = MaterialTheme.typography.headlineMedium)
                     OutlinedTextField(search, { search = it }, label = { Text("Search pages & tags") }, modifier = Modifier.fillMaxWidth())
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -241,6 +242,7 @@ fun JournalEditorScreen(
                 }
             }
             item {
+                ReadingCopyButton(listOf(entry),entry.title.ifBlank {"A page from Lilyly"})
                 MusicAttachmentsPanel(entry.musicJson, savedMusic=store.savedMusic()) {entry=entry.copy(musicJson=it)}
                 TextButton(onClick={store.keepPageTemplate(entry);templateSaved=true},enabled=!templateSaved) { Text(if(templateSaved) "Template kept" else "Save as reusable template") }
                 FilterChip(entry.favorite, { entry = entry.copy(favorite = !entry.favorite) }, label = { Text("Favorite page") })
