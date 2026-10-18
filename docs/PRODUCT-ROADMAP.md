@@ -62,3 +62,6 @@ Threads over time adds opt-in sources, date windows, matched-date descriptive re
 
 ## Gathered Inspiration 0.16 continuation
 Local image imports, source-link/creator-credit cards, collection/favorite/search tools and credited scrapbook insertion are implemented. Existing image backups preserve the new fields. This is a real local inspiration workflow, not Pinterest account integration; share-sheet intake, deeper boards, media management and richer asset collections remain planned. See GATHERED-INSPIRATION.md.
+
+## Ink Studio 0.17 continuation
+Pen/highlighter colors and widths, stylus-only input, pressure-aware strokes, whole-stroke erasing, gesture undo/redo, clear confirmation and independent scrapbook ink placement extend the journal. New reference dimensions preserve drawing proportions; legacy handwriting remains readable. See INK-STUDIO.md for remaining depth and hardware limits.
