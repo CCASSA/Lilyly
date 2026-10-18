@@ -1,1 +1,1 @@
-Deliberate 0.18 validation retry: close keyboard before scrolling ritual save controls.
+Deliberate 0.18 retry: use existing AndroidX window APIs to close and await keyboard in ritual test.

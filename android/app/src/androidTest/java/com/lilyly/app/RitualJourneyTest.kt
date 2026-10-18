@@ -1,6 +1,7 @@
 package com.lilyly.app
 import android.graphics.Bitmap
-import androidx.test.espresso.Espresso
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -17,11 +18,19 @@ class RitualJourneyTest {
     @Test fun keepRitualEditReflectionAndOpenSameGrimoirePage() {
         lateinit var store:AppStore
         rule.runOnUiThread {store=AppStore(rule.activity);rule.activity.setContent {LilylyApp(store)}}
+        fun hideKeyboard() {
+            rule.runOnUiThread {ViewCompat.getWindowInsetsController(rule.activity.window.decorView)?.hide(WindowInsetsCompat.Type.ime())}
+            rule.waitUntil(5000) {
+                var hidden=false
+                rule.runOnUiThread {hidden=ViewCompat.getRootWindowInsets(rule.activity.window.decorView)?.isVisible(WindowInsetsCompat.Type.ime())!=true}
+                hidden
+            }
+        }
         rule.onNodeWithText("More").performClick()
         rule.onNodeWithText("Ritual room · spells & intentions").performClick()
         rule.onNodeWithText("A quiet beginning").performClick()
         rule.onNodeWithText("Ritual title").performTextReplacement("My threshold ritual")
-        Espresso.closeSoftKeyboard()
+        hideKeyboard()
         rule.onNodeWithTag("ritual-editor").performScrollToNode(hasText("Keep ritual"))
         rule.onNodeWithText("Keep ritual").assertIsDisplayed().performClick()
         rule.runOnUiThread {val page=AppStore(rule.activity).journalEntries.single {it.title=="My threshold ritual"};assertTrue(RitualDetails.fromJson(page.ritualJson).intention.contains("beginning"))}
@@ -29,7 +38,7 @@ class RitualJourneyTest {
         rule.onNodeWithText("My threshold ritual").performClick()
         rule.onNodeWithText("Reflection").performClick()
         rule.onNodeWithText("What I noticed afterward").performTextInput("A moment of quiet")
-        Espresso.closeSoftKeyboard()
+        hideKeyboard()
         rule.onNodeWithTag("ritual-editor").performScrollToNode(hasText("Keep ritual"))
         rule.onNodeWithText("Keep ritual").assertIsDisplayed().performClick()
         rule.onNodeWithTag("ritual-list").performScrollToNode(hasText("My threshold ritual"))
