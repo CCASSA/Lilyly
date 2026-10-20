@@ -1,1 +1,1 @@
-Deliberately build v0.20 library shelves, unit tests, Android journeys and Garden Preview APK.
+Deliberate v0.20 retry: close Android PdfDocument test fixture explicitly with finally.

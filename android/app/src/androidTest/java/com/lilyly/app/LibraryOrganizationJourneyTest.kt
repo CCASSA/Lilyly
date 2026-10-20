@@ -33,14 +33,15 @@ class LibraryOrganizationJourneyTest {
     }
     @Test fun organizeImportedBookFilterShelfAndPreserveProgress() {
         val pdf=File(rule.activity.cacheDir,"shelf-fixture.pdf")
-        PdfDocument().use {doc ->
+        val doc=PdfDocument()
+        try {
             repeat(2) {i ->
                 val page=doc.startPage(PdfDocument.PageInfo.Builder(400,600,i+1).create())
                 page.canvas.drawText("A shelf fixture",20f,60f,android.graphics.Paint().apply {textSize=20f})
                 doc.finishPage(page)
             }
             pdf.outputStream().use {doc.writeTo(it)}
-        }
+        } finally {doc.close()}
         val imported=BookFiles(rule.activity).importBook(Uri.fromFile(pdf)).copy(position=1,bookmarks=setOf(0),readingSeconds=120)
         importedId=imported.id
         rule.runOnUiThread {
