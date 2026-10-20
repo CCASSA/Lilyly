@@ -17,12 +17,7 @@ fun personalInsights(sleeps:List<SleepRecord>,mind:List<MentalCheckIn>,cycles:Li
     val start=today.minusDays(days.coerceIn(1,365).toLong()-1)
     fun included(raw:String)=runCatching {LocalDate.parse(raw).let {it>=start && it<=today}}.getOrDefault(false)
     val sleepRows=if("Sleep" in enabled)sleeps.filter {included(it.date) && sleepMinutes(it.bedtime,it.wakeTime)!=null} else emptyList()
-    val rest=sleepRows.groupBy {it.date}.mapNotNull {(date,rows) ->
-        val sorted=rows.sortedBy {it.bedtime}
-        val overlaps=sorted.zipWithNext().any {(a,b)->LocalDateTime.parse(a.wakeTime)>LocalDateTime.parse(b.bedtime)}
-        val minutes=rows.sumOf {it.durationMinutes}
-        if(overlaps || minutes>1440) null else date to minutes
-    }.toMap()
+    val rest=insightRest(sleepRows)
     val checkIns=if("Sanctuary" in enabled)mind.filter {it.detailedRatings && included(it.dateTime.take(10))} else emptyList()
     fun ratings(get:(MentalCheckIn)->Int)=checkIns.filter {get(it) in 0..10}.groupBy {it.dateTime.take(10)}.mapValues {(_,v)->v.map {get(it)}.average()}
     val cycleRows=if("Cycle" in enabled)cycles.filter {it.ratingsRecorded && included(it.date) && it.pain in 0..10} else emptyList()
@@ -38,4 +33,14 @@ fun personalInsights(sleeps:List<SleepRecord>,mind:List<MentalCheckIn>,cycles:Li
     val dreamRows=if("Dreams" in enabled)sleeps.filter {included(it.date) && (it.dream.isNotBlank() || it.symbols.isNotEmpty())} else emptyList()
     val dates=(rest.keys + checkIns.map {it.dateTime.take(10)} + cycleRows.map {it.date} + dreamRows.map {it.date}).toSet().size
     return InsightReport(comparisons,recurringDreamSymbols(dreamRows),dates)
+}
+
+/** Valid non-overlapping local-time records, summed by waking date. */
+internal fun insightRest(rows:List<SleepRecord>):Map<String,Long> {
+    return rows.groupBy {it.date}.mapNotNull {(date,rows) ->
+        val sorted=rows.sortedBy {it.bedtime}
+        val overlaps=sorted.zipWithNext().any {(a,b)->LocalDateTime.parse(a.wakeTime)>LocalDateTime.parse(b.bedtime)}
+        val minutes=rows.sumOf {it.durationMinutes}
+        if(overlaps || minutes>1440) null else date to minutes
+    }.toMap()
 }

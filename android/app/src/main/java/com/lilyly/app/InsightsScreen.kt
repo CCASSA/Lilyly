@@ -20,6 +20,7 @@ fun InsightsScreen(store:AppStore,onBack:()->Unit,onDay:(String)->Unit) {
     var choosing by rememberSaveable {mutableStateOf(false)}
     var expanded by rememberSaveable {mutableStateOf("")}
     val report=personalInsights(store.sleepRecords,store.mentalCheckIns,store.cycleLogs,store.insightData,store.insightDays,LocalDate.now())
+    val phases=phaseInsights(store.sleepRecords,store.mentalCheckIns,store.cycleLogs,store.insightData,store.insightDays,LocalDate.now(),store.cyclePreferences)
     Scaffold(topBar={TopAppBar(title={Text("Threads over time")},navigationIcon={IconButton(onClick=onBack){Icon(Icons.Default.ArrowBack,"Back")}})}) {padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).padding(horizontal=22.dp).testTag("insights"),verticalArrangement=Arrangement.spacedBy(20.dp),contentPadding=PaddingValues(bottom=32.dp)) {
             item {
@@ -58,6 +59,30 @@ fun InsightsScreen(store:AppStore,onBack:()->Unit,onDay:(String)->Unit) {
                         if(expanded==comparison.title) comparison.groups.forEach {group ->
                             Text(group.label,style=MaterialTheme.typography.labelLarge)
                             group.points.forEach {point -> TextButton(onClick={onDay(point.date)}) {Text("${point.date} · ${insightNumber(point.value)}/10")}}
+                        }
+                    }
+                }
+                item {
+                    BotanicalDivider()
+                    Text("Your cycle rhythms",style=MaterialTheme.typography.headlineSmall)
+                    Text(phases.explanation)
+                    Text("These are calendar estimates, not confirmed ovulation or hormone measurements. Current period and luteal settings also apply to past dates; historical contraception changes are not recorded here.",style=MaterialTheme.typography.bodySmall)
+                }
+                phases.comparisons.forEach {comparison ->
+                    item(key="phase-${comparison.metric}") {
+                        Text("${comparison.metric} across phases",style=MaterialTheme.typography.titleLarge)
+                        comparison.groups.forEach {group ->
+                            Text("${group.label} · ${insightNumber(group.mean)}${comparison.unit}",style=MaterialTheme.typography.titleSmall)
+                            Text("${group.points.size} dates · ${group.cycles} cycles",style=MaterialTheme.typography.bodySmall)
+                        }
+                        TextButton(onClick={expanded=if(expanded=="phase-${comparison.metric}") "" else "phase-${comparison.metric}"}) {
+                            Text(if(expanded=="phase-${comparison.metric}") "Hide phase dates" else "View ${comparison.metric.lowercase()} phase dates")
+                        }
+                    }
+                    if(expanded=="phase-${comparison.metric}") comparison.groups.forEach {group ->
+                        item {Text(group.label,style=MaterialTheme.typography.labelLarge)}
+                        items(group.points,key={"${comparison.metric}-${it.date}"}) {point ->
+                            TextButton(onClick={onDay(point.date)}) {Text("${point.date} · ${insightNumber(point.value)}${comparison.unit}")}
                         }
                     }
                 }
