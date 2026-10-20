@@ -300,6 +300,8 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
 @Composable
 private fun BookOrganizationDialog(book:LibraryBook,collections:List<String>,onDismiss:()->Unit,
     onSave:(String,String,String,Boolean)->Unit) {
+    val keyboard=androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+    val focus=androidx.compose.ui.platform.LocalFocusManager.current
     var title by rememberSaveable(book.id) {mutableStateOf(book.title)}
     var author by rememberSaveable(book.id) {mutableStateOf(book.author)}
     var collection by rememberSaveable(book.id) {mutableStateOf(book.collection)}
@@ -308,7 +310,7 @@ private fun BookOrganizationDialog(book:LibraryBook,collections:List<String>,onD
         Column(Modifier.heightIn(max=420.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)) {
             OutlinedTextField(title,{title=it.take(300)},label={Text("Book title")},modifier=Modifier.fillMaxWidth(),singleLine=true)
             OutlinedTextField(author,{author=it.take(200)},label={Text("Author")},modifier=Modifier.fillMaxWidth(),singleLine=true)
-            OutlinedTextField(collection,{collection=it.take(60)},label={Text("Shelf name")},supportingText={Text("One shelf per book. Leave blank for Unfiled.")},modifier=Modifier.fillMaxWidth(),singleLine=true)
+            OutlinedTextField(collection,{collection=it.take(60)},label={Text("Shelf name")},keyboardOptions=androidx.compose.foundation.text.KeyboardOptions(imeAction=androidx.compose.ui.text.input.ImeAction.Done),keyboardActions=androidx.compose.foundation.text.KeyboardActions(onDone={focus.clearFocus();keyboard?.hide()}),supportingText={Text("One shelf per book. Leave blank for Unfiled.")},modifier=Modifier.fillMaxWidth(),singleLine=true)
             if(collections.isNotEmpty()) LazyRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                 items(collections) {value ->SuggestionChip(onClick={collection=value},label={Text(value)})}
             }

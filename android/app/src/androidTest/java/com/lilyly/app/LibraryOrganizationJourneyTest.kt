@@ -4,8 +4,6 @@ import android.net.Uri
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.*
 import org.junit.Rule
@@ -21,14 +19,6 @@ class LibraryOrganizationJourneyTest {
         rule.runOnUiThread {
             if(previous.isNotEmpty())SecurePreferences(rule.activity).writeBatch(previous)
             importedId?.let {BookFiles(rule.activity).directory(it).deleteRecursively()}
-        }
-    }
-    private fun hideKeyboard() {
-        rule.runOnUiThread {ViewCompat.getWindowInsetsController(rule.activity.window.decorView)?.hide(WindowInsetsCompat.Type.ime())}
-        rule.waitUntil(5000) {
-            var hidden=false
-            rule.runOnUiThread {hidden=ViewCompat.getRootWindowInsets(rule.activity.window.decorView)?.isVisible(WindowInsetsCompat.Type.ime())!=true}
-            hidden
         }
     }
     @Test fun organizeImportedBookFilterShelfAndPreserveProgress() {
@@ -57,7 +47,8 @@ class LibraryOrganizationJourneyTest {
         rule.onNodeWithText("Book details & shelf").performScrollTo().performClick()
         rule.onNodeWithText("Book title").performTextReplacement("The Herbal Shelf")
         rule.onNodeWithText("Shelf name").performTextInput("Apothecary")
-        hideKeyboard()
+        rule.onNodeWithText("Shelf name").performImeAction()
+        rule.waitForIdle()
         rule.onNode(isToggleable()).performScrollTo().performClick()
         rule.onNodeWithText("Keep book details").performClick()
         rule.onNodeWithContentDescription("Back to shelves").performClick()

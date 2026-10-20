@@ -1,1 +1,1 @@
-Deliberate v0.20 retry: close Android PdfDocument test fixture explicitly with finally.
+Deliberate v0.20 retry: use dialog-local keyboard Done action in shelf editor and journey.
