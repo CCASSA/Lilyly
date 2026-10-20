@@ -86,6 +86,11 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
     var selected by rememberSaveable(initialBookId) { mutableStateOf(initialBookId) }
     var query by rememberSaveable { mutableStateOf("") }
     var onlyFavorites by rememberSaveable { mutableStateOf(false) }
+    var shelf by rememberSaveable { mutableStateOf<String?>(null) }
+    var status by rememberSaveable { mutableStateOf("All books") }
+    var sort by rememberSaveable { mutableStateOf("Recently read") }
+    var browse by rememberSaveable { mutableStateOf(false) }
+    val visible = librarySelection(store.books,query,onlyFavorites,status,shelf,sort)
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -113,9 +118,12 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
                 LazyRow(contentPadding=PaddingValues(horizontal=18.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) { items(listOf("Cottage","Gothic","Celestial","Botanical")) { theme -> FilterChip(store.nookTheme==theme,{store.updateNookTheme(theme)},label={Text(theme,color=palette.ink)}) } }
                 OutlinedTextField(query,{query=it},label={Text("Find a book")},modifier=Modifier.fillMaxWidth().padding(horizontal=18.dp),colors=OutlinedTextFieldDefaults.colors(unfocusedTextColor=palette.ink,focusedTextColor=palette.ink,unfocusedLabelColor=palette.ink))
                 FilterChip(onlyFavorites,{onlyFavorites=!onlyFavorites},label={Text("My favorites",color=palette.ink)},modifier=Modifier.padding(start=18.dp))
+                TextButton(onClick={browse=true},modifier=Modifier.padding(start=10.dp)) {Text("Browse shelves",color=palette.accent)}
+                Text("${shelf?.let {if(it.isBlank()) "Unfiled" else it} ?: "Every shelf"} · $status · ${visible.size} books",color=palette.ink,style=MaterialTheme.typography.labelMedium,modifier=Modifier.padding(horizontal=18.dp))
+                if(shelf!=null || status!="All books" || onlyFavorites || query.isNotBlank())
+                    TextButton(onClick={shelf=null;status="All books";onlyFavorites=false;query=""},modifier=Modifier.padding(start=10.dp)) {Text("Show all my books",color=palette.accent)}
                 if(busy) LinearProgressIndicator(Modifier.fillMaxWidth())
             }
-            val visible = store.books.filter { (it.title+it.author).contains(query,true) && (!onlyFavorites || it.favorite) }.sortedByDescending { it.lastReadAt }
             if(visible.isEmpty()) item { Text(if(store.books.isEmpty()) "Your shelves are waiting for the stories you love. Import a book you own to begin." else "No books match this search.",color=palette.ink,modifier=Modifier.padding(24.dp)) }
             items(visible.chunked(3)) { row ->
                 Column(Modifier.padding(horizontal=14.dp,vertical=10.dp)) {
@@ -135,6 +143,20 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
                 }
             }
             item { Text("Books stay on this device. EPUBs use a text reading view; PDF pages keep their original layout. No account or broad storage permission is needed.",color=palette.ink.copy(alpha=.7f),style=MaterialTheme.typography.bodySmall,modifier=Modifier.padding(18.dp)) }
+        }
+    }
+    if(browse) ModalBottomSheet(onDismissRequest={browse=false}) {
+        LazyColumn(Modifier.padding(horizontal=20.dp).testTag("library-browser"),contentPadding=PaddingValues(bottom=28.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+            item {Text("Find your next chapter",style=MaterialTheme.typography.headlineSmall);Text("Choose a shelf, reading stage or order. Books keep their saved places.")}
+            item {Text("Reading stage",style=MaterialTheme.typography.titleMedium)}
+            items(libraryStatuses) {value -> FilterChip(status==value,{status=value},label={Text(value)})}
+            item {Text("Shelves",style=MaterialTheme.typography.titleMedium)}
+            item {FilterChip(shelf==null,{shelf=null},label={Text("Every shelf")})}
+            item {FilterChip(shelf=="",{shelf=""},label={Text("Unfiled")})}
+            items(libraryCollections(store.books)) {value ->FilterChip(shelf==value,{shelf=value},label={Text(value)})}
+            item {Text("Order books",style=MaterialTheme.typography.titleMedium)}
+            items(librarySorts) {value ->FilterChip(sort==value,{sort=value},label={Text(value)})}
+            item {Button(onClick={browse=false}) {Text("Return to my shelves")}}
         }
     }
     error?.let { message -> AlertDialog(onDismissRequest={error=null},title={Text("Couldn't open this book")},text={Text(message)},confirmButton={TextButton(onClick={error=null}) { Text("Close") }}) }
@@ -157,6 +179,7 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
     var noteOpen by rememberSaveable { mutableStateOf(false) }
     var discardNote by remember { mutableStateOf(false) }
     var remove by remember { mutableStateOf(false) }
+    var organize by rememberSaveable(book.id) {mutableStateOf(false)}
     val list = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val owner = LocalLifecycleOwner.current
@@ -232,6 +255,7 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
                     FilterChip(book.favorite,{store.saveBook(book.copy(favorite=!book.favorite))},label={Text("Favorite")})
                     FilterChip(position in book.bookmarks,{store.saveBook(book.copy(bookmarks=if(position in book.bookmarks) book.bookmarks-position else book.bookmarks+position))},label={Text("Bookmark")})
                 }
+                TextButton(onClick={panel="";organize=true}) {Text("Book details & shelf")}
                 if(book.format=="EPUB") Row(verticalAlignment=Alignment.CenterVertically) { Text("Text size"); TextButton(onClick={font=(font-2).coerceAtLeast(13)}) {Text("A−")}; TextButton(onClick={font=(font+2).coerceAtMost(31)}) {Text("A+")} }
                 OutlinedTextField(query,{query=it},label={Text(if(book.format=="EPUB") "Search book text" else "Go to page number")},modifier=Modifier.fillMaxWidth())
                 if(book.format=="PDF") TextButton(onClick={query.toIntOrNull()?.takeIf { it in 1..book.units }?.let { savePosition(it-1);panel="" }},enabled=query.toIntOrNull()?.let { it in 1..book.units }==true) {Text("Go to page")}
@@ -257,6 +281,12 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
             item { TextButton(onClick={remove=true}) {Text("Remove this book",color=MaterialTheme.colorScheme.error)} }
         }
     }
+    if(organize) BookOrganizationDialog(book,libraryCollections(store.books),onDismiss={organize=false}) {title,author,collection,completed ->
+        store.books.firstOrNull {it.id==book.id}?.let {current ->
+            store.saveBook(current.copy(title=title,author=author,collection=collection,completed=completed))
+        }
+        organize=false
+    }
     if(noteOpen) AlertDialog(onDismissRequest={if(noteBody.isNotBlank() || noteQuote.isNotBlank()) discardNote=true else noteOpen=false},title={Text("A passage to keep")},text={
         Column(Modifier.heightIn(max=380.dp).verticalScroll(rememberScrollState())) {
             OutlinedTextField(noteQuote,{noteQuote=it},label={Text("Quote / highlighted passage")},modifier=Modifier.fillMaxWidth(),maxLines=5)
@@ -265,4 +295,29 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
     },confirmButton={TextButton(onClick={store.saveBookNote(BookNote(bookId=book.id,position=position,quote=noteQuote,note=noteBody));noteOpen=false;noteBody="";noteQuote=""},enabled=noteQuote.isNotBlank() || noteBody.isNotBlank()) {Text("Keep passage")}},dismissButton={TextButton(onClick={if(noteBody.isNotBlank() || noteQuote.isNotBlank()) discardNote=true else noteOpen=false}) {Text("Cancel")}})
     if(discardNote) AlertDialog(onDismissRequest={discardNote=false},title={Text("Discard this unsaved note?")},confirmButton={TextButton(onClick={noteOpen=false;discardNote=false;noteQuote="";noteBody=""}) {Text("Discard")}},dismissButton={TextButton(onClick={discardNote=false}) {Text("Keep writing")}})
     if(remove) AlertDialog(onDismissRequest={remove=false},title={Text("Remove ${book.title}?")},text={Text("This removes Lilyly's copy, bookmarks and reading notes. Your original document and any journal pages you made will remain.")},confirmButton={TextButton(onClick={scope.launch { withContext(Dispatchers.IO) { files.directory(book.id).deleteRecursively() };store.removeBook(book.id);onBack() }}) {Text("Remove book")}},dismissButton={TextButton(onClick={remove=false}) {Text("Keep it")}})
+}
+
+@Composable
+private fun BookOrganizationDialog(book:LibraryBook,collections:List<String>,onDismiss:()->Unit,
+    onSave:(String,String,String,Boolean)->Unit) {
+    var title by rememberSaveable(book.id) {mutableStateOf(book.title)}
+    var author by rememberSaveable(book.id) {mutableStateOf(book.author)}
+    var collection by rememberSaveable(book.id) {mutableStateOf(book.collection)}
+    var completed by rememberSaveable(book.id) {mutableStateOf(book.completed)}
+    AlertDialog(onDismissRequest=onDismiss,title={Text("A place on your shelf")},text={
+        Column(Modifier.heightIn(max=420.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+            OutlinedTextField(title,{title=it.take(300)},label={Text("Book title")},modifier=Modifier.fillMaxWidth(),singleLine=true)
+            OutlinedTextField(author,{author=it.take(200)},label={Text("Author")},modifier=Modifier.fillMaxWidth(),singleLine=true)
+            OutlinedTextField(collection,{collection=it.take(60)},label={Text("Shelf name")},supportingText={Text("One shelf per book. Leave blank for Unfiled.")},modifier=Modifier.fillMaxWidth(),singleLine=true)
+            if(collections.isNotEmpty()) LazyRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                items(collections) {value ->SuggestionChip(onClick={collection=value},label={Text(value)})}
+            }
+            Row(verticalAlignment=Alignment.CenterVertically) {
+                Checkbox(completed,{completed=it})
+                Text("Finished reading")
+            }
+            Text("Changing these details keeps your place, bookmarks and notes. Existing journal copies keep their original attribution.",style=MaterialTheme.typography.bodySmall)
+        }
+    },confirmButton={TextButton(onClick={onSave(title.trim(),author.trim(),collection.trim(),completed)},enabled=title.isNotBlank()) {Text("Keep book details")}},
+    dismissButton={TextButton(onClick=onDismiss) {Text("Cancel")}})
 }

@@ -1,1 +1,1 @@
-Deliberate v0.19 cycle rhythms milestone: unit tests, Android journeys and Preview APK.
+Deliberately build v0.20 library shelves, unit tests, Android journeys and Garden Preview APK.
