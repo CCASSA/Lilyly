@@ -68,3 +68,6 @@ Pen/highlighter colors and widths, stylus-only input, pressure-aware strokes, wh
 
 ## Reading copies 0.18 continuation
 Selected journal entries and filtered notebook collections can be exported as paginated printable PDFs with text, local images, ink, source credits and music references. Scope and unencrypted-output privacy are explicit. This reading layout is separate from exact scrapbook reproduction; richer book layout, exact canvas publishing and direct printing remain planned. See READING-COPIES.md.
+
+## Cycle rhythms 0.19 continuation
+Opt-in estimated cycle-phase comparisons now connect recorded Sanctuary mood/anxiety/energy, Cycle pain and Sleep time in bed. Evidence links, distinct-date and completed-cycle thresholds, source controls and conservative exclusions are implemented. Calendar estimates remain uncertain; historical contraception context, measured ovulation, medication/symptom correlations and broader analysis remain planned. See CYCLE-RHYTHMS.md.

@@ -6,4 +6,4 @@ Calendar phases use intervals between recorded period starts and current period/
 
 No hormone measurements, confirmed ovulation, causation, diagnosis or fertility advice is inferred. Source selections are persisted using the existing encrypted settings; no migration or new network request is needed. Evidence dates open the existing connected daily view. Existing rest comparisons and dream tag summaries remain available.
 
-Verification pending deliberate milestone build. The wider product roadmap remains in PRODUCT-ROADMAP.md.
+Verified by 67 JVM tests and 24 Android emulator journeys in successful run 39454020156; phase evidence screenshot reviewed. The wider product roadmap remains in PRODUCT-ROADMAP.md.
