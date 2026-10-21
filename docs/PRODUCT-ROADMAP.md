@@ -74,3 +74,6 @@ Opt-in estimated cycle-phase comparisons now connect recorded Sanctuary mood/anx
 
 ## Library shelves 0.20 continuation
 Named shelf assignments, reading-stage filters, library sorting, editable imported titles/authors and reversible completion status extend the Reading Nook. Existing book identities, reading positions, bookmarks and notes are preserved. See LIBRARY-SHELVES.md and MILESTONE-0.20.md for verified scope; richer EPUB presentation, individual session history and remaining library depth remain planned.
+
+## Remembered words 0.21 continuation
+A global saved-passages space now searches across reading notes, quotations, books, authors and shelves. Recorded source positions reconnect to the reader; journal links preserve independent commonplace copies. Editing and confirmed removal retain original books, bookmarks and journal pages. See REMEMBERED-WORDS.md for scope and validation. Exact inline highlights, richer EPUB rendering and reading-session history remain planned.
