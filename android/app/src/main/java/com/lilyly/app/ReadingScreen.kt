@@ -90,6 +90,7 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
     var status by rememberSaveable { mutableStateOf("All books") }
     var sort by rememberSaveable { mutableStateOf("Recently read") }
     var browse by rememberSaveable { mutableStateOf(false) }
+    var passages by rememberSaveable { mutableStateOf(false) }
     val visible = librarySelection(store.books,query,onlyFavorites,status,shelf,sort)
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -106,13 +107,22 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
         BookReaderScreen(store,book,files,onBack={selected=null},onJournal=onJournal)
         return
     }
+    if(passages) {
+        ReadingPassagesScreen(store,onBack={passages=false},onBook={note ->
+            store.books.firstOrNull {it.id==note.bookId}?.let {source ->
+                store.saveBook(source.copy(position=note.position.coerceIn(0,source.units-1)))
+                selected=source.id
+            }
+        },onJournal=onJournal)
+        return
+    }
     BackHandler { if(!busy) onBack() }
     val palette = nookPalette(store.nookTheme)
     Scaffold(topBar = { TopAppBar(title = { Text("Reading nook") }, navigationIcon = { IconButton(onClick = onBack, enabled = !busy) { Icon(Icons.Default.ArrowBack,"Back") } }) }, bottomBar = {
         Surface(Modifier.navigationBarsPadding()) { Button(onClick = { importer.launch(arrayOf("application/pdf","application/epub+zip")) }, enabled = !busy, modifier = Modifier.fillMaxWidth().padding(14.dp)) { Text(if(busy) "Bringing your book inside…" else "Import EPUB or PDF") } }
     }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).background(palette.wall).testTag("bookshelf"), contentPadding=PaddingValues(bottom=24.dp)) {
-            item { SoundtrackButton(store,"reading",Modifier.padding(horizontal=18.dp)) }
+            item { SoundtrackButton(store,"reading",Modifier.padding(horizontal=18.dp)); TextButton(onClick={passages=true},modifier=Modifier.padding(horizontal=10.dp)) {Text("Saved passages & notes",color=palette.accent)} }
             item { NookAtmosphere(store.nookTheme); Text("Stay for one more chapter", style=MaterialTheme.typography.headlineMedium,color=palette.ink,modifier=Modifier.padding(18.dp)) }
             item {
                 LazyRow(contentPadding=PaddingValues(horizontal=18.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) { items(listOf("Cottage","Gothic","Celestial","Botanical")) { theme -> FilterChip(store.nookTheme==theme,{store.updateNookTheme(theme)},label={Text(theme,color=palette.ink)}) } }

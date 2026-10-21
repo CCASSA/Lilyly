@@ -1,1 +1,1 @@
-Deliberate v0.20 retry: use dialog-local keyboard Done action in shelf editor and journey.
+Deliberate v0.21 remembered words milestone: build, unit tests and Android journeys.

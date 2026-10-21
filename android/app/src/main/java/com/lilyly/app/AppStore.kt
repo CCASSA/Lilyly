@@ -129,6 +129,10 @@ class AppStore(context: Context) {
         if(i < 0) bookNotes.add(0,note) else bookNotes[i] = note
         saveArray("bookNotes",bookNotes.map { it.toJson() })
     }
+    fun removeBookNote(id: String) {
+        bookNotes.removeAll {it.id==id}
+        saveArray("bookNotes",bookNotes.map {it.toJson()})
+    }
     fun journalBookNote(note: BookNote): JournalEntry {
         journalEntries.firstOrNull { it.id == note.journalId }?.let { return it }
         val book = books.first { it.id == note.bookId }
