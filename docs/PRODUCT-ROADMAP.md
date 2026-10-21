@@ -71,3 +71,6 @@ Selected journal entries and filtered notebook collections can be exported as pa
 
 ## Cycle rhythms 0.19 continuation
 Opt-in estimated cycle-phase comparisons now connect recorded Sanctuary mood/anxiety/energy, Cycle pain and Sleep time in bed. Evidence links, distinct-date and completed-cycle thresholds, source controls and conservative exclusions are implemented. Calendar estimates remain uncertain; historical contraception context, measured ovulation, medication/symptom correlations and broader analysis remain planned. See CYCLE-RHYTHMS.md.
+
+## Library shelves 0.20 continuation
+Named shelf assignments, reading-stage filters, library sorting, editable imported titles/authors and reversible completion status extend the Reading Nook. Existing book identities, reading positions, bookmarks and notes are preserved. See LIBRARY-SHELVES.md and MILESTONE-0.20.md for verified scope; richer EPUB presentation, individual session history and remaining library depth remain planned.
