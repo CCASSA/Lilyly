@@ -91,6 +91,7 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
     var sort by rememberSaveable { mutableStateOf("Recently read") }
     var browse by rememberSaveable { mutableStateOf(false) }
     var passages by rememberSaveable { mutableStateOf(false) }
+    var history by rememberSaveable { mutableStateOf(false) }
     val visible = librarySelection(store.books,query,onlyFavorites,status,shelf,sort)
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -105,6 +106,15 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
     val book = store.books.firstOrNull { it.id == selected }
     if(book != null) {
         BookReaderScreen(store,book,files,onBack={selected=null},onJournal=onJournal)
+        return
+    }
+    if(history) {
+        ReadingHistoryScreen(store,onBack={history=false},onBook={id,at ->
+            store.books.firstOrNull {it.id==id}?.let {source ->
+                store.saveBook(source.copy(position=at.coerceIn(0,source.units-1)))
+                selected=id
+            }
+        })
         return
     }
     if(passages) {
@@ -122,7 +132,7 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
         Surface(Modifier.navigationBarsPadding()) { Button(onClick = { importer.launch(arrayOf("application/pdf","application/epub+zip")) }, enabled = !busy, modifier = Modifier.fillMaxWidth().padding(14.dp)) { Text(if(busy) "Bringing your book inside…" else "Import EPUB or PDF") } }
     }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).background(palette.wall).testTag("bookshelf"), contentPadding=PaddingValues(bottom=24.dp)) {
-            item { SoundtrackButton(store,"reading",Modifier.padding(horizontal=18.dp)); TextButton(onClick={passages=true},modifier=Modifier.padding(horizontal=10.dp)) {Text("Saved passages & notes",color=palette.accent)} }
+            item { SoundtrackButton(store,"reading",Modifier.padding(horizontal=18.dp)); TextButton(onClick={passages=true},modifier=Modifier.padding(horizontal=10.dp)) {Text("Saved passages & notes",color=palette.accent)}; TextButton(onClick={history=true},modifier=Modifier.padding(horizontal=10.dp)) {Text("Reading sessions",color=palette.accent)} }
             item { NookAtmosphere(store.nookTheme); Text("Stay for one more chapter", style=MaterialTheme.typography.headlineMedium,color=palette.ink,modifier=Modifier.padding(18.dp)) }
             item {
                 LazyRow(contentPadding=PaddingValues(horizontal=18.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) { items(listOf("Cottage","Gothic","Celestial","Botanical")) { theme -> FilterChip(store.nookTheme==theme,{store.updateNookTheme(theme)},label={Text(theme,color=palette.ink)}) } }
@@ -199,17 +209,20 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
         store.saveBook(current.copy(position=position,lastReadAt=LocalDateTime.now().toString()))
     }
     DisposableEffect(book.id, owner) {
-        var started = if(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) System.nanoTime() else 0L
+        val timer=ReadingSessionTimer()
+        fun currentPosition()=store.books.firstOrNull {it.id==book.id}?.position ?: 0
+        if(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) timer.begin(currentPosition())
         fun pause() {
-            if(started!=0L) {
-                val seconds=(System.nanoTime()-started)/1_000_000_000
-                store.books.firstOrNull { it.id==book.id }?.let { if(seconds>0) store.saveBook(it.copy(readingSeconds=it.readingSeconds+seconds)) }
-                started=0
+            timer.pause(currentPosition())?.let {session ->
+                store.books.firstOrNull {it.id==book.id}?.let {store.saveBook(keepReadingSession(it,session))}
             }
         }
-        val observer=LifecycleEventObserver { _,event -> if(event==Lifecycle.Event.ON_RESUME && started==0L) started=System.nanoTime() else if(event==Lifecycle.Event.ON_PAUSE) pause() }
+        val observer=LifecycleEventObserver {_,event ->
+            if(event==Lifecycle.Event.ON_RESUME) timer.begin(currentPosition())
+            else if(event==Lifecycle.Event.ON_PAUSE) pause()
+        }
         owner.lifecycle.addObserver(observer)
-        onDispose { pause(); owner.lifecycle.removeObserver(observer) }
+        onDispose {pause();owner.lifecycle.removeObserver(observer)}
     }
     LaunchedEffect(book.id) {
         savePosition(position)

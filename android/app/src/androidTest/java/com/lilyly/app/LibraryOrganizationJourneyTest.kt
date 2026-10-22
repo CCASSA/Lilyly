@@ -70,6 +70,10 @@ class LibraryOrganizationJourneyTest {
             assertEquals(1,book.position)
             assertEquals(setOf(0),book.bookmarks)
             assertTrue(book.readingSeconds>=120)
+            assertTrue(book.sessions.isNotEmpty())
+            assertEquals(1,book.sessions.first().firstPosition)
+            assertEquals(1,book.sessions.last().lastPosition)
+            assertEquals(120L+book.sessions.sumOf {it.seconds},book.readingSeconds)
             assertEquals("Keep this note",restored.bookNotes.single().note)
         }
     }

@@ -1,1 +1,1 @@
-Deliberate v0.21 remembered words milestone: build, unit tests and Android journeys.
+Deliberate v0.22 reading sessions milestone: build, unit tests and Android journeys.

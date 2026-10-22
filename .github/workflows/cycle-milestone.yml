@@ -43,7 +43,7 @@ jobs:
           path: android/app/build/reports/tests/testDebugUnitTest
       - uses: actions/upload-artifact@v4
         with:
-          name: Lilyly-0.21.0-remembered-words-debug
+          name: Lilyly-0.22.0-reading-sessions-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
@@ -91,6 +91,7 @@ jobs:
             adb exec-out run-as com.lilyly.app cat files/ink-studio.png > ui-screenshots/ink-studio.png
             adb exec-out run-as com.lilyly.app cat files/reading-copy.pdf > ui-screenshots/reading-copy.pdf
             adb exec-out run-as com.lilyly.app cat files/phase-insights.png > ui-screenshots/phase-insights.png
+            adb exec-out run-as com.lilyly.app cat files/reading-history.png > ui-screenshots/reading-history.png
             grep -q 'OK (' instrument-results.txt
             python3 -c "from pathlib import Path; assert all(p.read_bytes().startswith(bytes([137,80,78,71])) for p in Path('ui-screenshots').glob('*.png'))"
       - uses: actions/upload-artifact@v4

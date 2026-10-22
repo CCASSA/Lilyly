@@ -10,16 +10,16 @@ data class LibraryBook(
     val format: String, val units: Int, val position: Int = 0, val favorite: Boolean = false,
     val bookmarks: Set<Int> = emptySet(), val addedAt: String = LocalDateTime.now().toString(),
     val lastReadAt: String = "", val readingSeconds: Long = 0, val completed: Boolean = false,
-    val collection: String = ""
+    val collection: String = "", val sessions: List<ReadingSession> = emptyList()
 ) {
     fun toJson() = JSONObject().put("id",id).put("title",title).put("author",author).put("format",format).put("units",units)
         .put("position",position).put("favorite",favorite).put("bookmarks",JSONArray(bookmarks.toList())).put("addedAt",addedAt)
-        .put("lastReadAt",lastReadAt).put("readingSeconds",readingSeconds).put("completed",completed).put("collection",collection)
+        .put("lastReadAt",lastReadAt).put("readingSeconds",readingSeconds).put("completed",completed).put("collection",collection).put("sessions",JSONArray(sessions.map {it.toJson()}))
     companion object { fun fromJson(o: JSONObject): LibraryBook {
         val units = o.getInt("units").coerceAtLeast(1)
         return LibraryBook(o.getString("id"),o.getString("title"),o.optString("author"),o.getString("format"),units,
             o.optInt("position").coerceIn(0,units-1),o.optBoolean("favorite"),o.optJSONArray("bookmarks")?.let { a -> (0 until a.length()).map { a.getInt(it) }.filter { it in 0 until units }.toSet() } ?: emptySet(),
-            o.optString("addedAt"),o.optString("lastReadAt"),o.optLong("readingSeconds"),o.optBoolean("completed"),o.optString("collection"))
+            o.optString("addedAt"),o.optString("lastReadAt"),o.optLong("readingSeconds"),o.optBoolean("completed"),o.optString("collection"),readSessions(o.optJSONArray("sessions"),units))
     } }
 }
 data class BookNote(val id: String = UUID.randomUUID().toString(), val bookId: String, val position: Int,
