@@ -77,3 +77,6 @@ Named shelf assignments, reading-stage filters, library sorting, editable import
 
 ## Remembered words 0.21 continuation
 A global saved-passages space now searches across reading notes, quotations, books, authors and shelves. Recorded source positions reconnect to the reader; journal links preserve independent commonplace copies. Editing and confirmed removal retain original books, bookmarks and journal pages. See REMEMBERED-WORDS.md for scope and validation. Exact inline highlights, richer EPUB rendering and reading-session history remain planned.
+
+## Reading sessions 0.22 continuation
+Dated foreground-reader sessions now record elapsed time, book positions and UTC offset, with a history view that opens the recorded place. Existing lifetime totals are retained as undated earlier time. Lifecycle pauses exclude background time; no reading-speed or attention inference is made. See READING-SESSIONS.md for limitations. Session checkpoints, independent history management and broader reading insights remain planned.
