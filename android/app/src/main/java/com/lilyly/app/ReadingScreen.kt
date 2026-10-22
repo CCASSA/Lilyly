@@ -90,6 +90,7 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
     var status by rememberSaveable { mutableStateOf("All books") }
     var sort by rememberSaveable { mutableStateOf("Recently read") }
     var browse by rememberSaveable { mutableStateOf(false) }
+    var room by rememberSaveable { mutableStateOf(false) }
     var passages by rememberSaveable { mutableStateOf(false) }
     var history by rememberSaveable { mutableStateOf(false) }
     val visible = librarySelection(store.books,query,onlyFavorites,status,shelf,sort)
@@ -132,13 +133,12 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
         Surface(Modifier.navigationBarsPadding()) { Button(onClick = { importer.launch(arrayOf("application/pdf","application/epub+zip")) }, enabled = !busy, modifier = Modifier.fillMaxWidth().padding(14.dp)) { Text(if(busy) "Bringing your book inside…" else "Import EPUB or PDF") } }
     }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).background(palette.wall).testTag("bookshelf"), contentPadding=PaddingValues(bottom=24.dp)) {
-            item { SoundtrackButton(store,"reading",Modifier.padding(horizontal=18.dp)); TextButton(onClick={passages=true},modifier=Modifier.padding(horizontal=10.dp)) {Text("Saved passages & notes",color=palette.accent)}; TextButton(onClick={history=true},modifier=Modifier.padding(horizontal=10.dp)) {Text("Reading sessions",color=palette.accent)} }
             item { NookAtmosphere(store.nookTheme); Text("Stay for one more chapter", style=MaterialTheme.typography.headlineMedium,color=palette.ink,modifier=Modifier.padding(18.dp)) }
             item {
-                LazyRow(contentPadding=PaddingValues(horizontal=18.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) { items(listOf("Cottage","Gothic","Celestial","Botanical")) { theme -> FilterChip(store.nookTheme==theme,{store.updateNookTheme(theme)},label={Text(theme,color=palette.ink)}) } }
-                OutlinedTextField(query,{query=it},label={Text("Find a book")},modifier=Modifier.fillMaxWidth().padding(horizontal=18.dp),colors=OutlinedTextFieldDefaults.colors(unfocusedTextColor=palette.ink,focusedTextColor=palette.ink,unfocusedLabelColor=palette.ink))
-                FilterChip(onlyFavorites,{onlyFavorites=!onlyFavorites},label={Text("My favorites",color=palette.ink)},modifier=Modifier.padding(start=18.dp))
-                TextButton(onClick={browse=true},modifier=Modifier.padding(start=10.dp)) {Text("Browse shelves",color=palette.accent)}
+                Row(Modifier.fillMaxWidth().padding(horizontal=10.dp),horizontalArrangement=Arrangement.SpaceBetween) {
+                    TextButton(onClick={browse=true}) {Text("Browse shelves",color=palette.accent)}
+                    TextButton(onClick={room=true}) {Text("Room & keepsakes",color=palette.accent)}
+                }
                 Text("${shelf?.let {if(it.isBlank()) "Unfiled" else it} ?: "Every shelf"} · $status · ${visible.size} books",color=palette.ink,style=MaterialTheme.typography.labelMedium,modifier=Modifier.padding(horizontal=18.dp))
                 if(shelf!=null || status!="All books" || onlyFavorites || query.isNotBlank())
                     TextButton(onClick={shelf=null;status="All books";onlyFavorites=false;query=""},modifier=Modifier.padding(start=10.dp)) {Text("Show all my books",color=palette.accent)}
@@ -165,9 +165,26 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
             item { Text("Books stay on this device. EPUBs use a text reading view; PDF pages keep their original layout. No account or broad storage permission is needed.",color=palette.ink.copy(alpha=.7f),style=MaterialTheme.typography.bodySmall,modifier=Modifier.padding(18.dp)) }
         }
     }
+    if(room) ModalBottomSheet(onDismissRequest={room=false}) {
+        LazyColumn(Modifier.padding(horizontal=20.dp).testTag("nook-room"),contentPadding=PaddingValues(bottom=28.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+            item {Text("Make yourself at home",style=MaterialTheme.typography.headlineSmall)}
+            item {Text("Choose your room",style=MaterialTheme.typography.titleMedium)}
+            items(listOf("Cottage","Gothic","Celestial","Botanical")) {theme ->
+                FilterChip(store.nookTheme==theme,{store.updateNookTheme(theme)},label={Text(theme)})
+            }
+            item {SoundtrackButton(store,"reading")}
+            item {TextButton(onClick={room=false;passages=true}) {Text("Saved passages & notes")}}
+            item {TextButton(onClick={room=false;history=true}) {Text("Reading sessions")}}
+            item {Button(onClick={room=false}) {Text("Settle into my room")}}
+        }
+    }
     if(browse) ModalBottomSheet(onDismissRequest={browse=false}) {
         LazyColumn(Modifier.padding(horizontal=20.dp).testTag("library-browser"),contentPadding=PaddingValues(bottom=28.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
             item {Text("Find your next chapter",style=MaterialTheme.typography.headlineSmall);Text("Choose a shelf, reading stage or order. Books keep their saved places.")}
+            item {
+                OutlinedTextField(query,{query=it},label={Text("Find a book")},modifier=Modifier.fillMaxWidth(),singleLine=true)
+                FilterChip(onlyFavorites,{onlyFavorites=!onlyFavorites},label={Text("My favorites")})
+            }
             item {Text("Reading stage",style=MaterialTheme.typography.titleMedium)}
             items(libraryStatuses) {value -> FilterChip(status==value,{status=value},label={Text(value)})}
             item {Text("Shelves",style=MaterialTheme.typography.titleMedium)}

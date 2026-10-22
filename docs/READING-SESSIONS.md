@@ -6,4 +6,4 @@ Duration uses a monotonic clock. Wall-clock changes do not alter elapsed seconds
 
 Sessions are additive fields in existing encrypted book metadata and travel through the existing backup format. Older readingSeconds totals are preserved and shown separately as undated time; no historical sessions are invented. Malformed session rows are skipped while retaining the book. Deleting a book removes its associated sessions as part of the already-confirmed deletion.
 
-Unexpected process termination before pause/disposal can lose the active unsaved interval. Session checkpoints, history deletion independent of book removal, date filters, goals and cross-system reading insights remain planned. No external service, permissions or dependency changes were introduced. Pending deliberate build validation.
+Unexpected process termination before pause/disposal can lose the active unsaved interval. Session checkpoints, history deletion independent of book removal, date filters, goals and cross-system reading insights remain planned. No external service, permissions or dependency changes were introduced. Validated by the 0.22 retry; see MILESTONE-0.22.md.

@@ -1,1 +1,1 @@
-Deliberate v0.22 retry: scroll imported book into view before opening; rerun all unit and Android journeys.
+Deliberate v0.23 books-first milestone: build, unit tests and all Android journeys after the successful 0.22 retry.

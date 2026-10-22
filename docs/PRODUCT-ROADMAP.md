@@ -80,3 +80,7 @@ A global saved-passages space now searches across reading notes, quotations, boo
 
 ## Reading sessions 0.22 continuation
 Dated foreground-reader sessions now record elapsed time, book positions and UTC offset, with a history view that opens the recorded place. Existing lifetime totals are retained as undated earlier time. Lifecycle pauses exclude background time; no reading-speed or attention inference is made. See READING-SESSIONS.md for limitations. Session checkpoints, independent history management and broader reading insights remain planned.
+
+## 0.23 continuation — books first
+
+Reading Nook now opens on its room illustration and book covers. Search, favorites and collection controls move into Browse shelves; room themes, soundtrack and reading keepsakes move into Room & keepsakes. All existing capabilities remain reachable with progressive disclosure. Validation pending; see MILESTONE-0.23.md.

@@ -19,6 +19,10 @@ import java.util.zip.ZipOutputStream
 @RunWith(AndroidJUnit4::class)
 class TarotNookJourneyTest {
     @get:Rule val rule=createAndroidComposeRule<MainActivity>()
+    private var previousBooks:String?=null
+    @org.junit.After fun restoreBooks() {
+        previousBooks?.let {books ->rule.runOnUiThread {SecurePreferences(rule.activity).writeBatch(mapOf("books" to books))}}
+    }
 
     @Test fun revealReadingAndLinkItToAPersistentGrimoirePage() {
         lateinit var store: AppStore
@@ -68,10 +72,17 @@ class TarotNookJourneyTest {
         assertEquals(2,importedPdf.units)
         files.pdf(importedPdf.id,1,300).let { assertTrue(it.width>0);it.recycle() }
         rule.runOnUiThread {
+            val secure=SecurePreferences(context)
+            previousBooks=secure.get("books","[]")
+            secure.writeBatch(mapOf("books" to "[]"))
             val store=AppStore(context);store.saveBook(imported);store.saveBook(importedPdf)
             rule.activity.setContent { LilylyTheme(true) { BookshelfScreen(store,{}, {}) } }
         }
+        rule.onNodeWithTag("book-${imported.id}").assertIsDisplayed()
+        rule.onNodeWithText("Room & keepsakes").performClick()
         rule.onNodeWithText("Celestial").performClick()
+        rule.onNodeWithTag("nook-room").performScrollToNode(hasText("Settle into my room"))
+        rule.onNodeWithText("Settle into my room").performClick()
         screenshot("bookshelf.png")
         rule.onNodeWithTag("bookshelf").performScrollToNode(hasTestTag("book-${imported.id}"))
         rule.onNodeWithTag("book-${imported.id}").assertIsDisplayed().performClick()
