@@ -83,4 +83,4 @@ Dated foreground-reader sessions now record elapsed time, book positions and UTC
 
 ## 0.23 continuation — books first
 
-Reading Nook now opens on its room illustration and book covers. Search, favorites and collection controls move into Browse shelves; room themes, soundtrack and reading keepsakes move into Room & keepsakes. All existing capabilities remain reachable with progressive disclosure. Validation pending; see MILESTONE-0.23.md.
+Reading Nook now opens on its room illustration and book covers. Search, favorites and collection controls move into Browse shelves; room themes, soundtrack and reading keepsakes move into Room & keepsakes. All existing capabilities remain reachable with progressive disclosure. Verified with 81 JVM and 27 Android tests; see MILESTONE-0.23.md.
