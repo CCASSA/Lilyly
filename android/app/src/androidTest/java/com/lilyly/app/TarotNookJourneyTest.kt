@@ -73,7 +73,8 @@ class TarotNookJourneyTest {
         }
         rule.onNodeWithText("Celestial").performClick()
         screenshot("bookshelf.png")
-        rule.onNodeWithTag("book-${imported.id}").performClick()
+        rule.onNodeWithTag("bookshelf").performScrollToNode(hasTestTag("book-${imported.id}"))
+        rule.onNodeWithTag("book-${imported.id}").assertIsDisplayed().performClick()
         rule.waitUntil(10000) { rule.onAllNodesWithText("The garden waited in the moonlight.",substring=true).fetchSemanticsNodes().isNotEmpty() }
         rule.onNodeWithText("Next").performClick()
         rule.waitUntil(10000) { rule.onAllNodesWithText("She followed the silver leaves home.",substring=true).fetchSemanticsNodes().isNotEmpty() }
