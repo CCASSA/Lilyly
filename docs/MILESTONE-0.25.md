@@ -7,3 +7,5 @@ Cross-midnight sessions are explicitly filed under their recorded local start da
 Existing saved thread choices remain unchanged, so existing users can enable Reading in Choose threads. New installs include Reading in the default set. The chooser scrolls to remain usable as categories grow. Hiding a thread preserves source records.
 
 Includes the reading checkpoint and confirmed session-removal work from 0.24. New unit coverage checks date/offset, linked position, old undated totals and malformed input; an Android journey checks visibility, callback position and persisted hiding. Full build and screenshot validation pending.
+
+First build 40692756030 compiled and passed 86 unit tests and the new daily-thread journey, but the foreground checkpoint journey timed out. The save loop now uses an Android main-thread Handler with callbacks removed on pause/disposal and scheduled on resume, avoiding the mismatch between Compose test coroutine scheduling and the monotonic elapsed clock. Retry pending; no failed-run APK delivered.

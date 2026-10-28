@@ -38,7 +38,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.compose.AsyncImage
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -227,25 +226,31 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
         store.saveBook(current.copy(position=position,lastReadAt=LocalDateTime.now().toString()))
     }
     val timer=remember(book.id,owner) {ReadingSessionTimer()}
-    LaunchedEffect(book.id,timer) {
-        while(true) {
-            delay(30_000)
-            store.books.firstOrNull {it.id==book.id}?.let {current ->
-                timer.checkpoint(current.position)?.let {store.saveBook(keepReadingSession(current,it))}
-            }
-        }
-    }
     DisposableEffect(book.id, owner,timer) {
+        val handler=android.os.Handler(android.os.Looper.getMainLooper())
         fun currentPosition()=store.books.firstOrNull {it.id==book.id}?.position ?: 0
-        if(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) timer.begin(currentPosition())
-        fun pause() {
-            timer.pause(currentPosition())?.let {session ->
-                store.books.firstOrNull {it.id==book.id}?.let {store.saveBook(keepReadingSession(it,session))}
+        fun keep(session:ReadingSession?) {
+            session?.let {row ->store.books.firstOrNull {it.id==book.id}?.let {store.saveBook(keepReadingSession(it,row))}}
+        }
+        val checkpoint=object:Runnable {
+            override fun run() {
+                keep(timer.checkpoint(currentPosition()))
+                handler.postDelayed(this,30_000)
             }
         }
+        fun resume() {
+            timer.begin(currentPosition())
+            handler.removeCallbacks(checkpoint)
+            handler.postDelayed(checkpoint,30_000)
+        }
+        fun pause() {
+            handler.removeCallbacks(checkpoint)
+            keep(timer.pause(currentPosition()))
+        }
+        if(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED))resume()
         val observer=LifecycleEventObserver {_,event ->
-            if(event==Lifecycle.Event.ON_RESUME) timer.begin(currentPosition())
-            else if(event==Lifecycle.Event.ON_PAUSE) pause()
+            if(event==Lifecycle.Event.ON_RESUME)resume()
+            else if(event==Lifecycle.Event.ON_PAUSE)pause()
         }
         owner.lifecycle.addObserver(observer)
         onDispose {pause();owner.lifecycle.removeObserver(observer)}
