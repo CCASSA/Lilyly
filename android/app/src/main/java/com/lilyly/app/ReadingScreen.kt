@@ -38,6 +38,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.compose.AsyncImage
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -225,8 +226,16 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
         val current=store.books.first { it.id==book.id }
         store.saveBook(current.copy(position=position,lastReadAt=LocalDateTime.now().toString()))
     }
-    DisposableEffect(book.id, owner) {
-        val timer=ReadingSessionTimer()
+    val timer=remember(book.id,owner) {ReadingSessionTimer()}
+    LaunchedEffect(book.id,timer) {
+        while(true) {
+            delay(30_000)
+            store.books.firstOrNull {it.id==book.id}?.let {current ->
+                timer.checkpoint(current.position)?.let {store.saveBook(keepReadingSession(current,it))}
+            }
+        }
+    }
+    DisposableEffect(book.id, owner,timer) {
         fun currentPosition()=store.books.firstOrNull {it.id==book.id}?.position ?: 0
         if(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) timer.begin(currentPosition())
         fun pause() {

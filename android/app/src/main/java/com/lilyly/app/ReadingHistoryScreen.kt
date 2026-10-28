@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ReadingHistoryScreen(store:AppStore,onBack:()->Unit,onBook:(String,Int)->Unit) {
     BackHandler(onBack=onBack)
+    var removing by remember {mutableStateOf<Pair<String,String>?>(null)}
     val rows=store.books.flatMap {book ->book.sessions.map {book to it}}.sortedByDescending {OffsetDateTime.parse(it.second.startedAt).toInstant()}
     val earlier=store.books.sumOf {(it.readingSeconds-it.sessions.sumOf {row->row.seconds}).coerceAtLeast(0)}
     Scaffold(topBar={TopAppBar(title={Text("Hours among the pages")},navigationIcon={IconButton(onClick=onBack){Icon(Icons.Default.ArrowBack,"Back to shelves")}})}) {padding ->
@@ -37,8 +38,18 @@ fun ReadingHistoryScreen(store:AppStore,onBack:()->Unit,onBook:(String,Int)->Uni
                     Text(readingDuration(session.seconds),style=MaterialTheme.typography.titleLarge)
                     Text("${if(book.format=="PDF") "Pages" else "Sections"} ${session.firstPosition+1} → ${session.lastPosition+1}")
                     TextButton(onClick={onBook(book.id,session.lastPosition)}) {Text("Return to this place")}
+                    TextButton(onClick={removing=book.id to session.id}) {Text("Remove session") }
                 }
             }
         }
+    }
+    removing?.let {target ->
+        AlertDialog(onDismissRequest={removing=null},title={Text("Remove this session?")},
+            text={Text("This removes the session and its time from your reading total. Your book, saved place, bookmarks, notes and journal pages stay. This cannot be undone.")},
+            confirmButton={TextButton(onClick={
+                store.books.firstOrNull {it.id==target.first}?.let {store.saveBook(removeReadingSession(it,target.second))}
+                removing=null
+            }) {Text("Remove recorded time")}},
+            dismissButton={TextButton(onClick={removing=null}) {Text("Keep session")}})
     }
 }

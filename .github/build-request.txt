@@ -1,1 +1,1 @@
-Deliberate v0.23 books-first milestone: build, unit tests and all Android journeys after the successful 0.22 retry.
+Deliberate 0.24 build: checkpoint reading sessions, confirm individual removal, run full unit and Android journeys.

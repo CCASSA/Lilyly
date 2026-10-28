@@ -43,6 +43,8 @@ class LibraryOrganizationJourneyTest {
             store.saveBookNote(BookNote(bookId=imported.id,position=1,note="Keep this note"))
             rule.activity.setContent {LilylyTheme(true){BookshelfScreen(store,{}, {},imported.id)}}
         }
+        // A checkpoint must reach encrypted storage while the reader is still open.
+        rule.waitUntil(40_000) {AppStore(rule.activity).books.single().sessions.isNotEmpty()}
         rule.onNodeWithText("Tools").performClick()
         rule.onNodeWithText("Book details & shelf").performScrollTo().performClick()
         rule.onNodeWithText("Book title").performTextReplacement("The Herbal Shelf")
@@ -70,7 +72,7 @@ class LibraryOrganizationJourneyTest {
             assertEquals(1,book.position)
             assertEquals(setOf(0),book.bookmarks)
             assertTrue(book.readingSeconds>=120)
-            assertTrue(book.sessions.isNotEmpty())
+            assertEquals(1,book.sessions.size)
             assertEquals(1,book.sessions.first().firstPosition)
             assertEquals(1,book.sessions.last().lastPosition)
             assertEquals(120L+book.sessions.sumOf {it.seconds},book.readingSeconds)

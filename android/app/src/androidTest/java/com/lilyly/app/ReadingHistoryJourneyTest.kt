@@ -23,7 +23,7 @@ class ReadingHistoryJourneyTest {
             secure.writeBatch(mapOf("books" to "[]"))
             val store=AppStore(rule.activity)
             val session=ReadingSession(startedAt="2026-10-22T20:00:00+02:00",endedAt="2026-10-22T20:12:00+02:00",seconds=720,firstPosition=0,lastPosition=3)
-            store.saveBook(keepReadingSession(LibraryBook(id="history-fixture",title="The Moonlit Garden",author="Lilyly fixture",format="EPUB",units=8,readingSeconds=300),session))
+            store.saveBook(keepReadingSession(LibraryBook(id="history-fixture",title="The Moonlit Garden",author="Lilyly fixture",format="EPUB",units=8,readingSeconds=300,position=3,bookmarks=setOf(2)),session))
             val reloaded=AppStore(rule.activity)
             assertEquals(1020L,reloaded.books.single().readingSeconds)
             assertEquals(1,reloaded.books.single().sessions.size)
@@ -33,7 +33,21 @@ class ReadingHistoryJourneyTest {
         rule.onNodeWithTag("reading-history").performScrollToNode(hasText("Return to this place"))
         rule.onNodeWithText("Return to this place").performScrollTo().performClick()
         rule.runOnUiThread {assertEquals("history-fixture:3",opened)}
+        rule.onNodeWithTag("reading-history").performScrollToNode(hasText("Remove session"))
+        rule.onNodeWithText("Remove session").performClick()
+        rule.onNodeWithText("Keep session").performClick()
+        rule.runOnUiThread {assertEquals(1,AppStore(rule.activity).books.single().sessions.size)}
         val bitmap=InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
         File(rule.activity.filesDir,"reading-history.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)};bitmap.recycle()
+        rule.onNodeWithText("Remove session").performClick()
+        rule.onNodeWithText("Remove recorded time").performClick()
+        rule.onNodeWithText("Your next chapter starts here").assertExists()
+        rule.runOnUiThread {
+            val restored=AppStore(rule.activity).books.single()
+            assertTrue(restored.sessions.isEmpty())
+            assertEquals(300L,restored.readingSeconds)
+            assertEquals(3,restored.position)
+            assertEquals(setOf(2),restored.bookmarks)
+        }
     }
 }
