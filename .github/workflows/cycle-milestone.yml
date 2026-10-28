@@ -92,6 +92,7 @@ jobs:
             adb exec-out run-as com.lilyly.app cat files/reading-copy.pdf > ui-screenshots/reading-copy.pdf
             adb exec-out run-as com.lilyly.app cat files/phase-insights.png > ui-screenshots/phase-insights.png
             adb exec-out run-as com.lilyly.app cat files/reading-history.png > ui-screenshots/reading-history.png
+            adb exec-out run-as com.lilyly.app cat files/day-reading.png > ui-screenshots/day-reading.png
             grep -q 'OK (' instrument-results.txt
             python3 -c "from pathlib import Path; assert all(p.read_bytes().startswith(bytes([137,80,78,71])) for p in Path('ui-screenshots').glob('*.png'))"
       - uses: actions/upload-artifact@v4

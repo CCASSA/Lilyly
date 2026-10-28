@@ -23,7 +23,8 @@ fun keepReadingSession(book:LibraryBook,session:ReadingSession):LibraryBook {
     if(session.firstPosition !in 0 until book.units || session.lastPosition !in 0 until book.units)return book
     if(runCatching {OffsetDateTime.parse(session.startedAt);OffsetDateTime.parse(session.endedAt)}.isFailure)return book
     val previous=book.sessions.firstOrNull {it.id==session.id}
-    if(previous!=null && (previous.startedAt!=session.startedAt || previous.firstPosition!=session.firstPosition || session.seconds<=previous.seconds))return book
+    if(previous!=null && (previous.startedAt!=session.startedAt || previous.firstPosition!=session.firstPosition || session.seconds<previous.seconds))return book
+    if(previous==session)return book
     val delta=session.seconds-(previous?.seconds ?: 0L)
     if(book.readingSeconds>Long.MAX_VALUE-delta)return book
     return book.copy(readingSeconds=book.readingSeconds+delta,

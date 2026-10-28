@@ -2,6 +2,8 @@ package com.lilyly.app
 
 import android.app.DatePickerDialog
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -19,13 +21,13 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DayScreen(store:AppStore,initialDate:String?=null,onBack:()->Unit,onPage:(JournalEntry)->Unit,onSpace:(String,String)->Unit) {
+fun DayScreen(store:AppStore,initialDate:String?=null,onBack:()->Unit,onPage:(JournalEntry)->Unit,onSpace:(String,String)->Unit,onBook:(String,Int)->Unit) {
     androidx.activity.compose.BackHandler(onBack=onBack)
     var dateText by rememberSaveable(initialDate) {mutableStateOf(initialDate ?: LocalDate.now().toString())}
     var choosing by rememberSaveable {mutableStateOf(false)}
     val date=LocalDate.parse(dateText)
     val context=LocalContext.current
-    val threads=dayThreads(store.cycleLogs,store.mentalCheckIns,store.sleepRecords,store.medications,store.medicationLogs,store.journalEntries,store.therapyNotes,store.tarotReadings)
+    val threads=dayThreads(store.cycleLogs,store.mentalCheckIns,store.sleepRecords,store.medications,store.medicationLogs,store.journalEntries,store.therapyNotes,store.tarotReadings,store.books)
         .filter {it.category in store.daySections}
     val entries=threads.filter {it.date==dateText}
     val dates=threads.map {it.date}.distinct().sortedDescending()
@@ -58,7 +60,8 @@ fun DayScreen(store:AppStore,initialDate:String?=null,onBack:()->Unit,onPage:(Jo
                             Text(entry.detail,style=MaterialTheme.typography.bodyMedium)
                             val page=store.journalEntries.firstOrNull {it.id==entry.pageId}
                             if(page!=null) TextButton(onClick={onPage(page)}) {Text("Open page · ${page.title.ifBlank {"Untitled"}}")}
-                            if(category!="Pages") TextButton(onClick={onSpace(category,dateText)}) {Text("Visit $category")}
+                            if(entry.bookId.isNotBlank()) TextButton(onClick={onBook(entry.bookId,entry.bookPosition)}) {Text("Return to this reading place")}
+                            if(category!="Pages" && category!="Reading") TextButton(onClick={onSpace(category,dateText)}) {Text("Visit $category")}
                             HorizontalDivider()
                         }
                     }
@@ -66,10 +69,10 @@ fun DayScreen(store:AppStore,initialDate:String?=null,onBack:()->Unit,onPage:(Jo
             }
         }
     }
-    if(choosing) AlertDialog(onDismissRequest={choosing=false},title={Text("The threads you want to see")},text={Column {
+    if(choosing) AlertDialog(onDismissRequest={choosing=false},title={Text("The threads you want to see")},text={Column(Modifier.verticalScroll(rememberScrollState())) {
         Text("This only changes this view. Your saved records stay in their own spaces.",style=MaterialTheme.typography.bodySmall)
         dayThreadCategories.forEach {category -> Row {
-            Checkbox(category in store.daySections,{enabled ->store.updateDaySections(if(enabled)store.daySections+category else store.daySections-category)})
+            Checkbox(category in store.daySections,{enabled ->store.updateDaySections(if(enabled)store.daySections+category else store.daySections-category)},modifier=Modifier.testTag("thread-$category"))
             Text(category,Modifier.padding(top=12.dp))
         }}
     }},confirmButton={TextButton(onClick={choosing=false}) {Text("Done")}})

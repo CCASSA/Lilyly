@@ -55,6 +55,8 @@ class ReadingSessionsTest {
         val first=timer.checkpoint(1)!!
         var saved=keepReadingSession(book,first)
         assertEquals(130L,saved.readingSeconds)
+        saved=keepReadingSession(saved,timer.checkpoint(2)!!)
+        assertEquals(130L,saved.readingSeconds);assertEquals(2,saved.sessions.single().lastPosition)
         saved=LibraryBook.fromJson(saved.toJson())
         nanos=60_000_000_000
         saved=keepReadingSession(saved,timer.checkpoint(2)!!)

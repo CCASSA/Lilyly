@@ -1,1 +1,1 @@
-Deliberate 0.24 build: checkpoint reading sessions, confirm individual removal, run full unit and Android journeys.
+Deliberate 0.25 build: link reading into daily threads; run all unit and Android journeys after successful 0.24.

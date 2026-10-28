@@ -15,4 +15,15 @@ class DayThreadsTest {
         assertTrue(rows.first {it.category=="Medication"}.detail.startsWith("Late"))
         assertTrue(threads().isEmpty())
     }
+    @Test fun readingUsesRecordedStartDateAndKeepsBookLinkWithoutInventingOldSessions() {
+        val session=ReadingSession(id="night",startedAt="2026-10-27T23:55:00-04:00",endedAt="2026-10-28T00:05:00-04:00",seconds=600,firstPosition=0,lastPosition=2)
+        val book=LibraryBook(id="moon-book",title="The Moonlit Garden",format="EPUB",units=4,readingSeconds=900,sessions=listOf(session))
+        fun records(books:List<LibraryBook>)=dayThreads(emptyList(),emptyList(),emptyList(),emptyList(),emptyList(),emptyList(),emptyList(),emptyList(),books)
+        val row=records(listOf(book)).single()
+        assertEquals("2026-10-27",row.date);assertEquals("Reading",row.category)
+        assertEquals(book.id,row.bookId);assertEquals(2,row.bookPosition)
+        assertTrue(row.detail.contains("10 min"));assertTrue(row.detail.contains("-04:00"))
+        assertTrue(records(listOf(book.copy(sessions=emptyList()))).isEmpty())
+        assertTrue(records(listOf(book.copy(sessions=listOf(session.copy(startedAt="bad"))))).isEmpty())
+    }
 }

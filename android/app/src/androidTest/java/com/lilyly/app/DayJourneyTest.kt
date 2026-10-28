@@ -15,6 +15,8 @@ import java.time.LocalDate
 @RunWith(AndroidJUnit4::class)
 class DayJourneyTest {
     @get:Rule val rule=createAndroidComposeRule<MainActivity>()
+    private var previousReading=emptyMap<String,String>()
+    @After fun restoreReadingFixture() {if(previousReading.isNotEmpty())rule.runOnUiThread {SecurePreferences(rule.activity).writeBatch(previousReading)}}
     @After fun cleanUpSampleNight() { rule.runOnUiThread {AppStore(rule.activity).deleteSleep("day-journey-night")} }
     @Test fun gatherDateHideThreadPersistChoiceAndOpenActualPage() {
         lateinit var store:AppStore
@@ -39,5 +41,35 @@ class DayJourneyTest {
         rule.onNodeWithText("Open page · A thread worth keeping").performClick()
         rule.onNodeWithText("Page title").assertExists()
         rule.runOnUiThread {store.updateDaySections(dayThreadCategories.toSet())}
+    }
+    @Test fun readingThreadOpensRecordedPlaceAndVisibilityChoicePersists() {
+        lateinit var store:AppStore
+        var opened=""
+        val today=LocalDate.now().toString()
+        rule.runOnUiThread {
+            val secure=SecurePreferences(rule.activity)
+            previousReading=mapOf("books" to secure.get("books","[]"),"settings" to secure.get("settings","{}"))
+            secure.writeBatch(mapOf("books" to "[]"))
+            store=AppStore(rule.activity)
+            store.updateDaySections(setOf("Reading"))
+            val session=ReadingSession(startedAt=today+"T20:00:00+02:00",endedAt=today+"T20:10:00+02:00",seconds=600,firstPosition=0,lastPosition=3)
+            store.saveBook(LibraryBook(id="day-reading",title="The Moonlit Garden",format="EPUB",units=8,readingSeconds=600,sessions=listOf(session)))
+            rule.activity.setContent {LilylyTheme(true) {DayScreen(store,initialDate=today,onBack={},onPage={},onSpace={_,_->},onBook={id,at->opened="$id:$at"})}}
+        }
+        rule.onNodeWithTag("day-threads").performScrollToNode(hasText("Return to this reading place"))
+        rule.onNodeWithText("Return to this reading place").performClick()
+        rule.runOnUiThread {assertEquals("day-reading:3",opened)}
+        val bitmap=InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
+        File(rule.activity.filesDir,"day-reading.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)};bitmap.recycle()
+        rule.onNodeWithTag("day-threads").performScrollToNode(hasText("Choose threads"))
+        rule.onNodeWithText("Choose threads").performClick()
+        rule.onNodeWithTag("thread-Reading").performScrollTo().performClick()
+        rule.onNodeWithText("Done").performClick()
+        rule.onNodeWithText("All threads are hidden. Choose the ones you want to see.").assertExists()
+        rule.runOnUiThread {
+            val reloaded=AppStore(rule.activity)
+            assertFalse("Reading" in reloaded.daySections)
+            assertEquals(1,reloaded.books.single().sessions.size)
+        }
     }
 }

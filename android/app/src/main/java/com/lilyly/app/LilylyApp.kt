@@ -120,7 +120,12 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false, openSpotify: Boo
                     "bookshelf" -> BookshelfScreen(store, initialBookId=initialBookId, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                     "sleep" -> SleepScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" }, onDreamPages = { section = "Dreams"; route = "section" })
                     "insights" -> InsightsScreen(store,onBack={route="more"},onDay={insightDate=it;route="day"})
-                    "day" -> DayScreen(store,initialDate=insightDate,onBack={route=if(insightDate==null) "home" else "insights"},onPage={entry -> section=entry.section;editingId=entry.id;route="editor"},onSpace={category,date ->
+                    "day" -> DayScreen(store,initialDate=insightDate,onBook={id,at ->
+                        store.books.firstOrNull {it.id==id}?.let {book ->
+                            store.saveBook(book.copy(position=at.coerceIn(0,book.units-1)))
+                            initialBookId=id;route="bookshelf"
+                        }
+                    },onBack={route=if(insightDate==null) "home" else "insights"},onPage={entry -> section=entry.section;editingId=entry.id;route="editor"},onSpace={category,date ->
                         when(category) {
                             "Cycle" -> {initialCycleDate=date;route="cycle"}
                             "Sanctuary","Medication","Therapy" -> {sanctuaryTab=if(category=="Sanctuary") "Check-in" else category;route="sanctuary"}

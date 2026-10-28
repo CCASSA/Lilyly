@@ -2,10 +2,17 @@ package com.lilyly.app
 
 import java.time.LocalDate
 
-val dayThreadCategories=listOf("Cycle","Sanctuary","Sleep","Medication","Pages","Therapy","Tarot","Rituals")
-data class DayThread(val key:String,val date:String,val category:String,val title:String,val detail:String,val pageId:String="")
+val dayThreadCategories=listOf("Cycle","Sanctuary","Sleep","Medication","Pages","Therapy","Tarot","Rituals","Reading")
+data class DayThread(val key:String,val date:String,val category:String,val title:String,val detail:String,val pageId:String="",val bookId:String="",val bookPosition:Int=0)
 /** Dates reflect recorded local dates; no timezone or missing-observation inference. */
-fun dayThreads(cycles:List<CycleLog>,mind:List<MentalCheckIn>,sleeps:List<SleepRecord>,medications:List<Medication>,doses:List<MedicationLog>,pages:List<JournalEntry>,therapy:List<TherapyNote>,tarot:List<TarotReading>):List<DayThread> = buildList {
+fun dayThreads(cycles:List<CycleLog>,mind:List<MentalCheckIn>,sleeps:List<SleepRecord>,medications:List<Medication>,doses:List<MedicationLog>,pages:List<JournalEntry>,therapy:List<TherapyNote>,tarot:List<TarotReading>,books:List<LibraryBook> = emptyList()):List<DayThread> = buildList {
+    books.forEach {book ->book.sessions.forEach {session ->
+        val started=runCatching {java.time.OffsetDateTime.parse(session.startedAt)}.getOrNull()
+        if(started!=null && session.seconds>0 && session.lastPosition in 0 until book.units)
+            add(DayThread("reading:${book.id}:${session.id}",started.toLocalDate().toString(),"Reading",book.title,
+                "${readingDuration(session.seconds)} with the reader open · session start ${started.toLocalTime().toString().take(5)} ${started.offset}\n${if(book.format=="PDF") "Pages" else "Sections"} ${session.firstPosition+1} → ${session.lastPosition+1}\nFiled under the session's recorded start date; may span midnight.",
+                bookId=book.id,bookPosition=session.lastPosition))
+    }}
     cycles.forEach {r -> add(DayThread("cycle:${r.id}",r.date,"Cycle","Your cycle log",buildList {
         add("Flow · ${r.flow}")
         if(r.spotting)add("Spotting")
