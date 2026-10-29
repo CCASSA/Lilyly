@@ -18,8 +18,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         minSdk = 26
         targetSdk = 36
-        versionCode = 25
-        versionName = "0.25.0-reading-threads"
+        versionCode = 26
+        versionName = "0.26.0-personal-spreads"
         manifestPlaceholders["appLabel"] = "Lilyly"
         manifestPlaceholders["spotifyHost"] = spotifyHost
         manifestPlaceholders["spotifyPath"] = "/spotify/callback"

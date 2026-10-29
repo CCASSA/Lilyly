@@ -1,1 +1,1 @@
-Deliberate 0.25 retry: schedule reading checkpoints on lifecycle-managed Android Handler; rerun full test suite.
+Deliberate 0.26 milestone: personal tarot spreads, six-card visual layouts, persistence and full regression tests.

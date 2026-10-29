@@ -34,12 +34,6 @@ import java.time.LocalDateTime
 import kotlin.math.cos
 import kotlin.math.sin
 
-private val spreads = linkedMapOf(
-    "One quiet question" to listOf("A reflection"),
-    "Three lanterns" to listOf("What is here", "What needs care", "A next step"),
-    "Root & bloom" to listOf("The root", "What is growing", "What to release")
-)
-
 @Composable
 fun TarotFace(card: TarotCardInfo?, modifier: Modifier = Modifier, reversed: Boolean = false, onClick: (() -> Unit)? = null) {
     val gold = Color(0xFFC8AC75)
@@ -88,7 +82,11 @@ fun TarotScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntry) -
     var favorites by rememberSaveable { mutableStateOf(false) }
     var detail by rememberSaveable { mutableStateOf<String?>(null) }
     var readingId by rememberSaveable { mutableStateOf<String?>(null) }
-    var spread by rememberSaveable { mutableStateOf(spreads.keys.first()) }
+    var spreadId by rememberSaveable { mutableStateOf(builtInTarotSpreads.first().id) }
+    var manageSpreads by rememberSaveable {mutableStateOf(false)}
+    val spreads=builtInTarotSpreads+store.tarotSpreads
+    val selectedSpread=spreads.firstOrNull {it.id==spreadId} ?: builtInTarotSpreads.first()
+    val spread=selectedSpread.name
     var reversals by rememberSaveable { mutableStateOf(true) }
     var draft by rememberSaveable { mutableStateOf("[]") }
     var revealed by rememberSaveable { mutableIntStateOf(0) }
@@ -97,6 +95,10 @@ fun TarotScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntry) -
     var discard by remember { mutableStateOf(false) }
     val drawn = remember(draft) { drawnCards(draft) }
     val leave = { if(drawn.isNotEmpty() || question.isNotBlank() || reflection.isNotBlank()) discard = true else onBack() }
+    if(manageSpreads) {
+        TarotSpreadsScreen(store,onBack={manageSpreads=false},onUse={spreadId=it;manageSpreads=false})
+        return
+    }
     BackHandler(onBack = leave)
     Scaffold(topBar = { TopAppBar(title = { Text("The tarot room") }, navigationIcon = { IconButton(onClick = leave) { Icon(Icons.Default.ArrowBack, "Back") } }) }) { padding ->
         Column(Modifier.padding(padding).padding(horizontal = 18.dp)) {
@@ -111,7 +113,9 @@ fun TarotScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntry) -
                     }
                     item {
                         if(drawn.isEmpty()) {
-                            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { items(spreads.keys.toList()) { name -> FilterChip(spread == name, { spread = name }, label = { Text(name) }) } }
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { items(spreads,key={it.id}) { choice -> FilterChip(selectedSpread.id == choice.id, { spreadId = choice.id }, label = { Text(choice.name) }) } }
+                            TextButton(onClick={manageSpreads=true}) {Text("My spreads")}
+                            Text(selectedSpread.positions.mapIndexed {i,label -> "${i+1}. $label"}.joinToString(" · "),style=MaterialTheme.typography.bodySmall)
                             Row(verticalAlignment = Alignment.CenterVertically) { Switch(reversals, { reversals = it }); Text("Include reversed cards") }
                         }
                         OutlinedTextField(question, { question = it }, label = { Text("What are you bringing to this reading?") }, modifier = Modifier.fillMaxWidth(), maxLines = 3)
@@ -119,22 +123,27 @@ fun TarotScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntry) -
                     if(drawn.isEmpty()) {
                         item {
                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) { TarotFace(null, Modifier.width(150.dp)) }
-                            Button(onClick = { draft = drawTarot(spreads.getValue(spread), reversals).json(); revealed = 0 }, modifier = Modifier.fillMaxWidth().padding(top = 14.dp)) { Text("Shuffle & lay the cards") }
+                            Button(onClick = { draft = drawTarot(selectedSpread.positions, reversals).json(); revealed = 0 }, modifier = Modifier.fillMaxWidth().padding(top = 14.dp)) { Text("Shuffle & lay the cards") }
                         }
                     } else {
                         item {
                             Text(spread, style = MaterialTheme.typography.titleLarge)
-                            Row(Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally).widthIn(max = if(drawn.size == 1) 190.dp else 600.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                drawn.forEachIndexed { index, draw ->
-                                    val visible = revealed and (1 shl index) != 0
-                                    val alpha by animateFloatAsState(if(visible) 1f else .7f, label = "reveal")
-                                    Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(draw.position, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, modifier = Modifier.heightIn(min = 36.dp))
-                                        TarotFace(if(visible) tarotDeck.first { it.name == draw.name } else null, Modifier.fillMaxWidth().graphicsLayer { this.alpha = alpha }, draw.reversed) {
-                                            if(visible) detail = draw.name else revealed = revealed or (1 shl index)
+                            drawn.chunked(3).forEachIndexed {rowIndex,row ->
+                                Row(Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally).widthIn(max=if(drawn.size==1)190.dp else 600.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                                    row.forEachIndexed {columnIndex,draw ->
+                                        val index=rowIndex*3+columnIndex
+                                        val visible=revealed and (1 shl index)!=0
+                                        val alpha by animateFloatAsState(if(visible)1f else .7f,label="reveal")
+                                        Column(Modifier.weight(1f),horizontalAlignment=Alignment.CenterHorizontally) {
+                                            Text("${index+1}. ${draw.position}",style=MaterialTheme.typography.labelSmall,textAlign=TextAlign.Center,modifier=Modifier.heightIn(min=36.dp))
+                                            TarotFace(if(visible)tarotDeck.first {it.name==draw.name} else null,Modifier.fillMaxWidth().testTag("draw-card-$index").graphicsLayer {this.alpha=alpha},draw.reversed) {
+                                                if(visible)detail=draw.name else revealed=revealed or (1 shl index)
+                                            }
                                         }
                                     }
+                                    if(drawn.size>3)repeat(3-row.size) {Spacer(Modifier.weight(1f))}
                                 }
+                                Spacer(Modifier.height(12.dp))
                             }
                             Text("Tap each card to turn it over. Tap it again to explore.", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
                         }

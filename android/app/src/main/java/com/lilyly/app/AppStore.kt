@@ -139,6 +139,17 @@ class AppStore(context: Context) {
         val page = JournalEntry(title = "From ${book.title}", body = "${note.quote}\n\n${note.note}\n\n— ${book.title}, ${book.author} · ${if(book.format == "PDF") "page" else "section"} ${note.position+1}", tags = "reading, quote", notebook = "Commonplace book", paper = "Parchment")
         upsertJournal(page); saveBookNote(note.copy(journalId = page.id)); return page
     }
+    var tarotSpreads by mutableStateOf<List<TarotSpread>>(emptyList())
+        private set
+    fun saveTarotSpread(spread:TarotSpread) {
+        require(tarotSpreadError(spread)==null)
+        tarotSpreads=tarotSpreads.filterNot {it.id==spread.id}+spread
+        saveSettings()
+    }
+    fun deleteTarotSpread(id:String) {
+        tarotSpreads=tarotSpreads.filterNot {it.id==id}
+        saveSettings()
+    }
     val tarotReadings = mutableStateListOf<TarotReading>()
     val tarotFavorites = mutableStateListOf<String>()
     var tarotNotes by mutableStateOf<Map<String, String>>(emptyMap())
@@ -289,6 +300,7 @@ class AppStore(context: Context) {
         }
         runCatching {
             val settings = JSONObject(secure.get("settings", "{}"))
+            tarotSpreads=readTarotSpreads(settings)
             insightData=settings.optJSONArray("insightData")?.let {a -> (0 until a.length()).map {a.getString(it)}.toSet().intersect(insightSources.toSet())} ?: emptySet()
             insightDays=settings.optInt("insightDays",90).takeIf {it in listOf(30,90,365)} ?: 90
             soundtracks=readSoundtracks(settings)
@@ -342,7 +354,7 @@ class AppStore(context: Context) {
         saveJournal()
     }
 
-    private fun saveSettings() = secure.put("settings", JSONObject().put("darkTheme", darkTheme).put("themeName",themeName).put("typeStyle",typeStyle).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("notebookCovers",JSONObject(notebookCovers)).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList())).put("daySections",JSONArray(daySections.toList())).put("soundtracks",JSONObject(soundtracks)).put("insightData",JSONArray(insightData.toList())).put("insightDays",insightDays)
+    private fun saveSettings() = secure.put("settings", JSONObject().put("tarotSpreads",tarotSpreadsJson(tarotSpreads)).put("darkTheme", darkTheme).put("themeName",themeName).put("typeStyle",typeStyle).put("hemisphere", hemisphere).put("safetyPlan", safetyPlan).put("mentalProfile", mentalProfile).put("notebookCovers",JSONObject(notebookCovers)).put("greetingName",greetingName).put("homeSections",JSONArray(homeSections.toList())).put("daySections",JSONArray(daySections.toList())).put("soundtracks",JSONObject(soundtracks)).put("insightData",JSONArray(insightData.toList())).put("insightDays",insightDays)
         .put("cyclePreferences", JSONObject().put("length", cyclePreferences.length).put("periodLength", cyclePreferences.periodLength)
             .put("lutealLength", cyclePreferences.lutealLength).put("pmsDays", cyclePreferences.pmsDays)
             .put("mode", cyclePreferences.mode).put("contraception", cyclePreferences.contraception).put("useHistory", cyclePreferences.useHistory)).toString())
