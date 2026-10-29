@@ -88,3 +88,7 @@ Reading Nook now opens on its room illustration and book covers. Search, favorit
 ## Reading care and daily threads 0.24–0.25
 
 Foreground reading sessions gain periodic checkpoints and confirmed individual removal, preserving legacy totals and book metadata. Reading now connects to Threads of a day, with the recorded start date/offset and a link to the saved reading place. Existing thread visibility settings remain unchanged. See MILESTONE-0.24.md and MILESTONE-0.25.md for validation. Richer rendering, date filters, reading insights and remaining product depth remain planned.
+
+## Personal spreads 0.26 continuation
+
+Tarot gains reusable personal spreads with one to six named positions, edit/confirmed removal, visual rows of cards, individual reveal, saved-reading snapshots and existing grimoire links. Templates persist in encrypted settings and participate in backups. Verified with 91 JVM and 29 Android tests; see MILESTONE-0.26.md. Freeform placement, larger spreads, richer card artwork, expanded reference depth and the remaining full roadmap are retained.
