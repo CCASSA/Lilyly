@@ -16,7 +16,7 @@ This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone
 | Reading Nook | Themed shelves, EPUB/PDF import, saved passages, sessions and daily threads | Richer EPUB rendering, exact inline highlights, larger-library/performance checks and reading insights |
 | Moon | Approximate phase context across spaces and hemisphere-aware seasonal dates | Astronomical accuracy review, timezone edge cases, upcoming phases and fuller lunar calendar |
 | Sleep and insights | Persistent sleep/dream entries, recurring tags, opt-in rest and cycle-phase comparisons | Broader symptom/medication/pain/energy analysis, coverage controls and expanded inspectable evidence |
-| Music | Spotify PKCE architecture, saved link cards and room soundtracks | Developer configuration and live connect/deny/refresh/disconnect testing; supported richer metadata/discovery/playback where feasible |
+| Music | Existing page music memories retained as plain notes | Spotify removed by owner decision; no Spotify account/domain setup is required |
 | Inspiration | Local image imports, credit/source links and scrapbook insertion | Android share intake, deeper boards/collections and media management |
 | Visual system | Atmospheric themes, room art and progressive disclosure in key spaces | Consistent polish across remaining forms, transitions, curated typography, decoration controls and accessibility |
 | Privacy and release | Local encrypted records, lock, screenshot protection, encrypted backup/merge restore | Independent privacy review, migration/restore stress testing, signing continuity, physical Samsung checks and Play release preparation |
@@ -31,9 +31,9 @@ This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone
 - Large text, screen-reader labels, keyboard behavior and narrow screens are checked.
 - A deliberate build passes relevant tests and produces an installable APK. Physical-device behavior is verified where emulator checks are insufficient.
 
-## External configuration gate
+## Spotify removed
 
-Spotify remains unverified live until the owner supplies the developer Client ID and an owned HTTPS callback host with Android App Links configured. No client secret should be put in the APK. Follow SPOTIFY-SETUP.md; a successful APK build does not prove authentication works.
+Spotify is no longer a completion gate. The owner removed it on 1 November 2026. Do not reintroduce account linking, service lookups or Spotify prompts without a new request.
 
 ## Release gate
 
