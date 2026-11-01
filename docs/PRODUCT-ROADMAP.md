@@ -92,3 +92,7 @@ Foreground reading sessions gain periodic checkpoints and confirmed individual r
 ## Personal spreads 0.26 continuation
 
 Tarot gains reusable personal spreads with one to six named positions, edit/confirmed removal, visual rows of cards, individual reveal, saved-reading snapshots and existing grimoire links. Templates persist in encrypted settings and participate in backups. Verified with 91 JVM and 29 Android tests; see MILESTONE-0.26.md. Freeform placement, larger spreads, richer card artwork, expanded reference depth and the remaining full roadmap are retained.
+
+## My growing things 0.27 continuation
+
+Therapy gains persistent intentions, dated Growing/Resting/Reached reflections, state filters, session links, independent journal copies and daily Therapy threads. Existing freeform goals are preserved. See MILESTONE-0.27.md for validation and COMPLETION-GATES.md for remaining product and release work. Appointment reminders, richer practice management and deeper review remain planned.
