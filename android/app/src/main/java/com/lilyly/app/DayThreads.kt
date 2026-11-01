@@ -5,7 +5,10 @@ import java.time.LocalDate
 val dayThreadCategories=listOf("Cycle","Sanctuary","Sleep","Medication","Pages","Therapy","Tarot","Rituals","Reading")
 data class DayThread(val key:String,val date:String,val category:String,val title:String,val detail:String,val pageId:String="",val bookId:String="",val bookPosition:Int=0)
 /** Dates reflect recorded local dates; no timezone or missing-observation inference. */
-fun dayThreads(cycles:List<CycleLog>,mind:List<MentalCheckIn>,sleeps:List<SleepRecord>,medications:List<Medication>,doses:List<MedicationLog>,pages:List<JournalEntry>,therapy:List<TherapyNote>,tarot:List<TarotReading>,books:List<LibraryBook> = emptyList()):List<DayThread> = buildList {
+fun dayThreads(cycles:List<CycleLog>,mind:List<MentalCheckIn>,sleeps:List<SleepRecord>,medications:List<Medication>,doses:List<MedicationLog>,pages:List<JournalEntry>,therapy:List<TherapyNote>,tarot:List<TarotReading>,books:List<LibraryBook> = emptyList(),goals:List<TherapyGoal> = emptyList()):List<DayThread> = buildList {
+    goals.forEach {goal ->goal.reflections.forEach {row ->
+        add(DayThread("goal:${goal.id}:${row.id}",row.recordedAt.take(10),"Therapy","Goal · ${goal.title}","${row.state}\n${row.body}",goal.journalId))
+    }}
     books.forEach {book ->book.sessions.forEach {session ->
         val started=runCatching {java.time.OffsetDateTime.parse(session.startedAt)}.getOrNull()
         if(started!=null && session.seconds>0 && session.lastPosition in 0 until book.units)

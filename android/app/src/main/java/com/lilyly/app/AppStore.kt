@@ -82,7 +82,7 @@ class AppStore(context: Context) {
     suspend fun restoreSnapshot(incoming: Map<String,String>) {
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { secure.writeBatch(mergeSnapshots(secure.snapshot(),incoming)) }
         journalEntries.clear(); cycleLogs.clear(); mentalCheckIns.clear(); medications.clear(); medicationLogs.clear()
-        therapyNotes.clear(); incidents.clear(); tarotReadings.clear(); tarotFavorites.clear(); tarotNotes=emptyMap()
+        therapyNotes.clear(); therapyGoals.clear(); incidents.clear(); tarotReadings.clear(); tarotFavorites.clear(); tarotNotes=emptyMap()
         sleepRecords.clear(); books.clear(); bookNotes.clear()
         loadAll()
         MedicationReminders.schedule(appContext,medications,medicationLogs)
@@ -92,6 +92,7 @@ class AppStore(context: Context) {
     val mentalCheckIns = mutableStateListOf<MentalCheckIn>()
     val medications = mutableStateListOf<Medication>()
     val medicationLogs = mutableStateListOf<MedicationLog>()
+    val therapyGoals = mutableStateListOf<TherapyGoal>()
     val therapyNotes = mutableStateListOf<TherapyNote>()
     val incidents = mutableStateListOf<IncidentLog>()
     val sleepRecords = mutableStateListOf<SleepRecord>()
@@ -278,6 +279,30 @@ class AppStore(context: Context) {
         saveMedications(); MedicationReminders.schedule(appContext,medications,medicationLogs)
     }
     fun removeMedicationLog(id:String) {medicationLogs.removeAll {it.id==id};saveMedications();MedicationReminders.schedule(appContext,medications,medicationLogs)}
+    fun saveTherapyGoal(item:TherapyGoal) {
+        TherapyGoal.fromJson(item.toJson())
+        val index=therapyGoals.indexOfFirst {it.id==item.id}
+        if(index<0)therapyGoals.add(0,item) else therapyGoals[index]=item
+        saveArray("therapyGoals",therapyGoals.map {it.toJson()})
+    }
+    fun deleteTherapyGoal(id:String) {
+        val goals=therapyGoals.filterNot {it.id==id}
+        val notes=therapyNotes.map {it.copy(goalIds=it.goalIds-id)}
+        secure.writeBatch(mapOf("therapyGoals" to JSONArray(goals.map {it.toJson()}).toString(),"therapy" to JSONArray(notes.map {it.toJson()}).toString()))
+        therapyGoals.clear();therapyGoals.addAll(goals)
+        therapyNotes.clear();therapyNotes.addAll(notes)
+    }
+    fun journalTherapyGoal(goal:TherapyGoal):JournalEntry {
+        journalEntries.firstOrNull {it.id==goal.journalId}?.let {return it}
+        val body=buildList {
+            add(goal.intention)
+            add("Where I am now · ${goal.state}")
+            goal.reflections.forEach {add("${it.recordedAt} · ${it.state}\n${it.body}")}
+            therapyNotes.filter {goal.id in it.goalIds}.forEach {add("Linked session · ${it.date} · ${it.title}")}
+        }.filter {it.isNotBlank()}.joinToString("\n\n")
+        val page=JournalEntry(section="Journal",title=goal.title,body=body,tags="therapy, goals",notebook="Sanctuary")
+        upsertJournal(page);saveTherapyGoal(goal.copy(journalId=page.id));return page
+    }
     fun addTherapyNote(item: TherapyNote) {
         val index=therapyNotes.indexOfFirst {it.id==item.id}
         if(index<0)therapyNotes.add(0,item) else therapyNotes[index]=item
@@ -331,6 +356,7 @@ class AppStore(context: Context) {
         loadArray("mental") { mentalCheckIns.add(MentalCheckIn.fromJson(it)) }
         loadArray("medications") { medications.add(Medication.fromJson(it)) }
         loadArray("medicationLogs") { medicationLogs.add(MedicationLog.fromJson(it)) }
+        loadArray("therapyGoals") {runCatching {therapyGoals.add(TherapyGoal.fromJson(it))}}
         loadArray("therapy") { therapyNotes.add(TherapyNote.fromJson(it)) }
         loadArray("incidents") { incidents.add(IncidentLog.fromJson(it)) }
         loadArray("tarot") { tarotReadings.add(TarotReading.fromJson(it)) }

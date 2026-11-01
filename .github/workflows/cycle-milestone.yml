@@ -81,6 +81,7 @@ jobs:
             adb exec-out run-as com.lilyly.app cat files/home.png > ui-screenshots/home.png
             adb exec-out run-as com.lilyly.app cat files/medication.png > ui-screenshots/medication.png
             adb exec-out run-as com.lilyly.app cat files/therapy.png > ui-screenshots/therapy.png
+            adb exec-out run-as com.lilyly.app cat files/therapy-goals.png > ui-screenshots/therapy-goals.png
             adb exec-out run-as com.lilyly.app cat files/notebooks.png > ui-screenshots/notebooks.png
             adb exec-out run-as com.lilyly.app cat files/themes.png > ui-screenshots/themes.png
             adb exec-out run-as com.lilyly.app cat files/day-threads.png > ui-screenshots/day-threads.png

@@ -39,7 +39,7 @@ object BackupCipher {
     }
 }
 
-val recordArrayKeys=setOf("journal","cycle","mental","medications","medicationLogs","therapy","incidents","tarot","sleep","books","bookNotes")
+val recordArrayKeys=setOf("journal","cycle","mental","medications","medicationLogs","therapy","therapyGoals","incidents","tarot","sleep","books","bookNotes")
 fun validateSnapshot(records: Map<String,String>) {
     require(records.keys.all {it in recordArrayKeys || it in setOf("settings","tarotCards","nookTheme","sleepMindPatterns","privacy")}) {"This backup contains a newer unsupported data type"}
     records.forEach { (key,value) ->
@@ -52,6 +52,7 @@ fun validateSnapshot(records: Map<String,String>) {
                     "mental" -> MentalCheckIn.fromJson(o)
                     "medications" -> Medication.fromJson(o)
                     "medicationLogs" -> MedicationLog.fromJson(o)
+                    "therapyGoals" -> TherapyGoal.fromJson(o)
                     "therapy" -> TherapyNote.fromJson(o)
                     "incidents" -> IncidentLog.fromJson(o)
                     "tarot" -> TarotReading.fromJson(o)

@@ -27,7 +27,7 @@ fun DayScreen(store:AppStore,initialDate:String?=null,onBack:()->Unit,onPage:(Jo
     var choosing by rememberSaveable {mutableStateOf(false)}
     val date=LocalDate.parse(dateText)
     val context=LocalContext.current
-    val threads=dayThreads(store.cycleLogs,store.mentalCheckIns,store.sleepRecords,store.medications,store.medicationLogs,store.journalEntries,store.therapyNotes,store.tarotReadings,store.books)
+    val threads=dayThreads(store.cycleLogs,store.mentalCheckIns,store.sleepRecords,store.medications,store.medicationLogs,store.journalEntries,store.therapyNotes,store.tarotReadings,store.books,store.therapyGoals)
         .filter {it.category in store.daySections}
     val entries=threads.filter {it.date==dateText}
     val dates=threads.map {it.date}.distinct().sortedDescending()

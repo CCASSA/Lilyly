@@ -23,16 +23,23 @@ fun TherapyTab(store:AppStore,onJournal:(JournalEntry)->Unit) {
     var draft by rememberSaveable {mutableStateOf<String?>(null)}
     var section by rememberSaveable {mutableStateOf("Before")}
     var filter by rememberSaveable {mutableStateOf("All sessions")}
+    var goalsOpen by rememberSaveable {mutableStateOf(false)}
+    var linkingGoals by rememberSaveable {mutableStateOf(false)}
     var query by rememberSaveable {mutableStateOf("")}
     val sessions=store.therapyNotes.filter {
         (filter!="Practice to revisit" || (it.homework.isNotBlank() && !it.homeworkDone)) &&
         (query.isBlank() || listOf(it.title,it.date,it.before,it.after,it.homework,it.goals,it.questions).any {text -> text.contains(query,true)})
     }.sortedByDescending {it.date}
+    if(goalsOpen) {
+        TherapyGoalsScreen(store,onBack={goalsOpen=false},onSession={note ->goalsOpen=false;draft=note.toJson().toString();section="After"},onJournal=onJournal)
+        return
+    }
     LazyColumn(Modifier.testTag("therapy-room"),verticalArrangement=Arrangement.spacedBy(16.dp),contentPadding=PaddingValues(bottom=28.dp)) {
         item {
             Text("Room to untangle",style=MaterialTheme.typography.headlineMedium)
             Text("Bring the things you don't want to forget. Keep the words that helped.")
             TextButton(onClick={draft=TherapyNote().toJson().toString();section="Before"}) {Text("Prepare a session")}
+            TextButton(onClick={goalsOpen=true}) {Text("My growing things")}
             BotanicalDivider()
         }
         item {
@@ -45,6 +52,7 @@ fun TherapyTab(store:AppStore,onJournal:(JournalEntry)->Unit) {
                 Text(note.date,style=MaterialTheme.typography.labelLarge,color=MaterialTheme.colorScheme.primary)
                 Text(note.title,style=MaterialTheme.typography.titleLarge)
                 Text(note.after.ifBlank {note.before}.ifBlank {"A place kept for this session."},maxLines=4)
+                store.therapyGoals.filter {it.id in note.goalIds}.forEach {Text("Connected goal · ${it.title}",style=MaterialTheme.typography.labelLarge)}
                 if(note.goals.isNotBlank())Text("Working toward · ${note.goals}",maxLines=3)
                 if(note.homework.isNotBlank()) {
                     Row {
@@ -85,6 +93,13 @@ fun TherapyTab(store:AppStore,onJournal:(JournalEntry)->Unit) {
                         if(note.nextAppointment.isNotBlank())TextButton(onClick={change(note.copy(nextAppointment=""))}) {Text("Clear appointment date")}
                         Text("Appointment dates are notes here, not calendar reminders.",style=MaterialTheme.typography.bodySmall)
                     }
+                }
+                if(store.therapyGoals.isNotEmpty()) {
+                    TextButton(onClick={linkingGoals=!linkingGoals}) {Text(if(linkingGoals) "Hide connected goals" else "Connect goals")}
+                    if(linkingGoals)store.therapyGoals.forEach {goal ->Row {
+                        Checkbox(goal.id in note.goalIds,{checked ->change(note.copy(goalIds=if(checked)note.goalIds+goal.id else note.goalIds-goal.id))},modifier=Modifier.testTag("link-goal-${goal.id}"))
+                        Text(goal.title,Modifier.weight(1f).padding(top=12.dp))
+                    }}
                 }
                 if(note.journalId.isNotBlank())Text("Your linked journal page is a separate copy. Editing this session won't overwrite personal changes on that page.",style=MaterialTheme.typography.bodySmall)
             }

@@ -174,11 +174,12 @@ data class TherapyNote(
     var goals: String = "",
     var questions: String = "",
     var homeworkDone: Boolean = false,
-    var journalId: String = ""
+    var journalId: String = "",
+    val goalIds:Set<String> = emptySet()
 ) {
-    fun toJson() = JSONObject().put("id", id).put("date", date).put("title", title).put("before", before).put("after", after).put("homework", homework).put("nextAppointment", nextAppointment).put("goals",goals).put("questions",questions).put("homeworkDone",homeworkDone).put("journalId",journalId)
+    fun toJson() = JSONObject().put("id", id).put("date", date).put("title", title).put("before", before).put("after", after).put("homework", homework).put("nextAppointment", nextAppointment).put("goals",goals).put("questions",questions).put("homeworkDone",homeworkDone).put("journalId",journalId).put("goalIds",JSONArray(goalIds.toList()))
     companion object {
-        fun fromJson(o: JSONObject) = TherapyNote(o.optString("id", UUID.randomUUID().toString()), o.optString("date", LocalDate.now().toString()), o.optString("title", "Therapy session"), o.optString("before"), o.optString("after"), o.optString("homework"), o.optString("nextAppointment"),o.optString("goals"),o.optString("questions"),o.optBoolean("homeworkDone"),o.optString("journalId"))
+        fun fromJson(o: JSONObject) = TherapyNote(o.optString("id", UUID.randomUUID().toString()), o.optString("date", LocalDate.now().toString()), o.optString("title", "Therapy session"), o.optString("before"), o.optString("after"), o.optString("homework"), o.optString("nextAppointment"),o.optString("goals"),o.optString("questions"),o.optBoolean("homeworkDone"),o.optString("journalId"),o.optJSONArray("goalIds")?.let {a -> (0 until a.length()).map {a.getString(it)}.toSet()} ?: emptySet())
     }
 }
 
