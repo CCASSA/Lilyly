@@ -1,1 +1,1 @@
-0.27: verify connected therapy goals inside the actual Lilyly app shell
+0.28: remove Spotify integration at owner request; preserve legacy page data

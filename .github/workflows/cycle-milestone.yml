@@ -12,9 +12,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ORG_GRADLE_PROJECT_spotifyClientId: ${{ vars.SPOTIFY_CLIENT_ID }}
-      ORG_GRADLE_PROJECT_spotifyRedirectHost: ${{ vars.SPOTIFY_REDIRECT_HOST }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v5
@@ -86,8 +83,6 @@ jobs:
             adb exec-out run-as com.lilyly.app cat files/themes.png > ui-screenshots/themes.png
             adb exec-out run-as com.lilyly.app cat files/day-threads.png > ui-screenshots/day-threads.png
             adb exec-out run-as com.lilyly.app cat files/rituals.png > ui-screenshots/rituals.png
-            adb exec-out run-as com.lilyly.app cat files/music.png > ui-screenshots/music.png
-            adb exec-out run-as com.lilyly.app cat files/soundtrack.png > ui-screenshots/soundtrack.png
             adb exec-out run-as com.lilyly.app cat files/insights.png > ui-screenshots/insights.png
             adb exec-out run-as com.lilyly.app cat files/inspiration.png > ui-screenshots/inspiration.png
             adb exec-out run-as com.lilyly.app cat files/ink-studio.png > ui-screenshots/ink-studio.png

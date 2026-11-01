@@ -172,7 +172,6 @@ fun BookshelfScreen(store: AppStore, onBack: () -> Unit, onJournal: (JournalEntr
             items(listOf("Cottage","Gothic","Celestial","Botanical")) {theme ->
                 FilterChip(store.nookTheme==theme,{store.updateNookTheme(theme)},label={Text(theme)})
             }
-            item {SoundtrackButton(store,"reading")}
             item {TextButton(onClick={room=false;passages=true}) {Text("Saved passages & notes")}}
             item {TextButton(onClick={room=false;history=true}) {Text("Reading sessions")}}
             item {Button(onClick={room=false}) {Text("Settle into my room")}}
@@ -302,7 +301,6 @@ private fun BookReaderScreen(store: AppStore, initial: LibraryBook, files: BookF
     if(panel.isNotEmpty()) ModalBottomSheet(onDismissRequest={panel=""}) {
         LazyColumn(Modifier.padding(horizontal=20.dp),contentPadding=PaddingValues(bottom=28.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             item {
-                SoundtrackButton(store,"reading")
                 Text(book.title,style=MaterialTheme.typography.headlineSmall)
                 Text("${book.author} · ${book.readingSeconds/60} minutes of reading",style=MaterialTheme.typography.bodySmall)
                 Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {

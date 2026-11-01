@@ -111,7 +111,7 @@ fun MagicalCalendarScreen(store: AppStore, onBack: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(store: AppStore, onBack: () -> Unit, onSpotify: () -> Unit = {}) {
+fun SettingsScreen(store: AppStore, onBack: () -> Unit) {
     Scaffold(topBar = { TopAppBar(title = { Text("Settings & privacy") }, navigationIcon = { IconButton(onClick = onBack, enabled = !store.privacyBusy) { Icon(Icons.Default.ArrowBack, "Back") } }) }) { padding ->
         LazyColumn(Modifier.padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
@@ -133,7 +133,6 @@ fun SettingsScreen(store: AppStore, onBack: () -> Unit, onSpotify: () -> Unit = 
                     }
                 }
             }
-            item { Button(onClick=onSpotify) {Text("Spotify & music")} }
             item { PrivacyPanel(store) }
         }
     }

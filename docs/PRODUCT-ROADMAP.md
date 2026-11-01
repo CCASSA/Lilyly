@@ -1,3 +1,5 @@
+> **Owner decision — 1 November 2026:** Spotify integration is removed from Lilyly in 0.28. Earlier Spotify plans/setup instructions below are historical and no longer required. Account linking, service lookups, attachment creation and room soundtrack controls are removed. Existing page music notes and backup fields are retained to avoid losing personal content. Other music ideas are not implemented by this removal.
+
 # Lilyly — full product direction
 
 Lilyly is an Android-first private magical world: grimoire, journal, scrapbook, cycle tracker, mental-health sanctuary, wellness companion, reading space and personal pattern system. This is a continuation of CCASSA/Lilyly, not a replacement app or reduced MVP. Major systems must connect through the user's own daily context. Complexity underneath; simplicity on the surface.

@@ -243,7 +243,7 @@ fun JournalEditorScreen(
             }
             item {
                 ReadingCopyButton(listOf(entry),entry.title.ifBlank {"A page from Lilyly"})
-                MusicAttachmentsPanel(entry.musicJson, savedMusic=store.savedMusic()) {entry=entry.copy(musicJson=it)}
+                LegacyMusicNotes(entry.musicJson)
                 TextButton(onClick={store.keepPageTemplate(entry);templateSaved=true},enabled=!templateSaved) { Text(if(templateSaved) "Template kept" else "Save as reusable template") }
                 FilterChip(entry.favorite, { entry = entry.copy(favorite = !entry.favorite) }, label = { Text("Favorite page") })
                 OutlinedTextField(entry.notebook, { entry = entry.copy(notebook = it) }, label = { Text("Notebook or collection") }, modifier = Modifier.fillMaxWidth())

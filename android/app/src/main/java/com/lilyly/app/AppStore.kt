@@ -65,6 +65,10 @@ internal class SecurePreferences(context: Context, namespace: String = "lilyly_s
 }
 
 class AppStore(context: Context) {
+    init {
+        // Retire only the removed integration credentials, never personal records.
+        context.applicationContext.getSharedPreferences("lilyly_spotify", Context.MODE_PRIVATE).edit().clear().apply()
+    }
     private val appContext = context.applicationContext
     private val secure = SecurePreferences(appContext)
 

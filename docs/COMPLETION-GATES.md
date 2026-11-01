@@ -1,3 +1,5 @@
+> **Owner decision — 1 November 2026:** Spotify integration is removed from Lilyly in 0.28. Earlier Spotify plans/setup instructions below are historical and no longer required. Account linking, service lookups, attachment creation and room soundtrack controls are removed. Existing page music notes and backup fields are retained to avoid losing personal content. Other music ideas are not implemented by this removal.
+
 # Lilyly completion gates
 
 This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone APK verifies only its stated scope. The full dream application is not complete at 0.27.

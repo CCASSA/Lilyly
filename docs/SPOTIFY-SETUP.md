@@ -1,3 +1,5 @@
+> **Owner decision — 1 November 2026:** Spotify integration is removed from Lilyly in 0.28. Earlier Spotify plans/setup instructions below are historical and no longer required. Account linking, service lookups, attachment creation and room soundtrack controls are removed. Existing page music notes and backup fields are retained to avoid losing personal content. Other music ideas are not implemented by this removal.
+
 # Spotify music pages (0.13)
 
 This milestone supports persistent song/playlist attachments on journal, grimoire and ritual pages. Paste a Spotify Share link, optionally give it a personal caption, then save the page. Opening a card launches Spotify or a browser. No audio is downloaded or streamed by Lilyly.
