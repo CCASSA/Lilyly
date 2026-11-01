@@ -27,8 +27,9 @@ class TherapyGoalsJourneyTest {
             secure.writeBatch(previous.keys.associateWith {"[]"})
             store=AppStore(rule.activity)
             store.addTherapyNote(TherapyNote(id="goal-session",title="A gentle session",goals="Keep these older words"))
-            rule.activity.setContent {LilylyTheme(true){TherapyTab(store,{})}}
+            rule.activity.setContent {LilylyApp(store,openMedication=true)}
         }
+        rule.onNodeWithText("Therapy").performScrollTo().performClick()
         rule.onNodeWithText("My growing things").performClick()
         rule.onNodeWithText("Plant a goal").performClick()
         rule.onNodeWithText("Keep intention").assertIsNotEnabled()

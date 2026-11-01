@@ -1,1 +1,1 @@
-Deliberate 0.27 milestone: connected therapy goals, reflection history, session links, journal copies, backup and all regressions.
+0.27: verify connected therapy goals inside the actual Lilyly app shell
