@@ -1,1 +1,1 @@
-0.29: verify Android share intake, local image copies and preserved source credits
+0.29: verify shared inspiration with keyboard-safe review controls

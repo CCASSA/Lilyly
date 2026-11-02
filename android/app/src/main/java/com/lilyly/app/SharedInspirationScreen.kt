@@ -1,6 +1,5 @@
 package com.lilyly.app
 
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,10 +18,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +39,7 @@ fun SharedInspirationScreen(store:AppStore,incoming:SharedInspiration?,problem:S
     BackHandler(onBack=close)
     val keyboard=LocalSoftwareKeyboardController.current
     val focus=LocalFocusManager.current
-    Scaffold(topBar={TopAppBar(title={Text("A spark from elsewhere")},navigationIcon={TextButton(onClick=close,enabled=!busy){Text("Close")}})},bottomBar={
+    Scaffold(modifier=Modifier.imePadding(),topBar={TopAppBar(title={Text("A spark from elsewhere")},navigationIcon={TextButton(onClick=close,enabled=!busy){Text("Close")}})},bottomBar={
         if(incoming!=null) Surface {Button(enabled=!busy,onClick={
             keyboard?.hide();focus.clearFocus()
             val valid=runCatching {sharedInspirationEntries(batchId,title,body,source,credit,collection,incoming.images)}
