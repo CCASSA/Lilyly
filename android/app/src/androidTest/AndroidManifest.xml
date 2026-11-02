@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <provider android:name="com.lilyly.app.ShareFixtureProvider" android:authorities="com.lilyly.app.test.sharefixtures" android:exported="true" android:grantUriPermissions="true" />
+    </application>
+</manifest>

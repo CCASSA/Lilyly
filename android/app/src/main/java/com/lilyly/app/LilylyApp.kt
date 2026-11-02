@@ -35,10 +35,10 @@ private data class NavItem(val route: String, val label: String, val icon: @Comp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LilylyApp(store: AppStore, openMedication: Boolean = false) {
+fun LilylyApp(store: AppStore, openMedication: Boolean = false, openInspiration:Boolean = false) {
     LilylyTheme(store.darkTheme, store.themeName, store.typeStyle) {
         var insightDate by rememberSaveable { mutableStateOf<String?>(null) }
-        var route by rememberSaveable { mutableStateOf(if(openMedication) "sanctuary" else "home") }
+        var route by rememberSaveable { mutableStateOf(if(openInspiration) "inspiration" else if(openMedication) "sanctuary" else "home") }
         var section by rememberSaveable { mutableStateOf("Journal") }
         var editingId by rememberSaveable { mutableStateOf<String?>(null) }
 

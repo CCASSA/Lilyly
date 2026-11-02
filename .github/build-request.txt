@@ -1,1 +1,1 @@
-0.28: remove Spotify integration at owner request; preserve legacy page data
+0.29: verify Android share intake, local image copies and preserved source credits

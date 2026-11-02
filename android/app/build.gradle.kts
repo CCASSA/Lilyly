@@ -13,8 +13,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         minSdk = 26
         targetSdk = 36
-        versionCode = 28
-        versionName = "0.28.0-private-pages"
+        versionCode = 29
+        versionName = "0.29.0-gathered-sparks"
         manifestPlaceholders["appLabel"] = "Lilyly"
     }
 

@@ -256,6 +256,21 @@ class AppStore(context: Context) {
     fun updateSafetyPlan(value: String) { safetyPlan = value; saveSettings() }
     fun updateMentalProfile(value: String) { mentalProfile = value; saveSettings() }
 
+    fun refreshSharedJournal() {
+        val stored=JSONArray(secure.get("journal","[]"))
+        val entries=(0 until stored.length()).map {JournalEntry.fromJson(stored.getJSONObject(it))}
+        journalEntries.clear();journalEntries.addAll(entries)
+    }
+    fun keepSharedInspiration(entries:List<JournalEntry>) {
+        require(entries.isNotEmpty() && entries.all {it.section=="Inspiration"})
+        val ids=entries.map {it.id}.toSet()
+        require(ids.size==entries.size)
+        val latest=JSONArray(secure.get("journal","[]"))
+        val current=(0 until latest.length()).map {JournalEntry.fromJson(latest.getJSONObject(it))}
+        val merged=entries+current.filterNot {it.id in ids}
+        secure.writeBatch(mapOf("journal" to JSONArray(merged.map {it.toJson()}).toString()))
+        journalEntries.clear();journalEntries.addAll(merged)
+    }
     fun upsertJournal(entry: JournalEntry) {
         entry.updatedAt = LocalDateTime.now().toString()
         val index = journalEntries.indexOfFirst { it.id == entry.id }

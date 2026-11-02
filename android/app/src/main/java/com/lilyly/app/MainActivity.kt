@@ -22,6 +22,16 @@ import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
     private lateinit var store:AppStore
+    private var shareHandled=false
+    private var shareInput:SharedInspiration?=null
+    private var shareProblem:String?=null
+    private var reviewingShare by mutableStateOf(false)
+    private var openInspiration by mutableStateOf(false)
+    override fun onSaveInstanceState(outState:Bundle) {
+        outState.putBoolean("shareHandled",shareHandled)
+        outState.putBoolean("openInspiration",openInspiration)
+        super.onSaveInstanceState(outState)
+    }
     private var unlocked by mutableStateOf(false)
     private var authMessage by mutableStateOf("")
     private var callback:((Boolean)->Unit)?=null
@@ -58,6 +68,10 @@ class MainActivity : ComponentActivity() {
                 })
         } else screenLock()
     }
+    override fun onRestart() {
+        super.onRestart()
+        if(::store.isInitialized)store.refreshSharedJournal()
+    }
     override fun onStop() {
         if(::store.isInitialized && store.appLockEnabled) unlocked=false
         super.onStop()
@@ -66,6 +80,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         store=AppStore(this)
+        shareHandled=savedInstanceState?.getBoolean("shareHandled") ?: false
+        openInspiration=savedInstanceState?.getBoolean("openInspiration") ?: false
+        reviewingShare=!shareHandled && intent.action in listOf(android.content.Intent.ACTION_SEND,android.content.Intent.ACTION_SEND_MULTIPLE)
+        if(reviewingShare) runCatching {readSharedInspiration(intent)}.onSuccess {shareInput=it}.onFailure {shareProblem=it.message ?: "This share could not be opened."}
         MedicationReminders.schedule(this,store.medications,store.medicationLogs)
         unlocked=!store.appLockEnabled
         setContent {
@@ -77,7 +95,13 @@ class MainActivity : ComponentActivity() {
                 onDispose { }
             }
             val pages=rememberSaveableStateHolder()
-            if(!store.appLockEnabled || unlocked) pages.SaveableStateProvider("lilyly") {LilylyApp(store, intent.getBooleanExtra("medication",false))}
+            if(!store.appLockEnabled || unlocked) pages.SaveableStateProvider("lilyly") {
+                if(reviewingShare) LilylyTheme(store.darkTheme,store.themeName,store.typeStyle) {
+                    SharedInspirationScreen(store,shareInput,shareProblem,
+                        onClose={shareHandled=true;reviewingShare=false;finish()},
+                        onKept={store=AppStore(this);shareHandled=true;openInspiration=true;reviewingShare=false})
+                } else LilylyApp(store, intent.getBooleanExtra("medication",false),openInspiration)
+            }
             else LilylyTheme(store.darkTheme, store.themeName, store.typeStyle) {
                 Surface(Modifier.fillMaxSize()) {
                     Column(Modifier.fillMaxSize().padding(30.dp),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally) {
