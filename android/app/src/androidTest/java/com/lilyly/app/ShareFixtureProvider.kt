@@ -8,6 +8,18 @@ import java.io.File
 /** Synthetic image fixtures in the test APK only. No production provider is added. */
 class ShareFixtureProvider:ContentProvider() {
     override fun onCreate()=true
+    override fun call(method:String,arg:String?,extras:android.os.Bundle?):android.os.Bundle? {
+        require(method=="reset")
+        val dir=requireNotNull(context).cacheDir.apply {mkdirs()}
+        listOf("one.png","two.png").forEach {name ->
+            val b=android.graphics.Bitmap.createBitmap(24,24,android.graphics.Bitmap.Config.ARGB_8888)
+            b.eraseColor(android.graphics.Color.GREEN)
+            File(dir,name).outputStream().use {b.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it)}
+            b.recycle()
+        }
+        File(dir,"broken.png").writeText("not an image")
+        return android.os.Bundle()
+    }
     override fun getType(uri:Uri)="image/png"
     override fun openFile(uri:Uri,mode:String):ParcelFileDescriptor {
         require(mode=="r" && uri.lastPathSegment in listOf("one.png","two.png","broken.png"))
@@ -15,6 +27,9 @@ class ShareFixtureProvider:ContentProvider() {
     }
     override fun query(uri:Uri,projection:Array<out String>?,selection:String?,selectionArgs:Array<out String>?,sortOrder:String?):Cursor?=null
     override fun insert(uri:Uri,values:ContentValues?):Uri?=null
-    override fun delete(uri:Uri,selection:String?,selectionArgs:Array<out String>?)=0
+    override fun delete(uri:Uri,selection:String?,selectionArgs:Array<out String>?):Int {
+        require(uri.lastPathSegment in listOf("one.png","two.png","broken.png"))
+        return if(File(requireNotNull(context).cacheDir,uri.lastPathSegment!!).delete())1 else 0
+    }
     override fun update(uri:Uri,values:ContentValues?,selection:String?,selectionArgs:Array<out String>?)=0
 }

@@ -40,7 +40,9 @@ fun SharedInspirationScreen(store:AppStore,incoming:SharedInspiration?,problem:S
     val keyboard=LocalSoftwareKeyboardController.current
     val focus=LocalFocusManager.current
     Scaffold(modifier=Modifier.imePadding(),topBar={TopAppBar(title={Text("A spark from elsewhere")},navigationIcon={TextButton(onClick=close,enabled=!busy){Text("Close")}})},bottomBar={
-        if(incoming!=null) Surface {Button(enabled=!busy,onClick={
+        if(incoming!=null) Surface {Column {
+        if((message+job.message).isNotBlank()) Text(message.ifBlank {job.message},color=MaterialTheme.colorScheme.error,modifier=Modifier.padding(horizontal=20.dp))
+        Button(enabled=!busy,onClick={
             keyboard?.hide();focus.clearFocus()
             val valid=runCatching {sharedInspirationEntries(batchId,title,body,source,credit,collection,incoming.images)}
             if(valid.isFailure)message=valid.exceptionOrNull()?.message ?: "Check the details above."
@@ -48,7 +50,7 @@ fun SharedInspirationScreen(store:AppStore,incoming:SharedInspiration?,problem:S
                 message=""
                 job.keep(store,batchId,title,body,source,credit,collection,incoming.images)
             }
-        },modifier=Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp)){Text(if(busy) "Keeping your inspiration…" else "Keep inspiration")}}
+        },modifier=Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp)){Text(if(busy) "Keeping your inspiration…" else "Keep inspiration")}}}
     }) {padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).padding(horizontal=20.dp).testTag("shared-inspiration"),verticalArrangement=Arrangement.spacedBy(14.dp),contentPadding=PaddingValues(bottom=24.dp)) {
             if(incoming==null) item {Text(problem ?: "This share could not be opened.");Text("Nothing was added to your collection.")}
@@ -64,7 +66,6 @@ fun SharedInspirationScreen(store:AppStore,incoming:SharedInspiration?,problem:S
                 item {Text("Up to 8 images, 25 MB each. Titles and collection names: 160 characters; words: 20,000; credit: 1,000.",style=MaterialTheme.typography.bodySmall)}
             }
             if(busy)item {LinearProgressIndicator(Modifier.fillMaxWidth())}
-            if((message+job.message).isNotBlank())item {Text(message.ifBlank {job.message},color=MaterialTheme.colorScheme.error)}
         }
     }
     if(discard) AlertDialog(onDismissRequest={discard=false},title={Text("Leave this inspiration?")},text={Text("Nothing will be added to Lilyly. The original stays in the app you shared from.")},confirmButton={TextButton(onClick=onClose){Text("Leave share")}},dismissButton={TextButton(onClick={discard=false}){Text("Keep reviewing")}})
