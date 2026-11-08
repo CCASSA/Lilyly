@@ -1,1 +1,1 @@
-Verify 0.29: use Android MediaStore share fixtures and capture emulator crash diagnostics.
+0.30: verify Moon almanac, dated moon pages, shared inspiration and regression suite.
