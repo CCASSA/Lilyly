@@ -31,8 +31,19 @@ class SharedInspirationJourneyTest {
     }
     private fun uri(name:String)="content://com.lilyly.app.test.sharefixtures/$name"
     private fun fixture(name:String,valid:Boolean=true):Uri {
-        val value=Uri.parse(uri(name))
-        activity.contentResolver.call(value,"reset",null,null)
+        val resolver=activity.contentResolver
+        val values=android.content.ContentValues().apply {
+            put(android.provider.MediaStore.Images.Media.DISPLAY_NAME,name)
+            put(android.provider.MediaStore.Images.Media.MIME_TYPE,"image/png")
+        }
+        val value=requireNotNull(resolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values))
+        requireNotNull(resolver.openOutputStream(value)).use { out ->
+            if(valid) {
+                val bitmap=Bitmap.createBitmap(24,24,Bitmap.Config.ARGB_8888)
+                try { bitmap.eraseColor(android.graphics.Color.GREEN); check(bitmap.compress(Bitmap.CompressFormat.PNG,100,out)) }
+                finally { bitmap.recycle() }
+            } else out.write("not an image".toByteArray())
+        }
         return value
     }
     @Test fun realShareReviewsRotatesAndKeepsAttribution() {
@@ -70,7 +81,7 @@ class SharedInspirationJourneyTest {
             store=AppStore(activity)
             AppStore(activity).upsertJournal(JournalEntry(id="newer-share-fixture",title="A newer unrelated page"))
             job=ViewModelProvider(activity)[SharedInspirationViewModel::class.java]
-            job.keep(store,"shared-batch","Shared leaves","","https://example.org/leaves","Artist","Garden",listOf(uri("one.png"),uri("two.png")))
+            job.keep(store,"shared-batch","Shared leaves","","https://example.org/leaves","Artist","Garden",listOf(one.toString(),two.toString()))
         }
         rule.waitUntil(10000){!job.busy}
         assertTrue(job.message,job.kept);activity.contentResolver.delete(one,null,null);activity.contentResolver.delete(two,null,null)
@@ -90,7 +101,7 @@ class SharedInspirationJourneyTest {
         lateinit var job:SharedInspirationViewModel
         rule.runOnUiThread {
             job=ViewModelProvider(activity)[SharedInspirationViewModel::class.java]
-            job.keep(AppStore(activity),"failed-share","Bad batch","","","","",listOf(uri("one.png"),uri("broken.png")))
+            job.keep(AppStore(activity),"failed-share","Bad batch","","","","",listOf(one.toString(),broken.toString()))
         }
         rule.waitUntil(10000){!job.busy}
         assertFalse(job.kept);assertTrue(job.message.isNotBlank())

@@ -2,7 +2,7 @@
 
 # Lilyly completion gates
 
-This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone APK verifies only its stated scope. The full dream application is not complete at 0.27.
+This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone APK verifies only its stated scope. The full dream application is not complete at 0.29.
 
 ## Current gaps to close
 
@@ -17,7 +17,7 @@ This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone
 | Moon | Approximate phase context across spaces and hemisphere-aware seasonal dates | Astronomical accuracy review, timezone edge cases, upcoming phases and fuller lunar calendar |
 | Sleep and insights | Persistent sleep/dream entries, recurring tags, opt-in rest and cycle-phase comparisons | Broader symptom/medication/pain/energy analysis, coverage controls and expanded inspectable evidence |
 | Music | Existing page music memories retained as plain notes | Spotify removed by owner decision; no Spotify account/domain setup is required |
-| Inspiration | Local image imports, credit/source links and scrapbook insertion | Android share intake, deeper boards/collections and media management |
+| Inspiration | Local image imports, credited source cards, Android share review and scrapbook insertion | Deeper boards/collections, media management and physical-device checks with third-party senders |
 | Visual system | Atmospheric themes, room art and progressive disclosure in key spaces | Consistent polish across remaining forms, transitions, curated typography, decoration controls and accessibility |
 | Privacy and release | Local encrypted records, lock, screenshot protection, encrypted backup/merge restore | Independent privacy review, migration/restore stress testing, signing continuity, physical Samsung checks and Play release preparation |
 

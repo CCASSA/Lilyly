@@ -1,1 +1,1 @@
-0.29: fix share-test activity ownership and provider fixtures; verify full suite
+Verify 0.29: use Android MediaStore share fixtures and capture emulator crash diagnostics.

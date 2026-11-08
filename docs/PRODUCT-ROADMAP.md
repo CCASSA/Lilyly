@@ -98,3 +98,7 @@ Tarot gains reusable personal spreads with one to six named positions, edit/conf
 ## My growing things 0.27 continuation
 
 Therapy gains persistent intentions, dated Growing/Resting/Reached reflections, state filters, session links, independent journal copies and daily Therapy threads. Existing freeform goals are preserved. See MILESTONE-0.27.md for validation and COMPLETION-GATES.md for remaining product and release work. Appointment reminders, richer practice management and deeper review remain planned.
+
+## Gathered sparks 0.29 continuation
+
+Android share intake accepts text, HTTPS source references and up to eight images, with a protected review before saving. Imported images are copied locally, failed batches roll back, and credits connect to scrapbook pieces. See MILESTONE-0.29.md for validation and lifecycle limits. Spotify remains removed by the owner; deeper inspiration collections and the other completion gates remain planned.

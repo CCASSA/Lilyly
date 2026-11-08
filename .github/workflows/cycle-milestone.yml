@@ -63,6 +63,7 @@ jobs:
             adb install -r android/app/build/outputs/apk/debug/app-debug.apk
             adb install -r android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             adb shell am instrument -w com.lilyly.app.test/androidx.test.runner.AndroidJUnitRunner > instrument-results.txt
+            adb logcat -b crash -d > emulator-crash.txt
             cat instrument-results.txt
             mkdir -p ui-screenshots
             adb exec-out run-as com.lilyly.app cat files/cycle-wheel.png > ui-screenshots/cycle-wheel.png
@@ -99,5 +100,6 @@ jobs:
           name: Lilyly-device-check
           path: |
             instrument-results.txt
+            emulator-crash.txt
             ui-screenshots/
             android/app/build/reports/androidTests/connected/
