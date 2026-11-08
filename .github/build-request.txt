@@ -1,1 +1,1 @@
-0.30: build, verify and launch the signer-scoped Moon preview alongside older Lilyly installs.
+0.30: verify signer-scoped preview, lunar calendar and acknowledged Android notification/ritual outcomes.

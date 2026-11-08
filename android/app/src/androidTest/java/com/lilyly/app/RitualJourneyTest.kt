@@ -33,8 +33,8 @@ class RitualJourneyTest {
         hideKeyboard()
         rule.onNodeWithTag("ritual-editor").performScrollToNode(hasText("Keep ritual"))
         rule.onNodeWithText("Keep ritual").assertIsDisplayed().performClick()
-        rule.runOnUiThread {val page=AppStore(rule.activity).journalEntries.single {it.title=="My threshold ritual"};assertTrue(RitualDetails.fromJson(page.ritualJson).intention.contains("beginning"))}
         rule.onNodeWithTag("ritual-list").performScrollToNode(hasText("My threshold ritual"))
+        rule.runOnIdle {val page=AppStore(rule.activity).journalEntries.single {it.title=="My threshold ritual"};assertTrue(RitualDetails.fromJson(page.ritualJson).intention.contains("beginning"))}
         rule.onNodeWithText("My threshold ritual").performClick()
         rule.onNodeWithText("Reflection").performClick()
         rule.onNodeWithText("What I noticed afterward").performTextInput("A moment of quiet")

@@ -52,7 +52,9 @@ class MedicationJourneyTest {
         store.addMedication(Medication(id="notification-fixture",name="Private fixture name",dose="private dose",time="08:00",reminders=true))
         try {
             MedicationReminderReceiver().onReceive(context,Intent("com.lilyly.MEDICATION").putExtra("scheduled",at.toString()))
-            val notification=context.getSystemService(NotificationManager::class.java).activeNotifications.first {it.id==410}.notification
+            val manager=context.getSystemService(NotificationManager::class.java)
+            rule.waitUntil(5000) {manager.activeNotifications.any {it.id==410}}
+            val notification=manager.activeNotifications.single {it.id==410}.notification
             assertEquals("A moment for your care",notification.extras.getString("android.title"))
             assertFalse(notification.extras.toString().contains("Private fixture name"))
             assertEquals(before,AppStore(context).medicationLogs.size)
