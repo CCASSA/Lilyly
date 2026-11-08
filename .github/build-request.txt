@@ -1,1 +1,1 @@
-0.30: verify signer-scoped preview, lunar calendar and acknowledged Android notification/ritual outcomes.
+0.30: bind CI signing to the exact fingerprinted keystore and independently verify the packaged certificate.

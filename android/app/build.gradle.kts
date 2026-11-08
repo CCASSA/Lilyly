@@ -18,6 +18,11 @@ android {
         manifestPlaceholders["appLabel"] = "Lilyly"
     }
 
+    // CI fingerprints this exact file. AGP otherwise resolves its debug key using SDK-specific paths.
+    providers.gradleProperty("previewKeyFile").orNull?.let { path ->
+        signingConfigs.getByName("debug").storeFile = file(path)
+    }
+
     buildTypes {
         create("preview") {
             initWith(getByName("debug"))

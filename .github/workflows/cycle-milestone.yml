@@ -41,6 +41,7 @@ jobs:
             keytool -genkeypair -keystore "$key" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           fi
           digest=$(keytool -exportcert -keystore "$key" -alias androiddebugkey -storepass android | sha256sum | cut -c1-24)
+          echo "ORG_GRADLE_PROJECT_previewKeyFile=$key" >> "$GITHUB_ENV"
           echo "ORG_GRADLE_PROJECT_previewSigner=$digest" >> "$GITHUB_ENV"
       - name: Test and assemble the milestone
         run: gradle -p android :app:testDebugUnitTest :app:assembleDebug :app:assemblePreview --stacktrace
@@ -50,9 +51,12 @@ jobs:
           set -euo pipefail
           apk=android/app/build/outputs/apk/preview/app-preview.apk
           bin="$ANDROID_HOME/build-tools/36.0.0"
-          actual=$("$bin/apksigner" verify --print-certs "$apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | cut -c1-24)
+          "$bin/apksigner" verify --print-certs-pem "$apk" > preview-certs.txt
+          actual=$(openssl x509 -in preview-certs.txt -outform DER | sha256sum | cut -c1-24)
+          echo "Preview signer: packaged=$actual expected=$ORG_GRADLE_PROJECT_previewSigner"
           test "$actual" = "$ORG_GRADLE_PROJECT_previewSigner"
           "$bin/aapt" dump badging "$apk" > preview-badging.txt
+          head -n 1 preview-badging.txt
           grep -F "package: name='com.lilyly.app.preview.k$actual'" preview-badging.txt
       - uses: actions/upload-artifact@v4
         if: always()
