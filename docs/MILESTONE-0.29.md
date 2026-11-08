@@ -1,4 +1,4 @@
-# Lilyly 0.29 — Gathered sparks (verification pending)
+# Lilyly 0.29 — Gathered sparks
 
 Android Share now accepts plain text, links, a single image or a batch of up to eight images. The receiving screen is behind the existing app lock and screenshot protection. Nothing enters the inspiration collection until Keep inspiration is tapped. The review can add a title, source credit and collection. Text remains intact; the first valid HTTPS link is suggested as an editable source without fetching it.
 
@@ -9,3 +9,5 @@ Review fields survive activity recreation. A retained import controller finishes
 The receiving transaction merges against persisted journal records, preserving newer records saved by another activity instance. Returning to the original app activity refreshes journal records.
 
 Spotify remains removed by owner request. Other full-roadmap work remains intended.
+
+Verified on [run 42531297502](https://github.com/CCASSA/Lilyly/actions/runs/42531297502), source `748ac280e6b09a222dfd8b8e896b0cca61345f9f`: 101 JVM tests and 34 Android emulator tests passed. The test harness uses Android MediaStore for temporary image fixtures, including a malformed input; production needs no new provider or permission. Physical Samsung sharing and existing preview signing compatibility are separate checks.

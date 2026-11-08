@@ -1,1 +1,1 @@
-0.30: verify Moon almanac, dated moon pages, shared inspiration and regression suite.
+0.30: build, verify and launch the signer-scoped Moon preview alongside older Lilyly installs.

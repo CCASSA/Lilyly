@@ -31,8 +31,29 @@ jobs:
         with:
           path: ~/.android/debug.keystore
           key: lilyly-debug-signing-v1
+      - name: Give each preview signer its own installation
+        shell: bash
+        run: |
+          set -euo pipefail
+          key="$HOME/.android/debug.keystore"
+          if [[ ! -f "$key" ]]; then
+            mkdir -p "$HOME/.android"
+            keytool -genkeypair -keystore "$key" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          digest=$(keytool -exportcert -keystore "$key" -alias androiddebugkey -storepass android | sha256sum | cut -c1-24)
+          echo "ORG_GRADLE_PROJECT_previewSigner=$digest" >> "$GITHUB_ENV"
       - name: Test and assemble the milestone
         run: gradle -p android :app:testDebugUnitTest :app:assembleDebug :app:assemblePreview --stacktrace
+      - name: Verify the packaged preview matches its signing identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk=android/app/build/outputs/apk/preview/app-preview.apk
+          bin="$ANDROID_HOME/build-tools/36.0.0"
+          actual=$("$bin/apksigner" verify --print-certs "$apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | cut -c1-24)
+          test "$actual" = "$ORG_GRADLE_PROJECT_previewSigner"
+          "$bin/aapt" dump badging "$apk" > preview-badging.txt
+          grep -F "package: name='com.lilyly.app.preview.k$actual'" preview-badging.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -60,6 +81,9 @@ jobs:
           disable-animations: true
           script: |
             gradle -p android :app:assembleDebugAndroidTest --stacktrace
+            adb install -r android/app/build/outputs/apk/preview/app-preview.apk
+            adb shell am start -W -n com.lilyly.app.preview.k$ORG_GRADLE_PROJECT_previewSigner/com.lilyly.app.MainActivity
+            adb shell am force-stop com.lilyly.app.preview.k$ORG_GRADLE_PROJECT_previewSigner
             adb install -r android/app/build/outputs/apk/debug/app-debug.apk
             adb install -r android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             adb shell am instrument -w com.lilyly.app.test/androidx.test.runner.AndroidJUnitRunner > instrument-results.txt

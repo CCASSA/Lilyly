@@ -21,9 +21,11 @@ android {
     buildTypes {
         create("preview") {
             initWith(getByName("debug"))
-            applicationIdSuffix = ".preview"
+            val signerId = providers.gradleProperty("previewSigner").orNull
+            require(signerId == null || signerId.matches(Regex("[0-9a-f]{24}"))) { "Invalid preview signing fingerprint" }
+            applicationIdSuffix = if (signerId == null) ".preview" else ".preview.k" + signerId
             versionNameSuffix = "-preview"
-            manifestPlaceholders["appLabel"] = "Lilyly Garden Preview"
+            manifestPlaceholders["appLabel"] = if (signerId == null) "Lilyly Garden Preview" else "Lilyly Garden · Moon"
             matchingFallbacks += listOf("debug")
         }
         release {

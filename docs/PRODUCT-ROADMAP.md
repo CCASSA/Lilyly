@@ -102,3 +102,7 @@ Therapy gains persistent intentions, dated Growing/Resting/Reached reflections, 
 ## Gathered sparks 0.29 continuation
 
 Android share intake accepts text, HTTPS source references and up to eight images, with a protected review before saving. Imported images are copied locally, failed batches roll back, and credits connect to scrapbook pieces. See MILESTONE-0.29.md for validation and lifecycle limits. Spotify remains removed by the owner; deeper inspiration collections and the other completion gates remain planned.
+
+## Moon almanac 0.30 continuation
+
+The magical calendar now links a chosen date to the local lunar estimate, the next four principal phases, the seasonal wheel, a dated journal draft and daily threads. The calendar does not request location access. See MILESTONE-0.30.md for scope and accuracy limits.
