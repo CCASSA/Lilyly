@@ -37,6 +37,9 @@ private data class NavItem(val route: String, val label: String, val icon: @Comp
 @Composable
 fun LilylyApp(store: AppStore, openMedication: Boolean = false, openInspiration:Boolean = false) {
     LilylyTheme(store.darkTheme, store.themeName, store.typeStyle) {
+        var dayOrigin by rememberSaveable {mutableStateOf("home")}
+        var calendarDate by rememberSaveable {mutableStateOf<String?>(null)}
+        var calendarOrigin by rememberSaveable {mutableStateOf("more")}
         var insightDate by rememberSaveable { mutableStateOf<String?>(null) }
         var route by rememberSaveable { mutableStateOf(if(openInspiration) "inspiration" else if(openMedication) "sanctuary" else "home") }
         var section by rememberSaveable { mutableStateOf("Journal") }
@@ -96,11 +99,11 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false, openInspiration:
                         onOpenSanctuary = { sanctuaryTab="Check-in";route = "sanctuary" },
                         onOpenTarot = { route = "tarot" },
                         onOpenBookshelf = { initialBookId=null;route = "bookshelf" },
-                        onOpenCalendar = { route = "calendar" },
+                        onOpenCalendar = { calendarOrigin=route;calendarDate=null;route = "calendar" },
                         onReadBook = { id -> initialBookId=id;route="bookshelf" },
                         onNewPage = { editingId=null;section="Journal";route="editor" },
                         onMedication = { sanctuaryTab="Medication";route="sanctuary" },
-                        onOpenDay = {insightDate=null;route="day"},
+                        onOpenDay = {dayOrigin="home";insightDate=null;route="day"},
                         onOpenEntry = { entry -> editingId=entry.id;section=entry.section;route="editor" }
                     )
                     "journal" -> JournalListScreen(store, "Journal", onEdit = { editingId = it; section = "Journal"; route = "editor" }, onNew = { editingId = null; section = "Journal"; route = "editor" })
@@ -113,19 +116,19 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false, openInspiration:
                         onOpenSection = { s -> section = s; route = if(s == "Dreams") "sleep" else if(s == "Spells") "rituals" else "section" },
                         onOpenTarot = { route = "tarot" },
                         onOpenBookshelf = { initialBookId=null;route = "bookshelf" },
-                        onOpenCalendar = { route = "calendar" },
+                        onOpenCalendar = { calendarOrigin=route;calendarDate=null;route = "calendar" },
                         onOpenSettings = { route = "settings" }, onInsights={route="insights"}, onInspiration={route="inspiration"}
                     )
                     "tarot" -> TarotScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                     "bookshelf" -> BookshelfScreen(store, initialBookId=initialBookId, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })
                     "sleep" -> SleepScreen(store, onBack = { route = "more" }, onJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" }, onDreamPages = { section = "Dreams"; route = "section" })
-                    "insights" -> InsightsScreen(store,onBack={route="more"},onDay={insightDate=it;route="day"})
+                    "insights" -> InsightsScreen(store,onBack={route="more"},onDay={dayOrigin="insights";insightDate=it;route="day"})
                     "day" -> DayScreen(store,initialDate=insightDate,onBook={id,at ->
                         store.books.firstOrNull {it.id==id}?.let {book ->
                             store.saveBook(book.copy(position=at.coerceIn(0,book.units-1)))
                             initialBookId=id;route="bookshelf"
                         }
-                    },onBack={route=if(insightDate==null) "home" else "insights"},onPage={entry -> section=entry.section;editingId=entry.id;route="editor"},onSpace={category,date ->
+                    },onBack={route=dayOrigin},onPage={entry -> section=entry.section;editingId=entry.id;route="editor"},onSpace={category,date ->
                         when(category) {
                             "Cycle" -> {initialCycleDate=date;route="cycle"}
                             "Sanctuary","Medication","Therapy" -> {sanctuaryTab=if(category=="Sanctuary") "Check-in" else category;route="sanctuary"}
@@ -135,7 +138,8 @@ fun LilylyApp(store: AppStore, openMedication: Boolean = false, openInspiration:
                         }
                     })
                     "rituals" -> RitualScreen(store, onBack={route="more"}, onPages={section="Spells";route="section"}, onJournal={entry -> section=entry.section;editingId=entry.id;route="editor"})
-                    "calendar" -> MagicalCalendarScreen(store, onBack = { route = "more" })
+                    "moon-editor" -> JournalEditorScreen(store,null,"Journal",onDone={route="calendar"},onBack={route="calendar"},lunarDate=calendarDate?.let {java.time.LocalDate.parse(it)})
+                    "calendar" -> MagicalCalendarScreen(store, calendarDate, onBack = { route = calendarOrigin }, onDay = {calendarDate=it;insightDate=it;dayOrigin="calendar";route="day"},onJournal={calendarDate=it;route="moon-editor"})
                     "inspiration" -> InspirationScreen(store,onBack={route="more"})
                     "settings" -> SettingsScreen(store, onBack = { route = "more" })
                     "search" -> SearchScreen(store, onBack = { route = "home" }, onOpenJournal = { entry -> section = entry.section; editingId = entry.id; route = "editor" })

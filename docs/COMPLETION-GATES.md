@@ -2,7 +2,7 @@
 
 # Lilyly completion gates
 
-This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone APK verifies only its stated scope. The full dream application is not complete at 0.29.
+This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone APK verifies only its stated scope. The full dream application is not complete at 0.30.
 
 ## Current gaps to close
 
@@ -14,7 +14,7 @@ This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone
 | Creative journal | Notebooks, covers, templates, movable elements, photos, ink, context/music cards and reading-copy PDFs | Richer decorations and composition tools, large-canvas performance, exact canvas export and further handwriting/stylus polish |
 | Tarot and witchcraft | Visual deck, personal spreads, reading history, journal links, ritual records | Richer original/licensed card art, freeform/larger spreads, expanded reviewed references and personal correspondences |
 | Reading Nook | Themed shelves, EPUB/PDF import, saved passages, sessions and daily threads | Richer EPUB rendering, exact inline highlights, larger-library/performance checks and reading insights |
-| Moon | Approximate phase context across spaces and hemisphere-aware seasonal dates | Astronomical accuracy review, timezone edge cases, upcoming phases and fuller lunar calendar |
+| Moon | Browsable local lunar calendar, upcoming estimates, moon pages, day threads and seasonal dates | Ephemeris accuracy review, broader accessibility and physical-device validation |
 | Sleep and insights | Persistent sleep/dream entries, recurring tags, opt-in rest and cycle-phase comparisons | Broader symptom/medication/pain/energy analysis, coverage controls and expanded inspectable evidence |
 | Music | Existing page music memories retained as plain notes | Spotify removed by owner decision; no Spotify account/domain setup is required |
 | Inspiration | Local image imports, credited source cards, Android share review and scrapbook insertion | Deeper boards/collections, media management and physical-device checks with third-party senders |

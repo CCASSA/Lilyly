@@ -37,7 +37,7 @@ fun dayThreads(cycles:List<CycleLog>,mind:List<MentalCheckIn>,sleeps:List<SleepR
     }.joinToString("\n"),r.journalId)) }
     doses.forEach {r -> add(DayThread("dose:${r.id}",r.dateTime.take(10),"Medication",medications.firstOrNull {it.id==r.medicationId}?.name ?: "Medication record","${r.status} · ${r.dateTime.drop(11).take(5)}${if(r.scheduledFor.isNotBlank()) "\nScheduled for ${r.scheduledFor}" else ""}${if(r.notes.isNotBlank()) "\n${r.notes}" else ""}")) }
     pages.filter {it.section!="Templates"}.forEach {p ->
-        add(DayThread("page:${p.id}",p.createdAt.take(10),"Pages",p.title.ifBlank {"Untitled page"},"${p.section} · created this day${if(p.notebook.isNotBlank()) " · ${p.notebook}" else ""}",p.id))
+        add(DayThread("page:${p.id}",p.reflectionDate.ifBlank {p.createdAt.take(10)},"Pages",p.title.ifBlank {"Untitled page"},"${p.section} · ${if(p.reflectionDate.isBlank()) "created this day" else "reflection for this day"}${if(p.notebook.isNotBlank()) " · ${p.notebook}" else ""}",p.id))
         if(p.ritualJson.isNotBlank()) {
             val r=RitualDetails.fromJson(p.ritualJson)
             if(r.plannedDate.isNotBlank())add(DayThread("plan:${p.id}",r.plannedDate,"Rituals","Planned · ${p.title}",r.intention,p.id))

@@ -139,11 +139,12 @@ fun JournalEditorScreen(
     editingId: String?,
     section: String,
     onDone: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    lunarDate: LocalDate? = null
 ) {
     val context = LocalContext.current
     val original = remember(editingId) { store.journalEntries.firstOrNull { it.id == editingId } }
-    var draft by rememberSaveable(editingId, section) { mutableStateOf((original?.copy() ?: JournalEntry(section = section, title = "")).toJson().toString()) }
+    var draft by rememberSaveable(editingId, section) { mutableStateOf((original?.copy() ?: lunarDate?.let { moonReflectionDraft(it) } ?: JournalEntry(section = section, title = "")).toJson().toString()) }
     var entry by remember(editingId, section) { mutableStateOf(JournalEntry.fromJson(JSONObject(draft))) }
     LaunchedEffect(entry) { draft = entry.toJson().toString() }
     val initial = remember(editingId, section) { entry.toJson().toString() }

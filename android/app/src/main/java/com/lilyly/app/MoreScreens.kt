@@ -81,36 +81,6 @@ fun MoreHubScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MagicalCalendarScreen(store: AppStore, onBack: () -> Unit) {
-    val sabbat = nextSabbat(store.hemisphere, LocalDate.now())
-    Scaffold(topBar = { TopAppBar(title = { Text("Magical calendar") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back") } }) }) { padding ->
-        LazyColumn(Modifier.padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item {
-                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = .13f))) {
-                    Column(Modifier.padding(18.dp)) {
-                        Text("☾ ${moonPhaseName(java.time.LocalDateTime.now())}", style = MaterialTheme.typography.headlineSmall)
-                        Text("Approximate current lunar phase")
-                    }
-                }
-            }
-            item {
-                Text("Wheel of the Year • ${store.hemisphere}", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Text("Next: ${sabbat.first} — ${sabbat.second}")
-            }
-            item {
-                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("Planet cycles", fontWeight = FontWeight.SemiBold)
-                        Text("Accurate ephemeris data, retrogrades, eclipses and location-aware moon timing are planned for the astronomy integration.", style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 fun SettingsScreen(store: AppStore, onBack: () -> Unit) {
     Scaffold(topBar = { TopAppBar(title = { Text("Settings & privacy") }, navigationIcon = { IconButton(onClick = onBack, enabled = !store.privacyBusy) { Icon(Icons.Default.ArrowBack, "Back") } }) }) { padding ->
         LazyColumn(Modifier.padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
