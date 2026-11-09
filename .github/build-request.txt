@@ -1,1 +1,1 @@
-0.31: verify recorded cycle history, date editing, existing journeys and signed preview.
+0.31: target the editable share fields directly and rerun signed APK and Android checks.

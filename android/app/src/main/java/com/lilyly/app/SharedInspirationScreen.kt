@@ -61,8 +61,8 @@ fun SharedInspirationScreen(store:AppStore,incoming:SharedInspiration?,problem:S
                 item {OutlinedTextField(title,{title=it},label={Text("Inspiration title")},enabled=!busy,modifier=Modifier.fillMaxWidth())}
                 item {OutlinedTextField(body,{body=it},label={Text("Shared words or a thought")},enabled=!busy,modifier=Modifier.fillMaxWidth())}
                 item {OutlinedTextField(source,{source=it},label={Text("Source link (HTTPS, optional)")},enabled=!busy,modifier=Modifier.fillMaxWidth())}
-                item {OutlinedTextField(credit,{credit=it},label={Text("Creator or source credit")},enabled=!busy,modifier=Modifier.fillMaxWidth())}
-                item {OutlinedTextField(collection,{collection=it},label={Text("Collection")},enabled=!busy,modifier=Modifier.fillMaxWidth(),keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),keyboardActions=KeyboardActions(onDone={keyboard?.hide();focus.clearFocus()}))}
+                item {OutlinedTextField(credit,{credit=it},label={Text("Creator or source credit")},enabled=!busy,modifier=Modifier.fillMaxWidth().testTag("share-credit"))}
+                item {OutlinedTextField(collection,{collection=it},label={Text("Collection")},enabled=!busy,modifier=Modifier.fillMaxWidth().testTag("share-collection"),keyboardOptions=KeyboardOptions(imeAction=ImeAction.Done),keyboardActions=KeyboardActions(onDone={keyboard?.hide();focus.clearFocus()}))}
                 item {Text("Up to 8 images, 25 MB each. Titles and collection names: 160 characters; words: 20,000; credit: 1,000.",style=MaterialTheme.typography.bodySmall)}
             }
             if(busy)item {LinearProgressIndicator(Modifier.fillMaxWidth())}

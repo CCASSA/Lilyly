@@ -2,13 +2,13 @@
 
 # Lilyly completion gates
 
-This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone APK verifies only its stated scope. The full dream application is not complete at 0.30.
+This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone APK verifies only its stated scope. The full dream application is not complete at 0.31.
 
 ## Current gaps to close
 
 | Area | Existing foundation | Work still needed before calling the dream complete |
 | --- | --- | --- |
-| Cycle | Wheel, calendar, historical logs, configurable estimates, phase comparisons | Full pregnancy/TTC experiences, temperature workflows, historical contraception context, deeper cycle history and uncertainty handling |
+| Cycle | Wheel, calendar, historical logs, configurable estimates, editable interval history, phase comparisons | Full pregnancy/TTC experiences, temperature workflows, historical contraception context, explicit start corrections independent of the grouping rule and better uncertainty handling |
 | Sanctuary | Check-ins, separate diagnosed/exploring profiles, support plan, therapy notes and connected goals | Richer practice management, appointment reminders, deeper longitudinal review and reviewed educational content |
 | Medication | Scheduled/PRN records, reminders, manual refill tracking | Complex schedules, inventory depth, medication correlations and physical-device reminder reliability |
 | Creative journal | Notebooks, covers, templates, movable elements, photos, ink, context/music cards and reading-copy PDFs | Richer decorations and composition tools, large-canvas performance, exact canvas export and further handwriting/stylus polish |
