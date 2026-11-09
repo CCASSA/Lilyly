@@ -64,6 +64,7 @@ fun CycleScreen(store: AppStore, initialDate:String?=null) {
     var selectedText by rememberSaveable(initialDate) { mutableStateOf(openingDate.toString()) }
     var editing by rememberSaveable { mutableStateOf(false) }
     var settings by rememberSaveable { mutableStateOf(false) }
+    var history by rememberSaveable { mutableStateOf(false) }
     val month = YearMonth.parse(monthText)
     val selected = LocalDate.parse(selectedText)
     val prefs = store.cyclePreferences
@@ -77,6 +78,7 @@ fun CycleScreen(store: AppStore, initialDate:String?=null) {
                 }
                 IconButton(onClick = { settings = true }) { Icon(Icons.Default.Settings, "Cycle settings") }
             }
+            TextButton(onClick={history=true}) {Text("Cycle history")}
             CycleWheel(today, pattern, prefs) { selectedText = today.toString(); editing = true }
             Text(when {
                 prefs.mode == "Pregnancy" -> "Cycle predictions are paused. Your daily body journal stays open."
@@ -142,6 +144,9 @@ fun CycleScreen(store: AppStore, initialDate:String?=null) {
         item { Spacer(Modifier.height(20.dp)) }
     }
     if (editing) DailyLogSheet(store, selected, onClose = { editing = false })
+    if(history) CycleHistorySheet(store.cycleLogs.toList(),today,onEdit={day ->
+        selectedText=day.toString();monthText=YearMonth.from(day).toString();history=false;editing=true
+    },onClose={history=false})
     if (settings) CycleSettingsSheet(store, onClose = { settings = false })
 }
 

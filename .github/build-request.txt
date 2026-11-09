@@ -1,1 +1,1 @@
-0.30: bind CI signing to the exact fingerprinted keystore and independently verify the packaged certificate.
+0.31: verify recorded cycle history, date editing, existing journeys and signed preview.
