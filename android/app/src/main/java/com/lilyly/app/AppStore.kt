@@ -20,6 +20,7 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
 internal class SecurePreferences(context: Context, namespace: String = "lilyly_secure") {
+    fun contains(key: String) = prefs.contains(key)
     private val prefs = context.getSharedPreferences(namespace, Context.MODE_PRIVATE)
     private val keyAlias = "lilyly_local_data_key"
     private val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
@@ -390,7 +391,7 @@ class AppStore(context: Context) {
         loadArray("books") { books.add(LibraryBook.fromJson(it)) }
         loadArray("bookNotes") { bookNotes.add(BookNote.fromJson(it)) }
         nookTheme = secure.get("nookTheme", "Cottage")
-        if (journalEntries.isEmpty()) seedSamples()
+        if (!secure.contains("journal") && journalEntries.isEmpty()) seedSamples()
     }
 
     private fun seedSamples() {

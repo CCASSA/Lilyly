@@ -1,0 +1,4 @@
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/lilyly_icon_ground"/>
+    <foreground android:drawable="@drawable/lilyly_moon_lily"/>
+</adaptive-icon>

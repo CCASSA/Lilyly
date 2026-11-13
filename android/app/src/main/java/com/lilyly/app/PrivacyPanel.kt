@@ -21,6 +21,7 @@ import java.time.LocalDate
 
 @Composable
 fun PrivacyPanel(store:AppStore) {
+    var showNotice by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     val context=LocalContext.current
     val files=remember {BackupFiles(context.applicationContext)}
     val fallbackScope=rememberCoroutineScope()
@@ -39,6 +40,7 @@ fun PrivacyPanel(store:AppStore) {
     }
     val importer=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {uri ->if(uri!=null) {importUri=uri;mode="Restore";password="";repeated=""}}
     Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
+        TextButton(onClick={showNotice=true}) {Text("Privacy & health information")}
         Text("The key to your world",style=MaterialTheme.typography.titleLarge)
         Row {
             Column(Modifier.weight(1f)) {Text("App lock");Text("Android biometrics or screen lock. Locks when Lilyly leaves the foreground and hides screenshots/recent-app previews.",style=MaterialTheme.typography.bodySmall)}
@@ -58,6 +60,17 @@ fun PrivacyPanel(store:AppStore) {
         Text("Restore merges records and keeps your current version when an ID or cycle date already exists. It does not import another device's app-lock setting. Original document-picker files are never deleted.",style=MaterialTheme.typography.bodySmall)
         if(store.privacyBusy) {LinearProgressIndicator(Modifier.fillMaxWidth());Text("Keeping your pages safe…")}
         if(store.privacyMessage.isNotBlank()) Text(store.privacyMessage)
+    }
+    if(showNotice) {
+        AlertDialog(onDismissRequest={showNotice=false},title={Text("Privacy & health information")},text={
+            androidx.compose.foundation.lazy.LazyColumn(verticalArrangement=Arrangement.spacedBy(12.dp)) {
+                item {Text(androidx.compose.ui.res.stringResource(R.string.lilyly_privacy_notice))}
+                item {Text(androidx.compose.ui.res.stringResource(R.string.lilyly_health_notice))}
+            }
+        },confirmButton={TextButton(onClick={showNotice=false}) {Text("Close")}},
+        dismissButton={TextButton(onClick={
+            context.startActivity(android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+context.packageName)))
+        }) {Text("Android app settings")}})
     }
     if(mode.isNotEmpty()) AlertDialog(onDismissRequest={mode="";password="";repeated=""},title={Text(if(mode=="Export") "Protect this backup" else "Open your backup")},text={Column {
         Text(if(mode=="Export") "Use at least 12 characters. You'll need this password to restore your records." else "Enter the password used to create this backup.")

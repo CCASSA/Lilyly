@@ -1,1 +1,1 @@
-0.31: target the editable share fields directly and rerun signed APK and Android checks.
+0.32: build the original production bundle; check permissions and preview journeys.
