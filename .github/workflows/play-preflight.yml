@@ -1,0 +1,81 @@
+name: Play bundle install check
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/play-preflight-request.txt']
+permissions:
+  contents: read
+jobs:
+  play-install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Build production Android App Bundle
+        run: |
+          sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$sdkmanager" --licenses >/dev/null 2>&1 || true
+          "$sdkmanager" "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+          gradle -p android :app:bundleRelease --stacktrace
+      - name: Fetch pinned Android bundletool
+        env:
+          GH_TOKEN: ${{github.token}}
+        run: |
+          set -euo pipefail
+          asset=bundletool-all-1.18.2.jar
+          gh release download 1.18.2 --repo google/bundletool --pattern "$asset" --dir "$RUNNER_TEMP"
+          echo "378b5434cd1378bef6b2bc527b8c7f0ff2584b273830335bce54d6d0813c8584  $RUNNER_TEMP/$asset" | sha256sum -c -
+          echo "BUNDLETOOL=$RUNNER_TEMP/$asset" >> "$GITHUB_ENV"
+      - name: Verify delivery manifest and create temporary device-test key
+        run: |
+          set -euo pipefail
+          bundle=android/app/build/outputs/bundle/release/app-release.aab
+          java -jar "$BUNDLETOOL" validate --bundle="$bundle"
+          java -jar "$BUNDLETOOL" dump manifest --bundle="$bundle" > delivery-manifest.xml
+          python3 - <<'PY'
+          import xml.etree.ElementTree as E
+          root=E.parse('delivery-manifest.xml').getroot()
+          ns='{http://schemas.android.com/apk/res/android}'
+          assert root.get('package')=='com.lilyly.app'
+          assert root.find('application').get(ns+'debuggable','false')=='false'
+          assert root.find('application').get(ns+'allowBackup')=='false'
+          assert 'android.permission.INTERNET' not in {p.get(ns+'name') for p in root.findall('uses-permission')}
+          PY
+          keytool -genkeypair -keystore "$RUNNER_TEMP/device-test.p12" -storepass android -keypass android -alias testonly -keyalg RSA -validity 2 -dname "CN=Temporary device verification"
+          java -jar "$BUNDLETOOL" build-apks --bundle="$bundle" --output="$RUNNER_TEMP/device.apks" --ks="$RUNNER_TEMP/device-test.p12" --ks-key-alias=testonly --ks-pass=pass:android --key-pass=pass:android
+          sha256sum "$bundle" > verified-bundle.sha256
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            java -jar "$BUNDLETOOL" install-apks --apks="$RUNNER_TEMP/device.apks"
+            adb shell am start -W -n com.lilyly.app/com.lilyly.app.MainActivity > launch.txt
+            grep -F 'Status: ok' launch.txt
+            adb shell pidof com.lilyly.app
+            adb shell pm path com.lilyly.app > installed-splits.txt
+            grep -F '/split_' installed-splits.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Play-tested-unsigned-bundle
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            verified-bundle.sha256
+            delivery-manifest.xml
+            installed-splits.txt
+            launch.txt

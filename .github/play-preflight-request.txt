@@ -1,0 +1,1 @@
+Verify 0.32 release bundle delivery with Android bundletool and install generated splits.
