@@ -19,6 +19,7 @@ fun dayThreads(cycles:List<CycleLog>,mind:List<MentalCheckIn>,sleeps:List<SleepR
     cycles.forEach {r -> add(DayThread("cycle:${r.id}",r.date,"Cycle","Your cycle log",buildList {
         add("Flow · ${r.flow}")
         if(r.spotting)add("Spotting")
+        if(r.wakingTemperature.isNotBlank())add("Waking temperature · "+r.wakingTemperature+" °C")
         if(r.selections.isNotEmpty())add(r.selections.sorted().joinToString(" · "))
         if(r.symptoms.isNotBlank())add(r.symptoms)
         if(r.ratingsRecorded)add("Mood ${r.mood}/10 · energy ${r.energy}/10 · pain ${r.pain}/10")

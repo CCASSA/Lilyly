@@ -66,13 +66,14 @@ data class CycleLog(
     var medicationNotes: String = "",
     var notes: String = "",
     val selections: Set<String> = emptySet(),
+    val wakingTemperature: String = "",
     val ratingsRecorded: Boolean = false
 ) {
     fun toJson() = JSONObject().put("id", id).put("date", date).put("period", period).put("spotting", spotting).put("flow", flow)
         .put("mood", mood).put("pain", pain).put("energy", energy).put("sleepHours", sleepHours)
         .put("cravings", cravings).put("discharge", discharge).put("libido", libido).put("symptoms", symptoms)
         .put("sexualActivity", sexualActivity).put("testNotes", testNotes).put("medicationNotes", medicationNotes).put("notes", notes)
-        .put("selections", JSONArray(selections.toList())).put("ratingsRecorded", ratingsRecorded)
+        .put("selections", JSONArray(selections.toList())).put("ratingsRecorded", ratingsRecorded).put("wakingTemperature",wakingTemperature)
 
     companion object {
         fun fromJson(o: JSONObject) = CycleLog(
@@ -83,6 +84,7 @@ data class CycleLog(
             symptoms = o.optString("symptoms"), sexualActivity = o.optString("sexualActivity"), testNotes = o.optString("testNotes"),
             medicationNotes = o.optString("medicationNotes"), notes = o.optString("notes"),
             selections = o.optJSONArray("selections")?.let { a -> (0 until a.length()).map { a.getString(it) }.toSet() } ?: emptySet(),
+            wakingTemperature = o.optString("wakingTemperature", "").takeIf { validWakingTemperature(it) }.orEmpty(),
             ratingsRecorded = o.optBoolean("ratingsRecorded", false)
         )
     }

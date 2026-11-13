@@ -1,1 +1,1 @@
-0.32: build the original production bundle; check permissions and preview journeys.
+0.32: production preflight and Android journeys including waking temperatures and intentional empty journals.

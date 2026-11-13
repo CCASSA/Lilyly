@@ -141,6 +141,7 @@ fun CycleScreen(store: AppStore, initialDate:String?=null) {
         }
         item { DailyConnections(store, selected, pattern) }
         item { CycleTrends(store, pattern) }
+        if(prefs.mode=="Trying to conceive" || store.cycleLogs.any {it.wakingTemperature.isNotBlank()}) item {TemperatureChart(store.cycleLogs,today)}
         item { Spacer(Modifier.height(20.dp)) }
     }
     if (editing) DailyLogSheet(store, selected, onClose = { editing = false })

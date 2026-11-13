@@ -45,12 +45,15 @@ internal fun DailyLogSheet(store: AppStore, date: LocalDate, onClose: () -> Unit
     var draft by rememberSaveable(date.toString()) { mutableStateOf((existing?.copy() ?: CycleLog(date = date.toString())).toJson().toString()) }
     val log = remember(draft) { CycleLog.fromJson(JSONObject(draft)) }
     fun update(value: CycleLog) { draft = value.toJson().toString() }
+    var temperature by rememberSaveable(date.toString()) { mutableStateOf(existing?.wakingTemperature.orEmpty()) }
+    val validTemperature=temperature.isBlank() || validWakingTemperature(temperature)
+    fun saveDay() {store.upsertCycle(log.copy(wakingTemperature=temperature.trim().replace(',','.')));onClose()}
     var category by rememberSaveable { mutableStateOf("Feelings") }
     var details by rememberSaveable { mutableStateOf(false) }
     var custom by rememberSaveable { mutableStateOf("") }
     var confirmClose by remember { mutableStateOf(false) }
     val initial = remember(date) { (existing?.copy() ?: log).toJson().toString() }
-    fun close() { if (draft != initial) confirmClose = true else onClose() }
+    fun close() { if (draft != initial || temperature!=existing?.wakingTemperature.orEmpty()) confirmClose = true else onClose() }
     val future = date.isAfter(LocalDate.now())
     ModalBottomSheet(onDismissRequest = { close() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(Modifier.fillMaxWidth().fillMaxHeight(.94f).imePadding()) {
@@ -114,6 +117,11 @@ internal fun DailyLogSheet(store: AppStore, date: LocalDate, onClose: () -> Unit
                     item {
                         TextButton(onClick = { details = !details }) { Text(if (details) "Close detailed observations" else "More · ratings, sleep & existing notes") }
                     }
+                    if (details || store.cyclePreferences.mode=="Trying to conceive") item {
+                        OutlinedTextField(temperature,{temperature=it.take(10)},label={Text("Waking temperature (°C)")},singleLine=true,
+                            isError=!validTemperature, supportingText={Text(if(validTemperature) "Optional. Enter your measured reading; leave blank if unknown." else "Use a Celsius reading from 25 to 50 with up to two decimal places.")},
+                            modifier=Modifier.fillMaxWidth())
+                    }
                     if (details) {
                         item {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -150,10 +158,10 @@ internal fun DailyLogSheet(store: AppStore, date: LocalDate, onClose: () -> Unit
                     item { Spacer(Modifier.height(12.dp)) }
                 }
             }
-            if (!future) Button(onClick = { store.upsertCycle(log); onClose() }, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp)) { Text("Save this day") }
+            if (!future) Button(enabled=validTemperature,onClick = { saveDay() }, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp)) { Text("Save this day") }
         }
     }
-    if (confirmClose) AlertDialog(onDismissRequest = { confirmClose = false }, title = { Text("Keep this moment?") }, text = { Text("Your changes have not been saved yet.") }, confirmButton = { TextButton(onClick = { store.upsertCycle(log); onClose() }) { Text("Save & close") } }, dismissButton = { TextButton(onClick = onClose) { Text("Discard changes") } })
+    if (confirmClose) AlertDialog(onDismissRequest = { confirmClose = false }, title = { Text("Keep this moment?") }, text = { Text("Your changes have not been saved yet.") }, confirmButton = { TextButton(enabled=validTemperature,onClick = { saveDay() }) { Text("Save & close") } }, dismissButton = { TextButton(onClick = onClose) { Text("Discard changes") } })
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)

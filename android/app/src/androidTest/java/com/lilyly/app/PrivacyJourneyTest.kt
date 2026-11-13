@@ -74,6 +74,19 @@ class PrivacyJourneyTest {
             assertFalse("Restoring must not enable a different device's app lock",restored.appLockEnabled)
         } finally {root.deleteRecursively()}
     }
+    @Test fun intentionallyEmptyJournalRemainsEmptyAndTemperatureSurvivesReload() {
+        val root=File(rule.activity.cacheDir,UUID.randomUUID().toString()).apply {mkdirs()}
+        val context=IsolatedContext(rule.activity,root,UUID.randomUUID().toString())
+        try {
+            val store=AppStore(context)
+            assertTrue(store.journalEntries.isNotEmpty())
+            store.journalEntries.toList().forEach {store.deleteJournal(it.id)}
+            store.upsertCycle(CycleLog(date="2026-01-01",wakingTemperature="36.45"))
+            val restarted=AppStore(context)
+            assertTrue(restarted.journalEntries.isEmpty())
+            assertEquals("36.45",restarted.cycleLogs.single().wakingTemperature)
+        } finally {root.deleteRecursively()}
+    }
     @Test fun protectedColdStartHidesPrivateScreensAndBlocksScreenshots() {
         try {
             rule.runOnUiThread {AppStore(rule.activity).updatePrivacy(lock=true)}
