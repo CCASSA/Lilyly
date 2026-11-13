@@ -39,6 +39,7 @@ jobs:
           set -euo pipefail
           bundle=android/app/build/outputs/bundle/release/app-release.aab
           java -jar "$BUNDLETOOL" validate --bundle="$bundle"
+          python3 docs/play/check_native.py "$bundle"
           java -jar "$BUNDLETOOL" dump manifest --bundle="$bundle" > delivery-manifest.xml
           python3 - <<'PY'
           import xml.etree.ElementTree as E

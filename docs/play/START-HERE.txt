@@ -1,0 +1,14 @@
+LILYLY · GOOGLE PLAY TESTING KIT
+
+1. To try Lilyly on your own Samsung, use the separate preview APK download.
+2. To prepare a Play test, open PUBLISH.md. The production app-release.aab
+   inside this kit must be signed with your own upload key first. It is not
+   an APK and is not installed by tapping it on a phone.
+3. Store artwork and synthetic screenshots are in artwork/. The proposed
+   short and full descriptions are in STORE-LISTING.md.
+4. Edit privacy-draft.html with your PUBLIC publisher name and a monitored
+   privacy contact. Host it as a public webpage and check it on your phone.
+5. Read STORE-QA.md before public release. No Play listing or production
+   rollout has been created by preparing this kit.
+
+Never send your upload key or passwords in chat.

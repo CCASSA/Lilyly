@@ -2,13 +2,13 @@
 
 # Lilyly completion gates
 
-This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone APK verifies only its stated scope. The full dream application is not complete at 0.31.
+This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone APK verifies only its stated scope. The full dream application is not complete at 0.32.
 
 ## Current gaps to close
 
 | Area | Existing foundation | Work still needed before calling the dream complete |
 | --- | --- | --- |
-| Cycle | Wheel, calendar, historical logs, configurable estimates, editable interval history, phase comparisons | Full pregnancy/TTC experiences, temperature workflows, historical contraception context, explicit start corrections independent of the grouping rule and better uncertainty handling |
+| Cycle | Wheel, calendar, historical logs, configurable estimates, editable interval history, waking temperatures and phase comparisons | Full pregnancy/TTC experiences, historical contraception context, explicit start corrections independent of the grouping rule and better uncertainty handling |
 | Sanctuary | Check-ins, separate diagnosed/exploring profiles, support plan, therapy notes and connected goals | Richer practice management, appointment reminders, deeper longitudinal review and reviewed educational content |
 | Medication | Scheduled/PRN records, reminders, manual refill tracking | Complex schedules, inventory depth, medication correlations and physical-device reminder reliability |
 | Creative journal | Notebooks, covers, templates, movable elements, photos, ink, context/music cards and reading-copy PDFs | Richer decorations and composition tools, large-canvas performance, exact canvas export and further handwriting/stylus polish |
@@ -19,7 +19,7 @@ This is a delivery checklist, not a reduction of PRODUCT-ROADMAP.md. A milestone
 | Music | Existing page music memories retained as plain notes | Spotify removed by owner decision; no Spotify account/domain setup is required |
 | Inspiration | Local image imports, credited source cards, Android share review and scrapbook insertion | Deeper boards/collections, media management and physical-device checks with third-party senders |
 | Visual system | Atmospheric themes, room art and progressive disclosure in key spaces | Consistent polish across remaining forms, transitions, curated typography, decoration controls and accessibility |
-| Privacy and release | Local encrypted records, lock, screenshot protection, encrypted backup/merge restore | Independent privacy review, migration/restore stress testing, signing continuity, physical Samsung checks and Play release preparation |
+| Privacy and release | Local encrypted records, lock, screenshot protection, encrypted backup/merge restore | Independent privacy review, migration/restore stress testing, signing continuity, physical Samsung checks, Play testing-track validation and publisher sign-off |
 
 ## Evidence required for a finished feature
 

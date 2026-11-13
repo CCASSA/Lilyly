@@ -4,6 +4,9 @@ An Android-first private world for body, mind, magic and memory.
 
 Active editable source: **android/**. This continues the existing application and preserves its encrypted local records. The original chunked source and manual legacy workflows remain available for recovery.
 
+- [Play publishing instructions and owner signing](docs/play/PUBLISH.md)
+- [Production bundle delivery check](../../actions/workflows/play-preflight.yml)
+- [Release and physical-device gates](docs/play/STORE-QA.md)
 - [Sanctuary & Pages milestone](docs/SANCTUARY-PAGES-MILESTONE.md)
 - [Full product roadmap](docs/PRODUCT-ROADMAP.md)
 - [Cycle Garden milestone and compatibility notes](docs/CYCLE-MILESTONE.md)

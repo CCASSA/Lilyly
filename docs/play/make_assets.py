@@ -1,6 +1,6 @@
 """Render store artwork using the original Android vector. Requires Pillow and Inkscape."""
 from pathlib import Path
-import tempfile, xml.etree.ElementTree as E, subprocess, math
+import tempfile, xml.etree.ElementTree as E, subprocess
 from PIL import Image, ImageDraw, ImageFont
 import sys
 out=Path(sys.argv[1]);out.mkdir(parents=True,exist_ok=True)
